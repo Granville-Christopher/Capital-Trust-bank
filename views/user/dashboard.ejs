@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-to-b relative overflow-y-hidden from-blue-100 to-gray-100 min-h-screen p-6 space-y-8">
+
+    <!-- Welcome + Settings -->
+    <div class="fixed top-0 left-0 bg-blue-100 right-0 pl-4 py-3 z-10">
+        <a href="profile" class="flex justify-start gap-2 items-center">
+            <span class="text-blue-50 bg-blue-600 rounded-full px-2 py-1"><i class="fa-solid fa-user "></i></span>
+            <h2 class="text-lg font-semibold text-gray-800"> <span id="greeting"></span>, Granville </h2>
+        </a>
+    </div>
+
+    <!-- Main Account Card -->
+    <div class="bg-black text-white rounded-xl p-6 relative shadow-lg h-[180px]">
+        <!-- Account Category & Type -->
+        <div class="absolute top-4 right-6 text-right">
+            <p class="text-sm font-semibold">Personal Account</p>
+            <p class="text-xs text-gray-300">Savings Account</p>
+        </div>
+
+        <!-- Available Balance -->
+        <div class="absolute top-4 left-6">
+            <p class="text-xs text-gray-400">Available Balance <button onclick="toggleBalance()"
+                    class="text-blue-400 ml-2 text-sm">
+                    <i id="balanceIcon" class="fa-solid fa-eye"></i>
+                </button></p>
+            <div class="flex items-center space-x-2 mt-1">
+                <p id="balanceAmount" class="text-2xl font-bold">$1,343,332.95</p>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="absolute bottom-4 left-6 text-sm">
+            <a href="transactionhistory" class="text-blue-400 hover:underline">View Transaction History</a>
+        </div>
+
+        <!-- Country -->
+        <div class="absolute bottom-4 right-6 text-sm text-gray-300">Nigeria</div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+        <!-- International Transfer -->
+        <a href="internationaltransfer"
+            class="bg-white rounded-xl px-auto flex justify-start pl-2 items-center shadow hover:shadow-md hover:bg-blue-50 transition">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-globe text-blue-600 text-lg"></i>
+                <h3 class="font-semibold text-gray-800 text-xs md:text-md">International Transfer</h3>
+            </div>
+        </a>
+
+        <!-- Local Transfer -->
+        <a href="localtransfer"
+            class="bg-white rounded-xl flex justify-start pl-2 items-center px-auto shadow hover:shadow-md hover:bg-blue-50 transition">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-location-dot text-blue-600 text-lg"></i>
+                <h3 class="font-semibold text-gray-800 text-xs md:text-md">Local Transfer</h3>
+            </div>
+        </a>
+    </div>
+
+    <!-- Recent Transactions Section -->
+    <div class="bg-white rounded-xl shadow p-6 h-[180px] ">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Transactions</h3>
+        <ul class="space-y-3 text-sm">
+            <li class="flex justify-between border-b pb-2">
+                <span>Transfer</span>
+                <span class="text-green-600 font-semibold">-₦5,000.00</span>
+            </li>
+            <li class="flex justify-between border-b pb-2">
+                <span>ATM Withdrawal</span>
+                <span class="text-red-600 font-semibold">-₦20,000.00</span>
+            </li>
+            <li class="flex justify-between border-b pb-2">
+                <span>Loan Credit</span>
+                <span class="text-blue-600 font-semibold">+₦150,000.00</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Action Cards Section -->
+    <div class="grid grid-cols-2 gap-4">
+        <!-- Credit Card -->
+        <a href="creditcard" class="bg-white rounded-xl p-6 shadow hover:shadow-md hover:bg-blue-50 transition">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-credit-card text-blue-600 text-lg"></i>
+                <h3 class="font-semibold text-gray-800">Credit Card</h3>
+            </div>
+        </a>
+
+        <!-- Debit Card -->
+        <a href="debitcard" class="bg-white rounded-xl p-6 shadow hover:shadow-md hover:bg-blue-50 transition">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-credit-card-alt text-blue-600 text-lg"></i>
+                <h3 class="font-semibold text-gray-800">Debit Card</h3>
+            </div>
+        </a>
+
+        <!-- Apply for Loan -->
+        <a href="finance" class="bg-white rounded-xl p-6 shadow hover:shadow-md hover:bg-blue-50 transition">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-hand-holding-dollar text-blue-600 text-lg"></i>
+                <h3 class="font-semibold text-gray-800"> Loans </h3>
+            </div>
+        </a>
+
+        <!-- Start Saving -->
+        <a href="finance" class="bg-white rounded-xl p-6 shadow hover:shadow-md hover:bg-blue-50 transition">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-piggy-bank text-blue-600 text-lg"></i>
+                <h3 class="font-semibold text-gray-800">Savings</h3>
+            </div>
+        </a>
+    </div>
+    <!-- Fixed Bottom Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
+        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
+
+            <!-- Home -->
+            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="mt-1">Home</span>
+            </a>
+
+            <!-- Finance -->
+            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-chart-line text-lg"></i>
+                <span class="mt-1">Finance</span>
+            </a>
+
+            <!-- Cards -->
+            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-credit-card text-lg"></i>
+                <span class="mt-1">Cards</span>
+            </a>
+
+            <!-- Me -->
+            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span class="mt-1">Me</span>
+            </a>
+
+        </div>
+    </div>
+    <script src="/js/frontendfiles/balancetoggle.js"></script>
+    <script src="/js/frontendfiles/customgreeting.js"></script>
+</body>
+
+</html>

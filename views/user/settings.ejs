@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - Settings</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 text-gray-800 space-y-6 relative overflow-y-hidden">
+
+    <!-- Back Button -->
+    <div class="flex items-center">
+        <button onclick="history.back()" class="text-blue-700 hover:text-blue-900 text-lg">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <h2 class="ml-3 text-xl font-semibold">Settings</h2>
+    </div>
+
+    <!-- Security Management Section -->
+    <div class="bg-white rounded-xl shadow p-6 space-y-4">
+        <h3 class="text-sm font-semibold text-gray-700 mb-2">Security Management</h3>
+
+        <a href="changeaccountpassword" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Change Account Password</a>
+        <a href="resetpassword" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Forgot Account Password</a>
+        <a href="changepaymentpin" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Change Payment PIN</a>
+        <a href="forgotpaymentpin" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Forgot Payment PIN</a>
+        <a href="managecreditcardpin" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Manage Credit Card PIN</a>
+        <a href="managedebitcardpin" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Manage Debit Card PIN</a>
+    </div>
+
+    <!-- Account Closure Section -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-sm font-semibold text-gray-700 mb-2">Account Options</h3>
+        <a href="#" class="block text-sm text-red-600 hover:bg-red-50 px-4 py-2 rounded transition">Close Account</a>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="mt-8">
+        <button onclick="logout()"
+            class="w-full py-3 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition">
+            <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Log Out
+        </button>
+    </div>
+
+    <!-- Logout Script -->
+    <script>
+        function logout() {
+            // Insert actual logout logic here
+            alert("You have been logged out.");
+            window.location.href = "login";
+        }
+    </script>
+</body>
+
+</html>

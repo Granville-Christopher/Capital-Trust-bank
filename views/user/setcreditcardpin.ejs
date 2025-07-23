@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - Set Credit Card PIN</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 flex flex-col justify-center items-center">
+    <div class="bg-white rounded-xl shadow p-6 max-w-sm w-full text-center">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">
+            <i class="fa-solid fa-key text-blue-600 mr-2"></i>
+            Set Credit Card PIN
+        </h2>
+
+        <p class="text-sm text-gray-600 mb-3">Enter your 4-digit PIN</p>
+        <div class="flex justify-center gap-2 mb-6">
+            <input type="password" maxlength="1" class="pin-box" />
+            <input type="password" maxlength="1" class="pin-box" />
+            <input type="password" maxlength="1" class="pin-box" />
+            <input type="password" maxlength="1" class="pin-box" />
+        </div>
+
+        <button id="setPinBtn"
+            class="w-full py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition">
+            <i class="fa-solid fa-lock mr-2"></i> Set Pin
+        </button>
+    </div>
+
+    <style>
+        .pin-box {
+            width: 2.5rem;
+            height: 2.5rem;
+            text-align: center;
+            font-size: 1.25rem;
+            border: 2px solid #3b82f6;
+            border-radius: 9999px;
+            outline: none;
+        }
+
+        .pin-box:focus {
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+    </style>
+
+    <!-- Generating Modal -->
+    <div id="generatingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
+            <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
+            <h3 class="text-lg font-semibold">Setting PIN...</h3>
+            <p class="text-sm text-gray-500">Please wait while we set your credit card PIN.</p>
+        </div>
+    </div>
+
+    <!-- Success/Failure Modal -->
+    <div id="pinModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
+
+            <!-- Success Icon -->
+            <div id="successIcon" class="mb-4">
+                <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
+                <h3 class="mt-2 text-xl font-semibold text-gray-800">PIN Set Successfully</h3>
+                <p class="text-sm text-gray-500">Your credit card PIN has been set.</p>
+            </div>
+
+            <!-- Failure Icon (hidden by default) -->
+            <div id="failureIcon" class="mb-4 hidden">
+                <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
+                <h3 class="mt-2 text-xl font-semibold text-gray-800">Failed to Set PIN</h3>
+                <p class="text-sm text-gray-500">Something went wrong. Please try again.</p>
+            </div>
+
+            <!-- Close Button -->
+            <button onclick="closePinModal()"
+                class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <script src="/js/frontendfiles/setcreditcardpin.js"></script>
+</body>
+
+</html>
