@@ -37,6 +37,5 @@ function setupInputs(selector) {
   });
 }
 
-// Initialize both OTP and PIN inputs
 setupInputs(".otp-box");
 setupInputs(".pin-box");
