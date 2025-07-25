@@ -8,106 +8,162 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 </head>
+<%- include('partials/toastalerts')%>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 flex flex-col justify-center items-center">
-    <div class="bg-white rounded-xl shadow p-6 max-w-sm w-full text-center">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">Change Payment PIN</h2>
+    <body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 flex flex-col justify-center items-center">
 
-        <form id="changePinForm" class="space-y-4">
-            <div class="relative">
-                <input type="password" id="oldPin" placeholder="Old PIN" maxlength="4"
-                    class="w-full py-3 px-4 rounded-full border-2 border-blue-600 text-center text-lg outline-none" />
-                <i class="fa fa-eye absolute right-4 top-3 cursor-pointer text-gray-500" onclick="togglePassword('oldPin', this)"></i>
+        <div class="bg-white rounded-xl shadow p-6 max-w-sm w-full text-center">
+
+            <div class="changepaymentpinsection mt-28">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Change Payment PIN</h2>
+
+                <form id="changePinForm" class="space-y-4">
+                    <div class="relative">
+                        <input type="password" id="oldPin" placeholder="Old PIN" maxlength="4"
+                            class="w-full py-3 px-4 rounded-full border-2 border-blue-600 text-center text-lg outline-none" />
+                        <i class="fa fa-eye absolute right-4 top-3 cursor-pointer text-gray-500"
+                            onclick="togglePassword('oldPin', this)"></i>
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="newPin" placeholder="New PIN" maxlength="4"
+                            class="w-full py-3 px-4 rounded-full border-2 border-blue-600 text-center text-lg outline-none" />
+                        <i class="fa fa-eye absolute right-4 top-3 cursor-pointer text-gray-500"
+                            onclick="togglePassword('newPin', this)"></i>
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="confirmNewPin" placeholder="Confirm New PIN" maxlength="4"
+                            class="w-full py-3 px-4 rounded-full border-2 border-blue-600 text-center text-lg outline-none" />
+                        <i class="fa fa-eye absolute right-4 top-3 cursor-pointer text-gray-500"
+                            onclick="togglePassword('confirmNewPin', this)"></i>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition">
+                        Change PIN
+                    </button>
+                </form>
             </div>
-            <div class="relative">
-                <input type="password" id="newPin" placeholder="New PIN" maxlength="4"
-                    class="w-full py-3 px-4 rounded-full border-2 border-blue-600 text-center text-lg outline-none" />
-                <i class="fa fa-eye absolute right-4 top-3 cursor-pointer text-gray-500" onclick="togglePassword('newPin', this)"></i>
-            </div>
-            <div class="relative">
-                <input type="password" id="confirmNewPin" placeholder="Confirm New PIN" maxlength="4"
-                    class="w-full py-3 px-4 rounded-full border-2 border-blue-600 text-center text-lg outline-none" />
-                <i class="fa fa-eye absolute right-4 top-3 cursor-pointer text-gray-500" onclick="togglePassword('confirmNewPin', this)"></i>
-            </div>
-
-            <button type="submit"
-                class="w-full py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition">
-                Change PIN
-            </button>
-        </form>
-    </div>
-
-    <!-- Generating Modal -->
-    <div id="generatingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
-            <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
-            <h3 class="text-lg font-semibold">Changing Payment PIN...</h3>
-            <p class="text-sm text-gray-500">Please wait while we update your payment PIN.</p>
         </div>
-    </div>
 
-    <!-- Success/Failure Modal -->
-    <div id="pinModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
-
-            <!-- Success Icon -->
-            <div id="successIcon" class="mb-4">
-                <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
-                <h3 class="mt-2 text-xl font-semibold text-gray-800">Payment PIN Changed Successfully</h3>
-                <p class="text-sm text-gray-500">Your payment PIN has been updated.</p>
+        <div id="generatingModal"
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
+                <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
+                <h3 class="text-lg font-semibold">Changing Payment PIN...</h3>
+                <p class="text-sm text-gray-500">Please wait while we update your payment PIN.</p>
             </div>
-
-            <!-- Failure Icon (hidden by default) -->
-            <div id="failureIcon" class="mb-4 hidden">
-                <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
-                <h3 class="mt-2 text-xl font-semibold text-gray-800">Failed to Change Payment PIN</h3>
-                <p class="text-sm text-gray-500">Something went wrong. Please try again.</p>
-            </div>
-
-            <!-- Close Button -->
-            <button onclick="closePinModal()"
-                class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-                Close
-            </button>
         </div>
-    </div>
 
-    <script>
-        function togglePassword(inputId, icon) {
-            const input = document.getElementById(inputId);
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove("fa-eye");
-                icon.classList.add("fa-eye-slash");
-            } else {
-                input.type = "password";
-                icon.classList.remove("fa-eye-slash");
-                icon.classList.add("fa-eye");
+        <div id="pinModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
+
+                <div id="successIcon" class="mb-4">
+                    <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
+                    <h3 class="mt-2 text-xl font-semibold text-gray-800">Payment PIN Changed Successfully</h3>
+                    <p class="text-sm text-gray-500">Your payment PIN has been updated.</p>
+                </div>
+
+                                        <div id="failureIcon" class="mb-4 hidden">
+                                            <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
+                                            <h3 class="mt-2 text-xl font-semibold text-gray-800">Failed to Change Payment PIN</h3>
+                                            <p id="failureMessage" class="text-sm text-gray-500">Something went wrong. Please try again.</p>
+                                        </div>
+
+                <button onclick="closePinModal()"
+                    class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+
+
+        <script>
+            function togglePassword(inputId, icon) {
+                const input = document.getElementById(inputId);
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.classList.remove("fa-eye");
+                    icon.classList.add("fa-eye-slash");
+                } else {
+                    input.type = "password";
+                    icon.classList.remove("fa-eye-slash");
+                    icon.classList.add("fa-eye");
+                }
             }
-        }
 
-        const generatingModal = document.getElementById("generatingModal");
-        const pinModal = document.getElementById("pinModal");
-        const successIcon = document.getElementById("successIcon");
-        const failureIcon = document.getElementById("failureIcon");
+            const generatingModal = document.getElementById("generatingModal");
+            const pinModal = document.getElementById("pinModal");
+            const successIcon = document.getElementById("successIcon");
+            const failureIcon = document.getElementById("failureIcon");
 
-        function closePinModal() {
-            pinModal.classList.add("hidden");
-        }
-        window.closePinModal = closePinModal;
+            function closePinModal() {
+                pinModal.classList.add("hidden");
+            }
+            window.closePinModal = closePinModal;
 
-        document.getElementById("changePinForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-            generatingModal.classList.remove("hidden");
-            // Simulate async operation
-            setTimeout(() => {
-                generatingModal.classList.add("hidden");
-                successIcon.classList.remove("hidden");
-                failureIcon.classList.add("hidden");
-                pinModal.classList.remove("hidden");
-            }, 2000);
-        });
-    </script>
-</body>
+            document.getElementById("changePinForm").addEventListener("submit", async function (e) {
+                e.preventDefault();
+
+                generatingModal.classList.remove("hidden");
+
+                const oldPin = document.getElementById('oldPin').value;
+                const newPin = document.getElementById('newPin').value;
+                const confirmNewPin = document.getElementById('confirmNewPin').value;
+
+                if (newPin !== confirmNewPin) {
+                    generatingModal.classList.add("hidden");
+                    showToast("New PIN and Confirm New PIN do not match");
+                    return;
+                }
+
+                try {
+                    const response = await fetch("/user/secure/ctb/changepaymentpin", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ oldPin, newPin }),
+                    });
+
+                    const contentType = response.headers.get("content-type");
+
+                    if (contentType && contentType.includes("application/json")) {
+                        const data = await response.json();
+                            if (!response.ok) {
+                                generatingModal.classList.add("hidden");
+                                successIcon.classList.add("hidden");
+                                failureIcon.classList.remove("hidden");
+                                pinModal.classList.remove("hidden");
+
+                                const failureMessageElem = document.getElementById("failureMessage");
+                                if (failureMessageElem) {
+                                    failureMessageElem.textContent = data.error || data.message || "Failed to change payment PIN.";
+                                }
+
+                                return;
+                            }
+
+                        generatingModal.classList.add("hidden");
+                        successIcon.classList.remove("hidden");
+                        failureIcon.classList.add("hidden");
+                        pinModal.classList.remove("hidden");
+
+                        setTimeout(() => {
+                            window.location.href = `/udp/dashboard`;
+                        }, 5000);
+                    } else {
+                        const text = await response.text();
+                        console.error("Non-JSON response:", text);
+                        generatingModal.classList.add("hidden");
+                        showToast("Server error: non-JSON response");
+                    }
+                } catch (err) {
+                    console.error("Error changing pin:", err);
+                    generatingModal.classList.add("hidden");
+                    showToast("Network error. Please try again later.");
+                }
+            });
+
+
+        </script>
+    </body>
 
 </html>

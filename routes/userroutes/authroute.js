@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const transactionPin = require("../../models/usermodels/transactionpin");
 
 router.get("/login", async (req, res) => {
   return res.status(200).render("user/login");
@@ -30,11 +31,43 @@ router.get("/forgotpaymentpin", async (req, res) => {
 });
 
 router.get("/changepaymentpin", async (req, res) => {
-  return res.status(200).render("user/changepaymentpin");
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+
+    return res.status(200).render("user/changepaymentpin");
+  } catch (error) {
+    return res.status(500).render("user/login");
+  }
+});
+
+router.get("/setpaymentpin", async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+    const pinRecord = await transactionPin.findOne({ userId });
+    const hasPin = !!pinRecord;
+    return res.status(200).render("user/setpaymentpin", { hasPin });
+  } catch (error) {
+    console.error("Error checking transaction pin:", error);
+    return res.status(500).send("Server error");
+  }
 });
 
 router.get("/changeaccountpassword", async (req, res) => {
-  return res.status(200).render("user/changeaccountpassword");
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+    return res.status(200).render("user/changeaccountpassword");
+  } catch (error) {
+    return res.status(200).render("user/login");
+  }
 });
 
 router.get("/managecreditcardpin", async (req, res) => {

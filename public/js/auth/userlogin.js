@@ -23,6 +23,7 @@ loginForm.addEventListener("submit", async function (e) {
     });
 
     const result = await res.json();
+
     if (res.ok) {
       loginText.textContent = "Logged In!";
       spinner.classList.add("hidden");
@@ -30,10 +31,17 @@ loginForm.addEventListener("submit", async function (e) {
         window.location.href = "/udp/dashboard";
         loginBtn.disabled = false;
         loginText.textContent = "Log in";
-        spinner.classList.add("hidden");
       }, 1000);
     } else {
-      showToast(result.error || "Login failed");
+      let errorMessage = "Login failed";
+
+      if (Array.isArray(result.errors)) {
+        errorMessage = result.errors.map((err) => err.msg).join(" | ");
+      } else if (result.error) {
+        errorMessage = result.error;
+      }
+
+      showToast(errorMessage);
       loginBtn.disabled = false;
       loginText.textContent = "Log in";
       spinner.classList.add("hidden");

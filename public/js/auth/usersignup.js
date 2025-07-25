@@ -50,7 +50,6 @@ form.addEventListener("submit", async function (event) {
       const text = await response.text();
       console.error("Non-JSON response:", text);
       showToast("Server error: non-JSON response");
-
       signupText.textContent = "Sign Up";
       spinner.classList.add("hidden");
       signupBtn.disabled = false;
@@ -58,7 +57,6 @@ form.addEventListener("submit", async function (event) {
   } catch (error) {
     console.error("Fetch error:", error);
     showToast("Network error. Please try again later.");
-
     signupText.textContent = "Sign Up";
     spinner.classList.add("hidden");
     signupBtn.disabled = false;

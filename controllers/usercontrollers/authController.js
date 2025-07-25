@@ -51,9 +51,6 @@ const registerUser = [
     }
 
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
 
     try {
       const { Email, Name, Password } = req.body;
@@ -106,7 +103,6 @@ const loginUser = [
     .withMessage("Password must contain only numbers"),
 
   async (req, res) => {
-    console.log("Login controller hit");
     if (req.sanitize) {
       req.body.Email = req.sanitize(req.body.Email);
     }
@@ -144,7 +140,95 @@ const loginUser = [
     }
   },
 ];
+
+const changeLoginPassword = [
+  body("oldPassword")
+    .isLength({ min: 6, max: 6 })
+    .withMessage("Old Password must be exactly 6 characters")
+    .trim()
+    .escape(),
+
+  body("newPassword")
+    .isLength({ min: 6, max: 6 })
+    .withMessage("Password must be 6 digits")
+    .isNumeric()
+    .withMessage("Password must contain only numbers"),
+
+  async (req, res) => {
+    if (req.sanitize) {
+      req.body.oldPassword = req.sanitize(req.body.oldPassword);
+      req.body.newPassword = req.sanitize(req.body.newPassword);
+    }
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const userId = req.session.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const { oldPassword, newPassword } = req.body;
+      const safeoldPassword = escape(oldPassword);
+      const safenewPassword = escape(newPassword);
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(400).json({ error: "User not found" });
+      }
+
+      const isMatch = await bcrypt.compare(safeoldPassword, user.Password);
+      if (!isMatch) {
+        return res.status(400).json({ error: "Old Password is incorrect" });
+      }
+
+      if (/(\d)\1\1/.test(safenewPassword)) {
+        return res
+          .status(400)
+          .json({
+            error:
+              "Password cannot contain the same digit three times in a row",
+          });
+      }
+
+      for (let i = 0; i < safenewPassword.length - 2; i++) {
+        const a = parseInt(safenewPassword[i]);
+        const b = parseInt(safenewPassword[i + 1]);
+        const c = parseInt(safenewPassword[i + 2]);
+
+        if (b === a + 1 && c === b + 1) {
+          return res
+            .status(400)
+            .json({
+              error: "Password cannot contain ascending sequences like 123",
+            });
+        }
+
+        if (b === a - 1 && c === b - 1) {
+          return res
+            .status(400)
+            .json({
+              error: "Password cannot contain descending sequences like 987",
+            });
+        }
+      }
+
+      const hashedNewPassword = await bcrypt.hash(safenewPassword, 10);
+      user.Password = hashedNewPassword;
+      await user.save();
+
+      res.status(200).json({ message: "Login Password changed successfully" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Server error" });
+    }
+  },
+];
 module.exports = {
   registerUser,
   loginUser,
+  changeLoginPassword,
 };
