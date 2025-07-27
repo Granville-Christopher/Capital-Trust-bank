@@ -1,19 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Capital Trust Bank - Profile</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
+  <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
+  <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#2563EB" />
+
+  <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
+  <meta property="og:description"
+    content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
+  <meta property="og:image" content="https://placehold.co/512x512/2563EB/DBEAFE?text=CTBank" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:site_name" content="Capital Trust Bank" />
+  <meta property="og:locale" content="en_NG" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@CTBankOfficial" />
+  <meta name="twitter:creator" content="@CTBankOfficial" />
+  <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
+  <meta name="twitter:description"
+    content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
+  <meta name="twitter:image" content="https://placehold.co/512x512/2563EB/DBEAFE?text=CTBank" />
+
 </head>
 
 <body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen text-gray-800 relative relative overflow-y-hidden">
 
-  <!-- Fixed Header -->
   <div class="fixed top-0 left-0 right-0 bg-transparent px-6 py-4 flex justify-between items-center z-50">
     <h2 class="text-lg font-semibold"> <span id="greeting">Welcome</span>, Granville</h2>
     <a href="settings" class="text-blue-700 text-xl hover:text-blue-900">
@@ -21,10 +44,8 @@
     </a>
   </div>
 
-  <!-- Main Content -->
   <div class="pt-24 px-6 space-y-6">
 
-    <!-- Total Balance Section -->
     <div class="bg-white rounded-xl shadow p-6 relative">
       <div class="flex justify-between items-center">
         <p class="text-sm font-medium text-gray-500">Total Balance</p>
@@ -35,12 +56,10 @@
       <p id="balanceAmount" class="mt-2 text-2xl font-bold text-gray-800">$50,250.00</p>
     </div>
 
-    <!-- Interest Credited Today Card -->
     <div class="bg-blue-200 text-blue-600 rounded-full px-6 py-3 text-center font-medium">
       Interest Credited Today: $1,200.00
     </div>
 
-    <!-- Quick Access Section -->
     <div class="space-y-4 text-sm">
       <a href="transactionhistory" class="block bg-white rounded-xl shadow px-6 py-4 hover:bg-blue-50 transition">
         <span class="font-semibold text-gray-700">Transaction History</span>
@@ -58,7 +77,6 @@
       </a>
     </div>
 
-    <!-- Customer Service Center Card -->
     <div
       class="bg-white rounded-xl shadow px-6 py-5 mt-4 hover:bg-blue-50 transition flex items-center justify-between">
       <a href="customerservicecenter">
@@ -72,29 +90,24 @@
 
   </div>
 
-  <!-- Fixed Bottom Navigation -->
   <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
     <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
 
-      <!-- Home -->
       <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
         <i class="fa-solid fa-house text-lg"></i>
         <span class="mt-1">Home</span>
       </a>
 
-      <!-- Finance -->
       <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
         <i class="fa-solid fa-chart-line text-lg"></i>
         <span class="mt-1">Finance</span>
       </a>
 
-      <!-- Cards -->
       <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
         <i class="fa-solid fa-credit-card text-lg"></i>
         <span class="mt-1">Cards</span>
       </a>
 
-      <!-- Me -->
       <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
         <i class="fa-solid fa-user text-lg"></i>
         <span class="mt-1">Me</span>

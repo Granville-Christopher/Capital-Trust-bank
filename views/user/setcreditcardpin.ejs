@@ -1,14 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Capital Trust Bank - Set Credit Card PIN</title>
-    <!-- Tailwind CSS -->
+    <title>Capital Trust Bank - Set credit card pin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2563EB" />
+
+    <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
+    <meta property="og:description"
+        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
+    <meta property="og:image" content="https://placehold.co/512x512/2563EB/DBEAFE?text=CTBank" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:site_name" content="Capital Trust Bank" />
+    <meta property="og:locale" content="en_NG" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@CTBankOfficial" />
+    <meta name="twitter:creator" content="@CTBankOfficial" />
+    <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
+    <meta name="twitter:description"
+        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
+    <meta name="twitter:image" content="https://placehold.co/512x512/2563EB/DBEAFE?text=CTBank" />
+
 </head>
 
 <body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 flex flex-col justify-center items-center">
@@ -48,7 +72,6 @@
         }
     </style>
 
-    <!-- Generating Modal -->
     <div id="generatingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
             <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
@@ -57,25 +80,21 @@
         </div>
     </div>
 
-    <!-- Success/Failure Modal -->
     <div id="pinModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
 
-            <!-- Success Icon -->
             <div id="successIcon" class="mb-4">
                 <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
                 <h3 class="mt-2 text-xl font-semibold text-gray-800">PIN Set Successfully</h3>
                 <p class="text-sm text-gray-500">Your credit card PIN has been set.</p>
             </div>
 
-            <!-- Failure Icon (hidden by default) -->
             <div id="failureIcon" class="mb-4 hidden">
                 <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
                 <h3 class="mt-2 text-xl font-semibold text-gray-800">Failed to Set PIN</h3>
                 <p class="text-sm text-gray-500">Something went wrong. Please try again.</p>
             </div>
 
-            <!-- Close Button -->
             <button onclick="closePinModal()"
                 class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
                 Close
