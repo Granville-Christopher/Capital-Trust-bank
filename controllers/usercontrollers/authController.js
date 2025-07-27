@@ -50,8 +50,10 @@ const registerUser = [
       req.body.Email = req.sanitize(req.body.Email);
       req.body.Name = req.sanitize(req.body.Name);
     }
-
     const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
     try {
       const { Email, Name, Password } = req.body;
