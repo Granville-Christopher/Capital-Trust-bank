@@ -42,12 +42,25 @@ router.get("/dashboard", async (req, res) => {
         .render("user/dashboard", { error: "User not found" });
     }
 
-    res.status(200).render("user/dashboard", { user });
+    const recentTransactions = await TransactionHistory.find({ userId })
+      .sort({ transactionDate: -1, createdAt: -1 })
+      .limit(3)
+      .lean();
+
+    res.status(200).render("user/dashboard", {
+      user,
+      recentTransactions,
+    });
   } catch (error) {
     console.error("Dashboard error:", error);
-    res.status(500).render("user/dashboard", { error: "Server error" });
+    res.status(500).render("user/dashboard", {
+      error: "Server error",
+      user: null,
+      recentTransactions: [],
+    });
   }
 });
+
 router.get("/finance", async (req, res) => {
   return res.status(200).render("user/finance");
 });
