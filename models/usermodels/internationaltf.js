@@ -2,13 +2,17 @@ const mongoose = require("mongoose");
 
 const internationalTransferSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     FullName: {
       type: String,
-      unique: true,
       required: true,
     },
     Amount: {
-      type: String,
+      type: Number,
       required: true,
     },
     AccountNumber: {
@@ -27,10 +31,31 @@ const internationalTransferSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    otp: {
+      type: String,
+      default: null,
+    },
+    otpExpires: {
+      type: Date,
+      default: null,
+    },
+    status: {
+      type: String,
+      enum: ["pending_otp", "completed", "failed", "cancelled"],
+      default: "pending_otp",
+    },
   },
   { timestamps: true }
 );
 
-const internationalTransfer = mongoose.model("internationalTransfer", internationalTransferSchema);
+internationalTransferSchema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: 3600 }
+);
 
-module.exports = internationalTransfer;
+const InternationalTransfer = mongoose.model(
+  "InternationalTransfer",
+  internationalTransferSchema
+);
+
+module.exports = InternationalTransfer;

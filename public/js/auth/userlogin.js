@@ -20,6 +20,7 @@ loginForm.addEventListener("submit", async function (e) {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
     });
 
     const result = await res.json();

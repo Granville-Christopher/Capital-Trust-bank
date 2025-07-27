@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
 const expressSanitizer = require("express-sanitizer");
+const MongoStore = require("connect-mongo");
 
 const indexRoute = require("./routes/indexroute/index");
 const basicRoute = require("./routes/userroutes/authroute");
@@ -33,6 +34,26 @@ app.use(
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,
+  })
+);
+
+app.use(
+  session({
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URL,
+      ttl: 14 * 24 * 60 * 60,
+      autoRemove: "interval",
+      autoRemoveInterval: 10,
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+    },
   })
 );
 

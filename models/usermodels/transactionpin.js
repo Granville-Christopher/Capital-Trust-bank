@@ -11,12 +11,19 @@ const transactionPinSchema = new mongoose.Schema(
     Pin: {
       type: String,
       required: true,
-      unique: true,
+    },
+    failedAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lockedUntil: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true }
 );
 
-const transactionPin = mongoose.model('transactionPin', transactionPinSchema);
+const transactionPin = mongoose.model("transactionPin", transactionPinSchema);
 
 module.exports = transactionPin;

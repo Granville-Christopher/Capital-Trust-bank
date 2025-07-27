@@ -3,6 +3,7 @@ const { body, validationResult } = require("express-validator");
 const escape = require("escape-html");
 const bcrypt = require("bcrypt");
 const { ExplainVerbosity } = require("mongodb");
+const generateAccountNumber = require("../../config/accountnumbergenerator");
 
 const registerUser = [
   body("Email")
@@ -65,11 +66,15 @@ const registerUser = [
 
       const hashedPassword = await bcrypt.hash(Password, 10);
       const Role = "user";
+      const accountNumber = await generateAccountNumber();
+      const initialAccountBalance = 0;
 
       const newUser = new User({
         Email: safeEmail,
         Name: safeName,
         Password: hashedPassword,
+        AccountNumber: accountNumber,
+        AccountBalance: initialAccountBalance,
         role: Role,
       });
 
@@ -79,10 +84,19 @@ const registerUser = [
         id: newUser._id,
         name: newUser.Name,
         email: newUser.Email,
-        role: "user",
+        accountNumber: newUser.AccountNumber,
+        accountBalance: newUser.AccountBalance,
+        role: newUser.role,
       };
 
-      res.status(201).json({ message: "Signup Successful" });
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+        } else {
+          console.log("Session user set:", req.session.user);
+          res.status(201).json({ message: "Signup Successful" });
+        }
+      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Server error" });
@@ -133,7 +147,14 @@ const loginUser = [
         role: user.role,
       };
 
-      return res.status(200).json({ message: "Login successful" });
+      req.session.save((err) => {
+        if (err) {
+          console.error("Error saving session:", err);
+        } else {
+          console.log("Session user set:", req.session.user);
+          return res.status(200).json({ message: "Login successful" });
+        }
+      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Server error" });
@@ -186,12 +207,9 @@ const changeLoginPassword = [
       }
 
       if (/(\d)\1\1/.test(safenewPassword)) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Password cannot contain the same digit three times in a row",
-          });
+        return res.status(400).json({
+          error: "Password cannot contain the same digit three times in a row",
+        });
       }
 
       for (let i = 0; i < safenewPassword.length - 2; i++) {
@@ -200,19 +218,15 @@ const changeLoginPassword = [
         const c = parseInt(safenewPassword[i + 2]);
 
         if (b === a + 1 && c === b + 1) {
-          return res
-            .status(400)
-            .json({
-              error: "Password cannot contain ascending sequences like 123",
-            });
+          return res.status(400).json({
+            error: "Password cannot contain ascending sequences like 123",
+          });
         }
 
         if (b === a - 1 && c === b - 1) {
-          return res
-            .status(400)
-            .json({
-              error: "Password cannot contain descending sequences like 987",
-            });
+          return res.status(400).json({
+            error: "Password cannot contain descending sequences like 987",
+          });
         }
       }
 

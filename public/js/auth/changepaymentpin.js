@@ -43,6 +43,7 @@ document
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ oldPin, newPin }),
+        credentials: "include",
       });
 
       const contentType = response.headers.get("content-type");

@@ -15,6 +15,17 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    AccountNumber: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    AccountBalance: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
+    },
     role: {
       type: String,
       enum: ["user", "admin"],

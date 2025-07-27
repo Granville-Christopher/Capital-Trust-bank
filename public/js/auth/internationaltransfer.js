@@ -24,10 +24,26 @@ form.addEventListener("submit", async function (event) {
       Iban: document.getElementById("Iban").value,
     };
 
+    if (
+      !data.FullName ||
+      !data.Amount ||
+      !data.AccountNumber ||
+      !data.BankName ||
+      !data.Address ||
+      !data.Iban
+    ) {
+      showToast("All fields are required");
+      internationaltransferText.textContent = "Initiate transfer";
+      spinner.classList.add("hidden");
+      internationaltransferBtn.disabled = false;
+      return;
+    }
+
     const response = await fetch("/user/secure/ctb/internationaltransfer", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
+      credentials: "include",
     });
 
     const contentType = response.headers.get("content-type");
@@ -51,7 +67,7 @@ form.addEventListener("submit", async function (event) {
       form.reset();
       const transferId = data.transferId;
       if (transferId) {
-        window.location.href = `/user/secure/ctb/confirmtransfer/${transferId}`;
+        window.location.href = `/udp/confirmtransfer/${transferId}`;
       } else {
         window.location.href = "/udp/confirmtransfer";
       }

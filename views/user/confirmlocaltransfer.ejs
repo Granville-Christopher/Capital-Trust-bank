@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - Transfer Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 relative overflow-y-hidden">
+    <div class="">
+        <a href="/udp/dashboard" class="text-red-600 hover:text-red-800 text-sm no-underline">
+            <i class="fa-solid fa-xmark"></i> Cancel Payment
+        </a>
+    </div>
+    <div class="mb-6 mt-8 flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800">
+            <i class="fa-solid fa-key text-blue-600 mr-2"></i>
+            Transfer Verification
+        </h2>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 max-w-sm mx-auto text-left mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">
+            <i class="fa-solid fa-money-bill-transfer text-blue-600 mr-2"></i> Transfer Summary
+        </h3>
+        <p class="text-sm text-gray-700">
+            <span class="font-medium">Recipient:</span>
+            <%= transferDetails.FullName %>
+        </p>
+        <p class="text-sm text-gray-700">
+            <span class="font-medium">Account Number:</span>
+            <%= transferDetails.AccountNumber %>
+        </p>
+        <p class="text-sm text-gray-700">
+            <span class="font-medium">Amount:</span>
+            ₦<%= transferDetails.Amount %>
+        </p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 max-w-sm mx-auto text-center">
+        <form id="confirmlocaltransfer">
+            <input type="hidden" id="transferId" value="<%= transferDetails._id %>">
+
+            <p class="text-sm text-gray-600 mb-3">Enter the 6-digit OTP sent to your email</p>
+            <div class="flex justify-center gap-2 mb-6">
+                <input type="text" maxlength="1" class="otp-box" />
+                <input type="text" maxlength="1" class="otp-box" />
+                <input type="text" maxlength="1" class="otp-box" />
+                <input type="text" maxlength="1" class="otp-box" />
+                <input type="text" maxlength="1" class="otp-box" />
+                <input type="text" maxlength="1" class="otp-box" />
+            </div>
+
+            <p class="text-sm text-gray-600 mb-3">Enter your 4-digit Payment PIN</p>
+            <div class="flex justify-center gap-2 mb-6">
+                <input type="password" maxlength="1" class="pin-box" />
+                <input type="password" maxlength="1" class="pin-box" />
+                <input type="password" maxlength="1" class="pin-box" />
+                <input type="password" maxlength="1" class="pin-box" />
+            </div>
+
+            <button type="submit"
+                class="w-full py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition">
+                <i class="fa-solid fa-check-circle mr-2"></i> Confirm Transfer
+            </button>
+        </form>
+    </div>
+
+    <div id="transferModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
+
+            <div id="successIcon" class="mb-4 hidden"> <i
+                    class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
+                <h3 class="mt-2 text-xl font-semibold text-gray-800">Transfer Successful</h3>
+                <p class="text-sm text-gray-500" id="successMessage">Your transaction was completed.</p>
+            </div>
+
+            <div id="failureIcon" class="mb-4 hidden"> <i
+                    class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
+                <h3 class="mt-2 text-xl font-semibold text-gray-800">Transfer Failed</h3>
+                <p class="text-sm text-gray-500" id="errorMessage">Something went wrong. Please try again.</p>
+            </div>
+
+            <button onclick="closeModal()"
+                class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <style>
+        .otp-box,
+        .pin-box {
+            width: 2.5rem;
+            height: 2.5rem;
+            text-align: center;
+            font-size: 1.25rem;
+            border: 2px solid #3b82f6;
+            border-radius: 9999px;
+            outline: none;
+        }
+
+        .otp-box:focus,
+        .pin-box:focus {
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+    </style>
+
+    <script src="/js/auth/confirmlocaltransfer.js"></script>
+
+</body>
+
+</html>

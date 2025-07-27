@@ -5,7 +5,7 @@ function toggleBalance() {
     balance.innerText = "••••••••";
     icon.classList.replace("fa-eye", "fa-eye-slash");
   } else {
-    balance.innerText = "$12,340.75";
+    balance.innerText = "<%= user.AccountBalance %>";
     icon.classList.replace("fa-eye-slash", "fa-eye");
   }
 }

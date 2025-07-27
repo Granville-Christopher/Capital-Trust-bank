@@ -21,6 +21,7 @@ form.addEventListener("submit", async function (event) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
+      credentials: "include",
     });
 
     const contentType = response.headers.get("content-type");

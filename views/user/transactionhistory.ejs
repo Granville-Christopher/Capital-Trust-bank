@@ -9,6 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 space-y-6 relative overflow-y-hidden">
@@ -20,97 +21,352 @@
             Transaction History
         </h2>
     </div>
-    <div class="grid grid-cols-2 gap-4 flex justify-between items-center">
-        <a href="dashboard" class="text-blue-500 text-sm no-underline hover:text-blue-700">
-            ← Back to Dashboard
-        </a>
-        <!-- Download Statement Trigger -->
-        <a href="#" onclick="openModal()" class="text-blue-500 text-sm no-underline hover:text-blue-700">
-            <i class="fa-solid fa-file-arrow-down"></i> Download Statement
-        </a>
 
-        <!-- Modal Background -->
-        <div id="statementModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-            <!-- Modal Content -->
-            <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Download Statement</h3>
+    <!-- Buttons for toggling sections -->
+    <div class="flex justify-between mb-4 px-4">
+        <button id="btnInternational" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">
+            International Transaction History
+        </button>
+        <button id="btnLocal"
+            class="text-gray-600 font-semibold border-b-2 border-transparent pb-1 hover:text-blue-600">
+            Local Transaction History
+        </button>
+    </div>
 
-                <form>
-                    <div class="mb-4">
-                        <label class="block text-sm text-gray-700 mb-1" for="fromDate">From Date</label>
-                        <input type="date" id="fromDate"
-                            class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm text-gray-700 mb-1" for="toDate">To Date</label>
-                        <input type="date" id="toDate"
-                            class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                    </div>
-                    <button type="submit"
-                        class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-                        Submit Request
-                    </button>
-                </form>
+    <!-- Sections -->
+    <div id="internationalSection" class="block">
+        <div class="flex justify-end mb-2 px-4">
+            <button id="downloadInternational" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Download Statement
+            </button>
+        </div>
+        <!-- International transaction table -->
+        <div class="overflow-x-auto rounded-xl pt-0 px-6 pb-6 overflow-y-auto h-[650px]">
+            <table class="min-w-full text-sm">
+                <thead class="bg-blue-100 text-gray-700 sticky top-0 z-10">
+                    <tr>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Date</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Description</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Type</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Amount</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-800">
+                    <% if (internationalTransfers && internationalTransfers.length> 0) { %>
+                        <% internationalTransfers.forEach(function(transfer) { %>
+                            <tr class="border-b">
+                                <td class="py-2 px-4 whitespace-nowrap">
+                                    <%= new Date(transfer.createdAt).toLocaleDateString() %>
+                                </td>
+                                <td class="py-2 px-4 whitespace-nowrap">International Transfer to <%= transfer.FullName
+                                        %>
+                                </td>
+                                <td class="py-2 px-4 whitespace-nowrap">Debit</td>
+                                <td class="py-2 px-4 whitespace-nowrap text-red-600">-$<%= transfer.Amount %>
+                                </td>
+                                <td class="py-2 px-4 whitespace-nowrap text-green-600">
+                                    <%= transfer.status==='completed' ? 'Completed' : transfer.status %>
+                                </td>
+                            </tr>
+                            <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5" class="py-4 text-center text-gray-500">No international
+                                            transactions found.</td>
+                                    </tr>
+                                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-                <!-- Close Button -->
-                <button onclick="closeModal()" class="absolute top-3 right-4 text-gray-500 hover:text-gray-700">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+    <div id="localSection" class="hidden">
+        <div class="flex justify-end mb-2 px-4">
+            <button id="downloadLocal" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Download Statement
+            </button>
+        </div>
+        <div class="overflow-x-auto rounded-xl pt-0 px-6 pb-6 overflow-y-auto h-[650px]">
+            <table class="min-w-full text-sm">
+                <thead class="bg-blue-100 text-gray-700 sticky top-0 z-10">
+                    <tr>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Date</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Description</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Type</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Amount</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Status</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-800">
+                    <% if (transactionHistory && transactionHistory.length> 0) { %>
+                        <% transactionHistory.forEach(transaction=> { %>
+                            <tr class="border-b">
+                                <td class="py-2 px-4 whitespace-nowrap">
+                                    <%= new Date(transaction.transactionDate).toLocaleDateString('en-US', {
+                                        month: 'short' , day: 'numeric' , year: 'numeric' }) %>
+                                </td>
+                                <td class="py-2 px-4 whitespace-nowrap">
+                                    <%= transaction.description %>
+                                </td>
+                                <td class="py-2 px-4 whitespace-nowrap capitalize">
+                                    <%= transaction.type %>
+                                </td>
+                                <td class="py-2 px-4 whitespace-nowrap
+                                <% if (transaction.type === 'debit') { %>
+                                    text-red-600
+                                <% } else { %>
+                                    text-green-600
+                                <% } %>
+                            ">
+                                    <% if (transaction.type==='debit' ) { %>-<% } %>
+                                            $<%= transaction.amount.toLocaleString(undefined, { minimumFractionDigits:
+                                                2, maximumFractionDigits: 2 }) %>
+                                </td>
+                                <td class="py-2 px-4 whitespace-nowrap capitalize
+                                <% if (transaction.status === 'successful') { %>
+                                    text-green-600
+                                <% } else if (transaction.status === 'failed') { %>
+                                    text-red-600
+                                <% } else { %>
+                                    text-yellow-600
+                                <% } %>
+                            ">
+                                    <%= transaction.status %>
+                                </td>
+                                <td class="py-2 px-4 whitespace-nowrap">
+                                    <button
+                                        class="view-receipt-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
+                                        data-amount="<%= transaction.amount %>"
+                                        data-description="<%= transaction.description %>"
+                                        data-type="<%= transaction.type %>" data-status="<%= transaction.status %>"
+                                        data-date="<%= transaction.transactionDate.toISOString() %>"
+                                        data-relatedname="<%= transaction.relatedFullName || 'N/A' %>"
+                                        data-relatedaccount="<%= transaction.relatedAccount || 'N/A' %>">
+                                        View Receipt
+                                    </button>
+                                </td>
+                            </tr>
+                            <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="py-4 px-4 text-center text-gray-500">No transactions
+                                            found.</td>
+                                    </tr>
+                                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="receiptModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-blue-100 rounded-lg shadow-xl w-full max-w-md mx-auto p-6 relative">
+            <button id="closeReceiptModal"
+                class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl font-bold">&times;</button>
+
+            <div class="flex justify-start mb-4 receipt-exclude"> <button id="downloadReceiptPdfBtn"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                    Download Receipt
                 </button>
+            </div>
+
+            <div id="receiptContent">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-extrabold text-blue-800 uppercase tracking-wider">Capital Trust Bank</h2>
+                    <p class="text-sm text-gray-600 mt-1">Transaction Receipt</p>
+                </div>
+
+                <div class="space-y-3 text-gray-800">
+                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                        <span class="font-semibold">Date:</span>
+                        <span id="receiptDate"></span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                        <span class="font-semibold">Description:</span>
+                        <span id="receiptDescription"></span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                        <span class="font-semibold">Transaction Type:</span>
+                        <span id="receiptType" class="capitalize"></span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                        <span class="font-semibold">Amount:</span>
+                        <span id="receiptAmount" class="font-bold text-lg"></span>
+                    </div>
+                    <div id="recipientDetails" class="hidden">
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold">Recipient Name:</span>
+                            <span id="receiptRelatedName"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold">Recipient Account:</span>
+                            <span id="receiptRelatedAccount"></span>
+                        </div>
+                    </div>
+                    <div id="senderDetails" class="hidden">
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold">Sender Name:</span>
+                            <span id="receiptRelatedNameSender"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold">Sender Account:</span>
+                            <span id="receiptRelatedAccountSender"></span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                        <span class="font-semibold">Status:</span>
+                        <span id="receiptStatus" class="capitalize"></span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-6 text-xs text-gray-500">
+                    &copy; <%= new Date().getFullYear() %> Capital Trust Bank. All Rights Reserved.
+                </div>
             </div>
         </div>
     </div>
-    <!-- Table Section -->
-    <div class="overflow-x-auto rounded-xl pt-0 px-6 pb-6 overflow-y-auto h-[650px]">
-        <table class="min-w-full text-sm">
-            <thead class="bg-blue-100 text-gray-700 sticky top-0 z-10">
-                <tr>
-                    <th class="py-2 px-4 whitespace-nowrap text-left">Date</th>
-                    <th class="py-2 px-4 whitespace-nowrap text-left">Description</th>
-                    <th class="py-2 px-4 whitespace-nowrap text-left">Type</th>
-                    <th class="py-2 px-4 whitespace-nowrap text-left">Amount</th>
-                    <th class="py-2 px-4 whitespace-nowrap text-left">Status</th>
-                </tr>
-            </thead>
-            <tbody class="text-gray-800">
-                <tr class="border-b">
-                    <td class="py-2 px-4 whitespace-nowrap">Jul 21, 2025</td>
-                    <td class="py-2 px-4 whitespace-nowrap">Transfer to John Doe</td>
-                    <td class="py-2 px-4 whitespace-nowrap">Debit</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-red-600">-₦5,000.00</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-green-600">Completed</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="py-2 px-4 whitespace-nowrap">Jul 20, 2025</td>
-                    <td class="py-2 px-4 whitespace-nowrap">ATM Withdrawal</td>
-                    <td class="py-2 px-4 whitespace-nowrap">Debit</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-red-600">-₦20,000.00</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-green-600">Completed</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="py-2 px-4 whitespace-nowrap">Jul 19, 2025</td>
-                    <td class="py-2 px-4 whitespace-nowrap">Loan Credit</td>
-                    <td class="py-2 px-4 whitespace-nowrap">Credit</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-blue-600">+₦150,000.00</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-green-600">Completed</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="py-2 px-4 whitespace-nowrap">Jul 18, 2025</td>
-                    <td class="py-2 px-4 whitespace-nowrap">Mobile Recharge</td>
-                    <td class="py-2 px-4 whitespace-nowrap">Debit</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-red-600">-₦500.00</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-green-600">Completed</td>
-                </tr>
-                <tr>
-                    <td class="py-2 px-4 whitespace-nowrap">Jul 17, 2025</td>
-                    <td class="py-2 px-4 whitespace-nowrap">POS Payment</td>
-                    <td class="py-2 px-4 whitespace-nowrap">Debit</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-red-600">-₦3,200.00</td>
-                    <td class="py-2 px-4 whitespace-nowrap text-green-600">Completed</td>
-                </tr>
-            </tbody>
-        </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const receiptModal = document.getElementById('receiptModal');
+            const closeReceiptModalBtn = document.getElementById('closeReceiptModal');
+            const receiptDate = document.getElementById('receiptDate');
+            const receiptDescription = document.getElementById('receiptDescription');
+            const receiptType = document.getElementById('receiptType');
+            const receiptAmount = document.getElementById('receiptAmount');
+            const receiptStatus = document.getElementById('receiptStatus');
+            const recipientDetails = document.getElementById('recipientDetails');
+            const senderDetails = document.getElementById('senderDetails');
+            const receiptRelatedName = document.getElementById('receiptRelatedName');
+            const receiptRelatedAccount = document.getElementById('receiptRelatedAccount');
+            const receiptRelatedNameSender = document.getElementById('receiptRelatedNameSender');
+            const receiptRelatedAccountSender = document.getElementById('receiptRelatedAccountSender');
+
+            const downloadReceiptPdfBtn = document.getElementById('downloadReceiptPdfBtn');
+            const receiptContent = document.getElementById('receiptContent');
+
+            document.querySelectorAll('.view-receipt-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const amount = this.dataset.amount;
+                    const description = this.dataset.description;
+                    const type = this.dataset.type;
+                    const status = this.dataset.status;
+                    const dateString = this.dataset.date;
+                    const relatedName = this.dataset.relatedname;
+                    const relatedAccount = this.dataset.relatedaccount;
+
+                    const transactionDate = new Date(dateString);
+                    receiptDate.textContent = transactionDate.toLocaleDateString('en-US', {
+                        month: 'short', day: 'numeric', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit'
+                    });
+                    receiptDescription.textContent = description;
+                    receiptType.textContent = type;
+
+                    let formattedAmount = `₦${parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    receiptAmount.textContent = formattedAmount;
+                    receiptAmount.className = 'font-bold text-lg';
+                    if (type === 'debit') {
+                        receiptAmount.textContent = `-${formattedAmount}`;
+                        receiptAmount.classList.add('text-red-600');
+                    } else {
+                        receiptAmount.classList.add('text-green-600');
+                    }
+
+                    receiptStatus.textContent = status;
+                    receiptStatus.className = 'capitalize';
+                    if (status === 'successful') {
+                        receiptStatus.classList.add('text-green-600');
+                    } else if (status === 'failed') {
+                        receiptStatus.classList.add('text-red-600');
+                    } else {
+                        receiptStatus.classList.add('text-yellow-600');
+                    }
+
+                    if (type === 'debit') {
+                        recipientDetails.classList.remove('hidden');
+                        senderDetails.classList.add('hidden');
+                        receiptRelatedName.textContent = relatedName;
+                        receiptRelatedAccount.textContent = relatedAccount;
+                    } else if (type === 'credit') {
+                        recipientDetails.classList.add('hidden');
+                        senderDetails.classList.remove('hidden');
+                        receiptRelatedNameSender.textContent = relatedName;
+                        receiptRelatedAccountSender.textContent = relatedAccount;
+                    } else {
+                        recipientDetails.classList.add('hidden');
+                        senderDetails.classList.add('hidden');
+                    }
+
+                    receiptModal.classList.remove('hidden');
+                });
+            });
+
+            closeReceiptModalBtn.addEventListener('click', function () {
+                receiptModal.classList.add('hidden');
+            });
+
+            receiptModal.addEventListener('click', function (event) {
+                if (event.target === receiptModal) {
+                    receiptModal.classList.add('hidden');
+                }
+            });
+
+            downloadReceiptPdfBtn.addEventListener('click', function () {
+                const element = receiptContent;
+
+                const options = {
+                    margin: 0.5,
+                    filename: 'CTBank_transaction_receipt.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                    html2canvas: {
+                        onrendered: function (canvas) {
+                        },
+                        useCORS: true,
+                        scale: 2,
+                        ignoreElements: (element) => element.classList.contains('receipt-exclude')
+                    }
+                };
+
+                html2pdf().set(options).from(element).save();
+            });
+        });
+    </script>
+
+    <!-- Modal Background -->
+    <div id="statementModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <!-- Modal Content -->
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Download Statement</h3>
+
+            <form>
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-700 mb-1" for="fromDate">From Date</label>
+                    <input type="date" id="fromDate"
+                        class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-700 mb-1" for="toDate">To Date</label>
+                    <input type="date" id="toDate"
+                        class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <button type="submit"
+                    class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+                    Submit Request
+                </button>
+            </form>
+
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-3 right-4 text-gray-500 hover:text-gray-700">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
     </div>
+
     <!-- Fixed Bottom Navigation -->
     <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
         <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
@@ -141,7 +397,71 @@
 
         </div>
     </div>
-    <script src="js/frontendfiles//downloadstatementmodal.js"></script>
+
+    <script>
+        const btnInternational = document.getElementById("btnInternational");
+        const btnLocal = document.getElementById("btnLocal");
+        const internationalSection = document.getElementById("internationalSection");
+        const localSection = document.getElementById("localSection");
+        const statementModal = document.getElementById("statementModal");
+        const downloadInternational = document.getElementById("downloadInternational");
+        const downloadLocal = document.getElementById("downloadLocal");
+
+        // Show international section by default
+        window.addEventListener("DOMContentLoaded", () => {
+            showSection("international");
+        });
+
+        btnInternational.addEventListener("click", () => {
+            showSection("international");
+        });
+
+        btnLocal.addEventListener("click", () => {
+            showSection("local");
+        });
+
+        downloadInternational.addEventListener("click", () => {
+            openModal("international");
+        });
+
+        downloadLocal.addEventListener("click", () => {
+            openModal("local");
+        });
+
+        function showSection(section) {
+            if (section === "international") {
+                internationalSection.classList.remove("hidden");
+                localSection.classList.add("hidden");
+                btnInternational.classList.add("text-blue-600", "border-blue-600");
+                btnInternational.classList.remove("text-gray-600", "border-transparent");
+                btnLocal.classList.add("text-gray-600", "border-transparent");
+                btnLocal.classList.remove("text-blue-600", "border-blue-600");
+            } else {
+                localSection.classList.remove("hidden");
+                internationalSection.classList.add("hidden");
+                btnLocal.classList.add("text-blue-600", "border-blue-600");
+                btnLocal.classList.remove("text-gray-600", "border-transparent");
+                btnInternational.classList.add("text-gray-600", "border-transparent");
+                btnInternational.classList.remove("text-blue-600", "border-blue-600");
+            }
+        }
+
+        function openModal(section) {
+            statementModal.classList.remove("hidden");
+            // You can customize modal content based on section if needed
+            // For example, set a hidden input or modal title
+            const modalTitle = statementModal.querySelector("h3");
+            if (section === "international") {
+                modalTitle.textContent = "Download International Transaction Statement";
+            } else {
+                modalTitle.textContent = "Download Local Transaction Statement";
+            }
+        }
+
+        function closeModal() {
+            statementModal.classList.add("hidden");
+        }
+    </script>
 </body>
 
 </html>

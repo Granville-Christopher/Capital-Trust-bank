@@ -42,6 +42,7 @@ form.addEventListener("submit", async function (e) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ oldPassword, newPassword }),
+      credentials: 'include',
     });
 
     const contentType = response.headers.get("content-type");
