@@ -160,7 +160,7 @@
                         <% } %>
                     ">
                                                         <% if (transaction.type==='debit' ) { %>-<% } %>
-                                                                ₦<%= transaction.amount.toLocaleString(undefined, {
+                                                                $<%= transaction.amount.toLocaleString(undefined, {
                                                                     minimumFractionDigits: 2, maximumFractionDigits: 2
                                                                     }) %>
                                                     </span>
