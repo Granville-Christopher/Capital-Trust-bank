@@ -30,6 +30,11 @@ const transactionHistorySchema = new mongoose.Schema(
       ref: "localTransfer",
       required: false,
     },
+    referenceId: {
+      type: String,
+      required: false,
+      index: true,
+    },
     relatedUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -28,6 +28,12 @@ const localTransferSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    ReferenceId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
     otp: {
       type: String,
       default: null,

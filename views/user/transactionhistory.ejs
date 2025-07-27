@@ -114,6 +114,7 @@
                         <th class="py-2 px-4 whitespace-nowrap text-left">Date</th>
                         <th class="py-2 px-4 whitespace-nowrap text-left">Description</th>
                         <th class="py-2 px-4 whitespace-nowrap text-left">Type</th>
+                        <th class="py-2 px-4 whitespace-nowrap text-left">Reference Id</th>
                         <th class="py-2 px-4 whitespace-nowrap text-left">Amount</th>
                         <th class="py-2 px-4 whitespace-nowrap text-left">Status</th>
                         <th class="py-2 px-4 whitespace-nowrap text-left">Actions</th>
@@ -132,6 +133,9 @@
                                 </td>
                                 <td class="py-2 px-4 whitespace-nowrap capitalize">
                                     <%= transaction.type %>
+                                </td>
+                                <td class="py-2 px-4 whitespace-nowrap capitalize">
+                                    <%= transaction.referenceId %>
                                 </td>
                                 <td class="py-2 px-4 whitespace-nowrap
                                 <% if (transaction.type === 'debit') { %>
@@ -160,6 +164,7 @@
                                         class="view-receipt-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
                                         data-amount="<%= transaction.amount %>"
                                         data-description="<%= transaction.description %>"
+                                        data-referenceId="<%= transaction.ReferenceId %>"
                                         data-type="<%= transaction.type %>" data-status="<%= transaction.status %>"
                                         data-date="<%= transaction.transactionDate.toISOString() %>"
                                         data-relatedname="<%= transaction.relatedFullName || 'N/A' %>"
@@ -204,8 +209,12 @@
                         <span id="receiptDate"></span>
                     </div>
                     <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                        <span class="font-semibold">Description:</span>
-                        <span id="receiptDescription"></span>
+                        <span class="font-semibold text-gray-700">Reference ID:</span>
+                        <span id="referenceId" class="text-gray-900"></span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                        <span class="font-semibold text-xs">Description:</span>
+                        <span id="receiptDescription" class="text-xs"></span>
                     </div>
                     <div class="flex justify-between items-center border-b border-gray-300 pb-2">
                         <span class="font-semibold">Transaction Type:</span>

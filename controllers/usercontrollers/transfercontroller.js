@@ -1,13 +1,26 @@
+// const { v4: uuidv4 } = require("uuid");
 const internationalTransferModel = require("../../models/usermodels/internationaltf");
 const localTransferModel = require("../../models/usermodels/localtf");
 const mongoose = require("mongoose");
 const User = require("../../models/usermodels/userSignup");
 const transactionPinModel = require("../../models/usermodels/transactionpin");
-const TransactionHistory = require('../../models/usermodels/transactionhistory')
+const TransactionHistory = require("../../models/usermodels/transactionhistory");
 const { body, validationResult } = require("express-validator");
 const escape = require("escape-html");
 const bcrypt = require("bcrypt");
 const { generateOtp, sendOtpEmail } = require("../../config/transferotpmailer");
+
+function generateNumericReferenceId() {
+  const timestamp = Date.now().toString();
+  const remainingDigits = 18 - timestamp.length;
+
+  let randomPart = "";
+  for (let i = 0; i < remainingDigits; i++) {
+    randomPart += Math.floor(Math.random() * 10);
+  }
+
+  return timestamp + randomPart;
+}
 
 const internationalTransfer = [
   body("FullName")
@@ -219,12 +232,15 @@ const localTransfer = [
       const otp = generateOtp();
       const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
+      const referenceId = generateNumericReferenceId();
+
       const newTransfer = new localTransferModel({
         userId: senderId,
         FullName: escape(FullName),
         Amount: transferAmount,
         AccountNumber: escape(AccountNumber),
         BankName: escape(BankName),
+        ReferenceId: referenceId,
         otp: otp,
         otpExpires: otpExpires,
         status: "pending_otp",
@@ -247,9 +263,16 @@ const localTransfer = [
         message:
           "OTP sent to your email. Please verify to complete the transfer.",
         transferId: newTransfer._id,
+        referenceId: newTransfer.ReferenceId,
       });
     } catch (err) {
       console.error("Error during local transfer initiation:", err);
+      if (err.code === 11000 && err.message.includes("referenceId")) {
+        return res.status(500).json({
+          error:
+            "A unique transaction reference could not be generated. Please try again.",
+        });
+      }
       res
         .status(500)
         .json({ error: "Server error during local transfer initiation." });
@@ -723,6 +746,7 @@ const verifyLocalTransfer = [
         currency: "USD",
         description: `Transfer to ${transfer.FullName} (${transfer.AccountNumber})`,
         transferId: transfer._id,
+        referenceId: transfer.ReferenceId,
         relatedUserId: transfer.recipientId,
         relatedAccount: transfer.AccountNumber,
         relatedFullName: transfer.FullName,
@@ -737,6 +761,7 @@ const verifyLocalTransfer = [
         currency: "USD",
         description: `Transfer from ${senderUser.Name} (${senderUser.AccountNumber})`,
         transferId: transfer._id,
+        referenceId: transfer.ReferenceId,
         relatedUserId: senderId,
         relatedAccount: senderUser.AccountNumber,
         relatedFullName: senderUser.Name,

@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const receiptModal = document.getElementById("receiptModal");
   const closeReceiptModalBtn = document.getElementById("closeReceiptModal");
   const receiptDate = document.getElementById("receiptDate");
+  const referenceIdElement = document.getElementById("referenceId");
   const receiptDescription = document.getElementById("receiptDescription");
   const receiptType = document.getElementById("receiptType");
   const receiptAmount = document.getElementById("receiptAmount");
@@ -33,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const dateString = this.dataset.date;
       const relatedName = this.dataset.relatedname;
       const relatedAccount = this.dataset.relatedaccount;
-
+      const fetchedReferenceId = this.dataset.ReferenceId;
       const transactionDate = new Date(dateString);
       receiptDate.textContent = transactionDate.toLocaleDateString("en-US", {
         month: "short",
@@ -43,6 +44,12 @@ document.addEventListener("DOMContentLoaded", function () {
         minute: "2-digit",
         second: "2-digit",
       });
+
+      if (referenceIdElement && fetchedReferenceId) {
+        referenceIdElement.textContent = fetchedReferenceId;
+      } else if (referenceIdElement) {
+        referenceIdElement.textContent = "N/A";
+      }
       receiptDescription.textContent = description;
       receiptType.textContent = type;
 
