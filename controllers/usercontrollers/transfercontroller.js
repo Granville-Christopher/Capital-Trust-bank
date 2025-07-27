@@ -9,6 +9,7 @@ const { body, validationResult } = require("express-validator");
 const escape = require("escape-html");
 const bcrypt = require("bcrypt");
 const { generateOtp, sendOtpEmail } = require("../../config/transferotpmailer");
+const Notification = require("../../models/usermodels/notifications");
 
 function generateNumericReferenceId() {
   const timestamp = Date.now().toString();
@@ -108,11 +109,37 @@ const internationalTransfer = [
       const safeAddress = escape(Address);
       const safeIban = escape(Iban);
 
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found." });
+      }
+
+      if (user.Balance < safeAmount) {
+        return res.status(400).json({ error: "Insufficient funds." });
+      }
+
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $inc: { Balance: -safeAmount } },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        console.error("Failed to update user balance for userId:", userId);
+        return res
+          .status(500)
+          .json({ error: "Failed to update balance. Please try again." });
+      }
+
+      const referenceId = generateNumericReferenceId();
+
       const otp = generateOtp();
       const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
       const newTransfer = new internationalTransferModel({
         userId: userId,
+        ReferenceId: referenceId,
         FullName: safeFullName,
         Amount: safeAmount,
         AccountNumber: safeAccountNumber,
@@ -774,11 +801,37 @@ const verifyLocalTransfer = [
       transfer.otpExpires = null;
       await transfer.save({ session });
 
+      const senderNotification = new Notification({
+        userId: senderId,
+        type: "transfer_debit",
+        message: `You sent ₦${transfer.Amount.toLocaleString()} to ${
+          transfer.FullName
+        } (${transfer.AccountNumber}). Reference: ${transfer.ReferenceId}.`,
+        relatedEntity: transfer._id,
+        relatedReferenceId: transfer.ReferenceId,
+        read: false,
+      });
+      await senderNotification.save({ session });
+
+      const recipientNotification = new Notification({
+        userId: transfer.recipientId,
+        type: "transfer_credit",
+        message: `You received ₦${transfer.Amount.toLocaleString()} from ${
+          senderUser.Name
+        } (${senderUser.AccountNumber}). Reference: ${transfer.ReferenceId}.`,
+        relatedEntity: transfer._id,
+        relatedReferenceId: transfer.ReferenceId,
+        read: false,
+      });
+      await recipientNotification.save({ session });
+
       await session.commitTransaction();
       session.endSession();
 
       res.status(200).json({
-        message: "Local Transfer Successful!",
+        message: `You successfully transferred ₦${transfer.Amount.toLocaleString()} to ${
+          transfer.FullName
+        }!`,
         transferId: transfer._id,
         status: transfer.status,
       });

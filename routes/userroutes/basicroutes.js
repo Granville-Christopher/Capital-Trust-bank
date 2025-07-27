@@ -7,9 +7,32 @@ const {
 const User = require("../../models/usermodels/userSignup");
 const internationalTransferModel = require("../../models/usermodels/internationaltf");
 const TransactionHistory = require("../../models/usermodels/transactionhistory");
+const Notification = require("../../models/usermodels/notifications");
 
 router.get("/cards", async (req, res) => {
   return res.status(200).render("user/cards");
+});
+
+router.get("/notifications", async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+
+    const notifications = await Notification.find({ userId })
+      .sort({ createdAt: -1 })
+      .lean();
+    return res
+      .status(200)
+      .render("user/notifications", { notifications: notifications });
+  } catch (error) {
+    console.error("notifications error:", error);
+    return res.status(500).render("user/notifications", {
+      error: "server error",
+      notifications: [],
+    });
+  }
 });
 
 router.get("/confirmtransfer/:transferId", transferPage);

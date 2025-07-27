@@ -7,6 +7,12 @@ const internationalTransferSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    ReferenceId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
     FullName: {
       type: String,
       required: true,

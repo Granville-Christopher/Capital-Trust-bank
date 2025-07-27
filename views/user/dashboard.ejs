@@ -38,15 +38,17 @@
 
 <body class="bg-gradient-to-b relative overflow-y-hidden from-blue-100 to-gray-100 min-h-screen p-6 space-y-8">
 
-    <div class="fixed top-0 left-0 bg-blue-100 right-0 pl-4 py-3 z-10">
+    <div class="fixed top-0 left-0 bg-blue-100 right-0 flex justify-between align-center px-4 py-3 z-10">
         <a href="profile" class="flex justify-start gap-2 items-center">
             <span class="text-blue-50 bg-blue-600 rounded-full px-2 py-1"><i class="fa-solid fa-user "></i></span>
-            <h2 class="text-lg font-semibold text-gray-800"> <span id="greeting"></span>, <h2
-                    class="text-lg font-semibold">
-                    <%= user.Name %>
+            <h2 class="text-lg font-semibold text-gray-800">
+                <span id="greeting"></span>,
+                <h2 class="text-lg font-semibold">
+                    <%= user.Name.split(' ')[0] %>
                 </h2>
             </h2>
         </a>
+        <a href="notifications"><i class="fa fa-bell text-blue-600 text-2xl"></i></a>
     </div>
 
     <div class="bg-black text-white rounded-xl p-6 relative shadow-lg h-[180px]">
@@ -136,16 +138,15 @@
                 <% recentTransactions.forEach(transaction=> { %>
                     <li class="flex justify-between border-b pb-2">
                         <span>
-                            <% if (transaction.type==='debit' && transaction.description.startsWith('Transfer to ')) { %>
+                            <% if (transaction.type===' debit' && transaction.description.startsWith('Transfer to ')) { %>
                             <%= transaction.description.split(' (')[0].trim() %>
-                                <% } else if (transaction.type==='credit' &&
-                                    transaction.description.startsWith('Transfer from ')) { %>
+                        <% } else if (transaction.type==='credit' && transaction.description.startsWith('Transfer from ')) { %>
                             <%= transaction.description.split(' (')[0].trim() %>
-                                    <% } else { %>
-                                        <%= transaction.description %>
-                                            <% } %>
-                        </span>
-                        <span class="font-semibold
+                            <% } else { %>
+                                <%= transaction.description %>
+                                    <% } %>
+                                        </span>
+                                        <span class="font-semibold
                         <% if (transaction.type === 'debit') { %>
                             text-red-600
                         <% } else if (transaction.type === 'credit') { %>
@@ -154,16 +155,16 @@
                             text-gray-800
                         <% } %>
                     ">
-                            <% if (transaction.type==='debit' ) { %>-<% } %>
-                                    ₦<%= transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2 }) %>
-                        </span>
-                    </li>
-                    <% }) %>
-                        <% } else { %>
-                            <li class="text-gray-500 text-center">No recent transactions.</li>
-                            <% } %>
-        </ul>
+                                            <% if (transaction.type==='debit' ) { %>-<% } %>
+                                                    ₦<%= transaction.amount.toLocaleString(undefined, {
+                                                        minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+                                        </span>
+                                        </li>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <li class="text-gray-500 text-center">No recent transactions.</li>
+                                                <% } %>
+                                                    </ul>
     </div>
 
     <div class="grid grid-cols-2 gap-4">

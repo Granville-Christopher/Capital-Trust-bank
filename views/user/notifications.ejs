@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - Notifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2563EB" />
+</head>
+
+<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 space-y-6 relative overflow-y-hidden">
+
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+            <i class="fa-solid fa-bell text-blue-600 mr-2"></i>
+            Notifications
+        </h2>
+    </div>
+
+    <div class="overflow-y-auto h-[600px] px-2">
+        <ul class="space-y-4">
+            <% if (notifications && notifications.length > 0) { %>
+                <% notifications.forEach(function(notification) { %>
+                    <li class="bg-white rounded-xl shadow p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-semibold text-gray-800"><%= notification.title || 'Notification' %></h3>
+                            <span class="text-xs text-gray-500">
+                                <%= new Date(notification.date).toLocaleString() %>
+                            </span>
+                        </div>
+                        <p class="text-gray-700 text-sm"><%= notification.message || '' %></p>
+                    </li>
+                <% }); %>
+            <% } else { %>
+                <li class="text-center text-gray-500">No notifications available.</li>
+            <% } %>
+        </ul>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
+        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
+
+            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="mt-1">Home</span>
+            </a>
+
+            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-chart-line text-lg"></i>
+                <span class="mt-1">Finance</span>
+            </a>
+
+            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-credit-card text-lg"></i>
+                <span class="mt-1">Cards</span>
+            </a>
+
+            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span class="mt-1">Me</span>
+            </a>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
