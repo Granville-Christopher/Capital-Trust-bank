@@ -60,7 +60,7 @@ form.addEventListener("submit", async function (event) {
     try {
       const parsedAmount = parseFloat(amountInput);
       if (isNaN(parsedAmount) || parsedAmount < 1) {
-        showToast("Amount must be a valid number and at least ₦1.00.");
+        showToast("Amount must be a valid number and at least $1.00.");
         internationaltransferText.textContent = "Initiate transfer";
         spinner.classList.add("hidden");
         internationaltransferBtn.disabled = false;

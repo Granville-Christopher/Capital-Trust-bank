@@ -265,7 +265,7 @@
                     receiptDescription.textContent = description;
                     receiptType.textContent = type;
 
-                    let formattedAmount = `₦${parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    let formattedAmount = `$${parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                     receiptAmount.textContent = formattedAmount;
                     receiptAmount.className = 'font-bold text-lg';
                     if (type === 'debit') {
