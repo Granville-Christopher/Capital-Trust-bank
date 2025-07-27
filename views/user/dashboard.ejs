@@ -41,7 +41,8 @@
     <div class="fixed top-0 left-0 bg-blue-100 right-0 pl-4 py-3 z-10">
         <a href="profile" class="flex justify-start gap-2 items-center">
             <span class="text-blue-50 bg-blue-600 rounded-full px-2 py-1"><i class="fa-solid fa-user "></i></span>
-            <h2 class="text-lg font-semibold text-gray-800"> <span id="greeting"></span>, <h2>
+            <h2 class="text-lg font-semibold text-gray-800"> <span id="greeting"></span>, <h2
+                    class="text-lg font-semibold">
                     <%= user.Name %>
                 </h2>
             </h2>
@@ -128,14 +129,21 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-xl shadow p-2 h-[180px] ">
+    <div class="bg-white rounded-xl shadow p-3 h-[180px] ">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Transactions</h3>
         <ul class="space-y-3 text-sm">
             <% if (recentTransactions && recentTransactions.length> 0) { %>
                 <% recentTransactions.forEach(transaction=> { %>
                     <li class="flex justify-between border-b pb-2">
                         <span>
-                            <%= transaction.description %>
+                            <% if (transaction.type==='debit' && transaction.description.startsWith('Transfer to ')) { %>
+                            <%= transaction.description.split(' (')[0].trim() %>
+                                <% } else if (transaction.type==='credit' &&
+                                    transaction.description.startsWith('Transfer from ')) { %>
+                            <%= transaction.description.split(' (')[0].trim() %>
+                                    <% } else { %>
+                                        <%= transaction.description %>
+                                            <% } %>
                         </span>
                         <span class="font-semibold
                         <% if (transaction.type === 'debit') { %>
@@ -147,7 +155,7 @@
                         <% } %>
                     ">
                             <% if (transaction.type==='debit' ) { %>-<% } %>
-                                    $<%= transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2,
+                                    ₦<%= transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2,
                                         maximumFractionDigits: 2 }) %>
                         </span>
                     </li>
