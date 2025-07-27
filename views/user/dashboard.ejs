@@ -132,21 +132,25 @@
     </div>
 
     <div class="bg-white rounded-xl shadow p-3 h-[180px] ">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Transactions</h3>
-        <ul class="space-y-3 text-sm">
-            <% if (recentTransactions && recentTransactions.length> 0) { %>
-                <% recentTransactions.forEach(transaction=> { %>
-                    <li class="flex justify-between border-b pb-2">
-                        <span>
-                            <% if (transaction.type===' debit' && transaction.description.startsWith('Transfer to ')) { %>
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Transactions</h3>
+    <ul class="space-y-3 text-sm">
+        <% if (recentTransactions && recentTransactions.length > 0) { %>
+            <% recentTransactions.forEach(transaction => { %>
+                <li class="flex justify-between border-b pb-2">
+                    <span>
+                        <% // Ensure the ' type' comparison is exact, no leading/trailing spaces %>
+                        <% if (transaction.type==='debit' && transaction.description.startsWith('Transfer to ')) { %>
+                            <% // This correctly splits at the first ' (' and takes the part before it %>
                             <%= transaction.description.split(' (')[0].trim() %>
-                        <% } else if (transaction.type==='credit' && transaction.description.startsWith('Transfer from ')) { %>
-                            <%= transaction.description.split(' (')[0].trim() %>
-                            <% } else { %>
-                                <%= transaction.description %>
-                                    <% } %>
-                                        </span>
-                                        <span class="font-semibold
+                                <% } else if (transaction.type==='credit' &&
+                                    transaction.description.startsWith('Transfer from ')) { %>
+                            <% // This also correctly splits at the first ' (' and takes the part before it %>
+                                    <%= transaction.description.split(' (')[0].trim() %>
+                                        <% } else { %>
+                                            <%= transaction.description %>
+                                                <% } %>
+                                                    </span>
+                                                    <span class="font-semibold
                         <% if (transaction.type === 'debit') { %>
                             text-red-600
                         <% } else if (transaction.type === 'credit') { %>
@@ -155,16 +159,18 @@
                             text-gray-800
                         <% } %>
                     ">
-                                            <% if (transaction.type==='debit' ) { %>-<% } %>
-                                                    ₦<%= transaction.amount.toLocaleString(undefined, {
-                                                        minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-                                        </span>
-                                        </li>
-                                        <% }) %>
-                                            <% } else { %>
-                                                <li class="text-gray-500 text-center">No recent transactions.</li>
-                                                <% } %>
-                                                    </ul>
+                                                        <% if (transaction.type==='debit' ) { %>-<% } %>
+                                                                ₦<%= transaction.amount.toLocaleString(undefined, {
+                                                                    minimumFractionDigits: 2, maximumFractionDigits: 2
+                                                                    }) %>
+                                                    </span>
+                                                    </li>
+                                                    <% }); %>
+                                                        <% } else { %>
+                                                            <li class="text-gray-500 text-center">No recent
+                                                                transactions.</li>
+                                                            <% } %>
+                                                                </ul>
     </div>
 
     <div class="grid grid-cols-2 gap-4">

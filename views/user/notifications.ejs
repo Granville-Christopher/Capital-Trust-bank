@@ -26,21 +26,51 @@
 
     <div class="overflow-y-auto h-[600px] px-2">
         <ul class="space-y-4">
-            <% if (notifications && notifications.length > 0) { %>
+            <% if (notifications && notifications.length> 0) { %>
                 <% notifications.forEach(function(notification) { %>
                     <li class="bg-white rounded-xl shadow p-4">
                         <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-semibold text-gray-800"><%= notification.title || 'Notification' %></h3>
+                            <h3 class="font-semibold text-gray-800">
+                                <% let notificationTitle='Notification' ; if (notification.type) {
+                                    notificationTitle=notification.type.replace(/_/g, ' ' ).toUpperCase(); } %>
+                                    <%= notificationTitle %>
+                            </h3>
                             <span class="text-xs text-gray-500">
-                                <%= new Date(notification.date).toLocaleString() %>
+                                <% // Manual date formatting for robustness %>
+                                    <% const date=new Date(notification.createdAt); const
+                                        day=String(date.getDate()).padStart(2, '0' ); const monthNames=["Jan", "Feb"
+                                        , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct" , "Nov" , "Dec"
+                                        ]; const month=monthNames[date.getMonth()]; const year=date.getFullYear(); let
+                                        hours=date.getHours(); const minutes=String(date.getMinutes()).padStart(2, '0'
+                                        ); const ampm=hours>= 12 ? 'PM' : 'AM';
+                                        hours = hours % 12;
+                                        hours = hours ? String(hours) : '12'; // The hour '0' (midnight) should be '12'
+                                        hours = hours.padStart(2, '0'); // Add leading zero if needed
+
+                                        // Format for example: 27-Jul-2025 11:59 PM
+                                        const formattedDate = `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
+                                        %>
+                                        <%= formattedDate %>
                             </span>
                         </div>
-                        <p class="text-gray-700 text-sm"><%= notification.message || '' %></p>
+                        <p class="text-gray-700 text-sm">
+                            <%= notification.message || '' %>
+                        </p>
+                        <% if (!notification.read) { %>
+                            <a href="transactionhistory#localSection">
+                                <div class="mt-2 text-right">
+                                    <span
+                                        class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">View</span>
+                                </div>
+                            </a>
+                            <% } %>
                     </li>
-                <% }); %>
-            <% } else { %>
-                <li class="text-center text-gray-500">No notifications available.</li>
-            <% } %>
+                    <% }); %>
+                        <% } else { %>
+                            <li class="text-center text-gray-500 p-4">
+                                No notifications available.
+                            </li>
+                            <% } %>
         </ul>
     </div>
 

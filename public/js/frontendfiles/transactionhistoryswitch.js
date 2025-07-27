@@ -7,7 +7,7 @@ const downloadInternational = document.getElementById("downloadInternational");
 const downloadLocal = document.getElementById("downloadLocal");
 
 window.addEventListener("DOMContentLoaded", () => {
-  showSection("international");
+  showSection("local");
 });
 
 btnInternational.addEventListener("click", () => {
