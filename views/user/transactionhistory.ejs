@@ -139,7 +139,7 @@
                                     <%= transaction.type %>
                                 </td>
                                 <td class="py-2 px-4 whitespace-nowrap capitalize">
-                                    <%= transaction.ReferenceId %>
+                                    <%= transaction.referenceId %>
                                 </td>
                                 <td class="py-2 px-4 whitespace-nowrap
                                 <% if (transaction.type === 'debit') { %>
@@ -168,7 +168,7 @@
                                         class="view-receipt-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
                                         data-amount="<%= transaction.amount %>"
                                         data-description="<%= transaction.description %>"
-                                        data-referenceId="<%= transaction.ReferenceId %>"
+                                        data-reference-id="<%= transaction.referenceId %>"
                                         data-type="<%= transaction.type %>" data-status="<%= transaction.status %>"
                                         data-date="<%= transaction.transactionDate.toISOString() %>"
                                         data-relatedname="<%= transaction.relatedFullName || 'N/A' %>"

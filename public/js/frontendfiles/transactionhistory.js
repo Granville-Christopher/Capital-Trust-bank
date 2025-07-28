@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const dateString = this.dataset.date;
       const relatedName = this.dataset.relatedname;
       const relatedAccount = this.dataset.relatedaccount;
-      const fetchedReferenceId = this.dataset.ReferenceId;
+      const fetchedReferenceId = this.dataset.referenceId;
       const transactionDate = new Date(dateString);
       receiptDate.textContent = transactionDate.toLocaleDateString("en-US", {
         month: "short",

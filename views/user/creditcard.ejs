@@ -20,7 +20,7 @@
         content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-<meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
+    <meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:site_name" content="Capital Trust Bank" />
@@ -31,7 +31,7 @@
     <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
     <meta name="twitter:description"
         content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-        <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
+    <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
 
 
 </head>
@@ -54,7 +54,6 @@
 <body
     class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 text-gray-800 space-y-6 relative overflow-y-hidden">
 
-    <!-- Hidden Section if no card exists -->
     <div id="noCardSection" class="hidden text-center">
         <p class="text-sm mb-4">No card available</p>
         <button onclick="toggleCardCreation()"
@@ -63,7 +62,6 @@
         </button>
     </div>
 
-    <!-- Dropdown to choose card type -->
     <div id="cardTypeSelector" class="hidden bg-white rounded-xl shadow p-6 max-w-md mx-auto">
         <p class="text-sm font-semibold mb-4 text-center text-gray-700">Select Debit Card Type</p>
         <div class="grid grid-cols-2 gap-4">
@@ -83,11 +81,8 @@
             Continue
         </button>
     </div>
-    <!-- Carousel Container -->
     <div class="relative w-full max-w-md mx-auto">
-        <!-- Card Slides -->
         <div id="carouselSlides" class="w-full">
-            <!-- Slide 1: Front of Card -->
             <div class="card-face w-full flex flex-col justify-between">
                 <div class="flex justify-between items-center">
                     <span><i class="fa-brands fa-cc-mastercard text-2xl"></i></span>
@@ -105,23 +100,28 @@
         </div>
 
     </div>
-    <!-- Card Actions Section -->
     <div class="grid grid-cols-2 gap-4 mt-6 text-center">
-        <!-- Freeze Card -->
         <button
             class="flex flex-col items-center justify-center bg-white rounded-xl shadow px-4 py-5 hover:bg-blue-50 transition">
             <i class="fa-solid fa-snowflake text-blue-600 text-2xl mb-1"></i>
             <span class="text-sm font-medium text-gray-700">Freeze Card</span>
         </button>
 
-        <!-- Terminate Card -->
         <button
             class="flex flex-col items-center justify-center bg-white rounded-xl shadow px-4 py-5 hover:bg-red-50 transition">
             <i class="fa-solid fa-ban text-red-600 text-2xl mb-1"></i>
             <span class="text-sm font-medium text-red-700">Terminate Card</span>
         </button>
     </div>
-    <!-- Generating Modal -->
+
+    <a href="/secure/ctb/managecreditcardpin" class="w-full">
+        <button
+            class="items-center justify-center bg-white rounded-xl mt-4 w-full shadow px-4 py-5 hover:bg-blue-50 transition">
+            <i class="fa-solid fa-edit text-blue-600 text-2xl mb-1"></i>
+            <span class="text-sm font-medium text-blue-700">Manage Card</span>
+        </button>
+    </a>
+
     <div id="generatingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
             <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
@@ -129,29 +129,25 @@
             <p class="text-sm text-gray-500">Please wait while we generate your card.</p>
         </div>
     </div>
-    <!-- Fixed Bottom Navigation -->
+
     <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
         <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
 
-            <!-- Home -->
             <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
                 <i class="fa-solid fa-house text-lg"></i>
                 <span class="mt-1">Home</span>
             </a>
 
-            <!-- Finance -->
             <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
                 <i class="fa-solid fa-chart-line text-lg"></i>
                 <span class="mt-1">Finance</span>
             </a>
 
-            <!-- Cards -->
             <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
                 <i class="fa-solid fa-credit-card text-lg"></i>
                 <span class="mt-1">Cards</span>
             </a>
 
-            <!-- Me -->
             <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
                 <i class="fa-solid fa-user text-lg"></i>
                 <span class="mt-1">Me</span>
@@ -160,7 +156,6 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script src="/js/frontendfiles/creditcard.js"> </script>
 
 </body>

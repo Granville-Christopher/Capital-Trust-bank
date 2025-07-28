@@ -31,20 +31,18 @@
   <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
   <meta name="twitter:description"
     content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-      <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
+  <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
 
 
 </head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 text-gray-800 relative overflow-y-hidden">
+<body class="bg-gradient-to-b relative from-blue-100 to-gray-100 min-h-screen pt-16 pb-24 px-6 space-y-8">
 
-  <!-- Total Balance at Top -->
   <div class="text-center mb-8">
     <p class="text-sm text-gray-600">Total Balance</p>
     <p class="text-4xl font-bold text-blue-600">$1,343,332.95</p>
   </div>
 
-  <!-- Navigation for Savings and Loans -->
   <div class="flex justify-between max-w-md mx-auto mb-6">
     <button id="savingsBtn"
       class="flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">
@@ -58,7 +56,6 @@
     </button>
   </div>
 
-  <!-- Savings Section -->
   <section id="savingsSection" class="max-w-md mx-auto">
     <div class="bg-white rounded-xl shadow p-6 mb-4 relative">
       <p class="text-lg font-semibold mb-2">Savings Balance</p>
@@ -82,7 +79,6 @@
     </form>
   </section>
 
-  <!-- Loans Section -->
   <section id="loansSection" class="max-w-md mx-auto hidden">
     <div class="bg-white rounded-xl shadow p-6 mb-4 relative">
       <p class="text-lg font-semibold mb-2">Loan Balance</p>
@@ -116,7 +112,6 @@
     </form>
   </section>
 
-  <!-- Loan Processing Modal -->
   <div id="loanProcessingModal"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative">
@@ -141,29 +136,24 @@
       </button>
     </div>
   </div>
-  <!-- Fixed Bottom Navigation -->
   <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
     <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
 
-      <!-- Home -->
       <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
         <i class="fa-solid fa-house text-lg"></i>
         <span class="mt-1">Home</span>
       </a>
 
-      <!-- Finance -->
       <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
         <i class="fa-solid fa-chart-line text-lg"></i>
         <span class="mt-1">Finance</span>
       </a>
 
-      <!-- Cards -->
       <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
         <i class="fa-solid fa-credit-card text-lg"></i>
         <span class="mt-1">Cards</span>
       </a>
 
-      <!-- Me -->
       <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
         <i class="fa-solid fa-user text-lg"></i>
         <span class="mt-1">Me</span>

@@ -20,7 +20,7 @@
         content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-<meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
+    <meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:site_name" content="Capital Trust Bank" />
@@ -31,7 +31,7 @@
     <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
     <meta name="twitter:description"
         content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-        <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
+    <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
 
 
 </head>
@@ -116,7 +116,6 @@
         });
     </script>
 
-    <!-- Generating Modal -->
     <div id="generatingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
             <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
@@ -125,29 +124,49 @@
         </div>
     </div>
 
-    <!-- Success/Failure Modal -->
     <div id="pinModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
-
-            <!-- Success Icon -->
             <div id="successIcon" class="mb-4">
                 <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
                 <h3 class="mt-2 text-xl font-semibold text-gray-800">Card PIN Reset Successfully</h3>
                 <p class="text-sm text-gray-500">Your card PIN has been reset.</p>
             </div>
 
-            <!-- Failure Icon (hidden by default) -->
             <div id="failureIcon" class="mb-4 hidden">
                 <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
                 <h3 class="mt-2 text-xl font-semibold text-gray-800">Failed to Reset Card PIN</h3>
                 <p class="text-sm text-gray-500">Something went wrong. Please try again.</p>
             </div>
 
-            <!-- Close Button -->
             <button onclick="closePinModal()"
                 class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
                 Close
             </button>
+        </div>
+    </div>
+    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
+        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
+
+            <a href="/udp/dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="mt-1">Home</span>
+            </a>
+
+            <a href="/udp/finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-chart-line text-lg"></i>
+                <span class="mt-1">Finance</span>
+            </a>
+
+            <a href="/udp/cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-credit-card text-lg"></i>
+                <span class="mt-1">Cards</span>
+            </a>
+
+            <a href="/udp/profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span class="mt-1">Me</span>
+            </a>
+
         </div>
     </div>
 

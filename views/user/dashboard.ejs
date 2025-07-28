@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,20 +31,18 @@
     <meta name="twitter:description"
         content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
     <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-
-
 </head>
 
-<body class="bg-gradient-to-b relative overflow-y-hidden from-blue-100 to-gray-100 min-h-screen p-6 space-y-8">
+<body class="bg-gradient-to-b relative from-blue-100 to-gray-100 min-h-screen pt-16 pb-24 px-6 space-y-8">
 
-    <div class="fixed top-0 left-0 bg-blue-100 right-0 flex justify-between align-center px-4 py-3 z-10">
+    <div class="fixed top-0 left-0 right-0 bg-blue-100 flex justify-between items-center px-4 py-4 z-20 ">
         <a href="profile" class="flex justify-start gap-2 items-center">
-            <span class="text-blue-50 bg-blue-600 rounded-full px-2 py-1"><i class="fa-solid fa-user "></i></span>
+            <span class="text-blue-50 bg-blue-600 rounded-full px-2 py-1"><i class="fa-solid fa-user"></i></span>
             <h2 class="text-lg font-semibold text-gray-800">
                 <span id="greeting"></span>,
-                <h2 class="text-lg font-semibold">
+                <span class="text-lg font-semibold">
                     <%= user.Name.split(' ')[0] %>
-                </h2>
+                </span>
             </h2>
         </a>
         <a href="notifications"><i class="fa fa-bell text-blue-600 text-2xl"></i></a>
@@ -91,7 +88,6 @@
                     <%= user.AccountNumber%>
                 </p>
                 <span id="copyFeedback" class="copy-feedback">Copied!</span>
-
             </div>
         </div>
 
@@ -132,45 +128,44 @@
     </div>
 
     <div class="bg-white rounded-xl shadow p-3 h-[180px] ">
-    <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Transactions</h3>
-    <ul class="space-y-3 text-sm">
-        <% if (recentTransactions && recentTransactions.length > 0) { %>
-            <% recentTransactions.forEach(transaction => { %>
-                <li class="flex justify-between border-b pb-2">
-                    <span>
-                        <% // Ensure the ' type' comparison is exact, no leading/trailing spaces %>
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Transactions</h3>
+        <ul class="space-y-3 text-sm">
+            <% if (recentTransactions && recentTransactions.length > 0) { %>
+                <% recentTransactions.forEach(transaction => { %>
+                    <li class="flex justify-between border-b pb-2">
+                        <span>
+                            <% // Ensure the ' type' comparison is exact, no leading/trailing spaces %>
                         <% if (transaction.type==='debit' && transaction.description.startsWith('Transfer to ')) { %>
-                            <% // This correctly splits at the first ' (' and takes the part before it %>
+                                <% // This correctly splits at the first ' (' and takes the part before it %>
                             <%= transaction.description.split(' (')[0].trim() %>
                                 <% } else if (transaction.type==='credit' &&
                                     transaction.description.startsWith('Transfer from ')) { %>
-                            <% // This also correctly splits at the first ' (' and takes the part before it %>
+                                <% // This also correctly splits at the first ' (' and takes the part before it %>
                                     <%= transaction.description.split(' (')[0].trim() %>
                                         <% } else { %>
                                             <%= transaction.description %>
                                                 <% } %>
-                                                    </span>
-                                                    <span class="font-semibold
-                        <% if (transaction.type === 'debit') { %>
-                            text-red-600
-                        <% } else if (transaction.type === 'credit') { %>
-                            text-green-600
-                        <% } else { %>
-                            text-gray-800
+                </span>
+                <span class="font-semibold
+                            <% if (transaction.type === 'debit') { %>
+                                text-red-600
+                            <% } else if (transaction.type === 'credit') { %>
+                                text-green-600
+                            <% } else { %>
+                                text-gray-800
+                            <% } %>
+                        ">
+                    <% if (transaction.type==='debit' ) { %>-<% } %>
+                            ₦<%= transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2,
+                                maximumFractionDigits: 2 }) %>
+                </span>
+                </li>
+                <% }); %>
+                    <% } else { %>
+                        <li class="text-gray-500 text-center">No recent
+                            transactions.</li>
                         <% } %>
-                    ">
-                                                        <% if (transaction.type==='debit' ) { %>-<% } %>
-                                                                $<%= transaction.amount.toLocaleString(undefined, {
-                                                                    minimumFractionDigits: 2, maximumFractionDigits: 2
-                                                                    }) %>
-                                                    </span>
-                                                    </li>
-                                                    <% }); %>
-                                                        <% } else { %>
-                                                            <li class="text-gray-500 text-center">No recent
-                                                                transactions.</li>
-                                                            <% } %>
-                                                                </ul>
+                            </ul>
     </div>
 
     <div class="grid grid-cols-2 gap-4">
@@ -202,6 +197,7 @@
             </div>
         </a>
     </div>
+
     <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
         <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
 
@@ -224,7 +220,6 @@
                 <i class="fa-solid fa-user text-lg"></i>
                 <span class="mt-1">Me</span>
             </a>
-
         </div>
     </div>
     <script src="/js/frontendfiles/balancetoggle.js"></script>

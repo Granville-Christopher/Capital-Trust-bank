@@ -95,7 +95,7 @@ setPinForm.addEventListener("submit", async function (event) {
 
       setPinForm.reset();
       setTimeout(() => {
-        window.location.href = `/udp/dashboard`;
+        window.location.href = `/udp/settings`;
       }, 2000);
 
       confirmPinbtn.disabled = false;
