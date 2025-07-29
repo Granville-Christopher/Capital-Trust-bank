@@ -36,7 +36,7 @@
 
 </head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 space-y-6 relative overflow-y-hidden">
+<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 space-y-6 relative">
 
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-gray-800">
@@ -97,8 +97,7 @@
                                         class="view-international-receipt-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
                                         data-amount="<%= transfer.Amount %>"
                                         data-description="International Transfer to <%= transfer.FullName %>"
-                                        data-reference-id="<%= transfer.ReferenceId %>"
-                                        data-type="debit"
+                                        data-reference-id="<%= transfer.ReferenceId %>" data-type="debit"
                                         data-status="<%= transfer.status %>"
                                         data-date="<%= transfer.createdAt.toISOString() %>"
                                         data-relatedname="<%= transfer.FullName %>"
