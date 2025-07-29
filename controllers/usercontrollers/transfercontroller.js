@@ -1,4 +1,4 @@
-// const { v4: uuidv4 } = require("uuid");
+git add .// const { v4: uuidv4 } = require("uuid");
 const internationalTransferModel = require("../../models/usermodels/internationaltf");
 const localTransferModel = require("../../models/usermodels/localtf");
 const mongoose = require("mongoose");
@@ -496,10 +496,15 @@ const verifyTransfer = [
       return res.status(400).json({ errors: errors.array() });
     }
 
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
       const { transferId, otp, paymentPin } = req.body;
 
       if (!req.session.user || !req.session.user.id) {
+        await session.abortTransaction();
+        session.endSession();
         return res
           .status(401)
           .json({ error: "Unauthorized: User not authenticated." });
@@ -509,9 +514,11 @@ const verifyTransfer = [
 
       const userPinRecord = await transactionPinModel.findOne({
         userId: userId,
-      });
+      }).session(session);
 
       if (!userPinRecord) {
+        await session.abortTransaction();
+        session.endSession();
         return res
           .status(404)
           .json({ error: "Payment PIN not set for this user." });
@@ -521,6 +528,8 @@ const verifyTransfer = [
         const remainingLockTime = Math.ceil(
           (userPinRecord.lockedUntil - Date.now()) / (1000 * 60)
         );
+        await session.abortTransaction();
+        session.endSession();
         return res.status(423).json({
           error: `Payment PIN is locked. Please try again in ${remainingLockTime} minute(s).`,
         });
@@ -530,9 +539,11 @@ const verifyTransfer = [
         _id: transferId,
         userId: userId,
         status: "pending_otp",
-      });
+      }).session(session);
 
       if (!transfer) {
+        await session.abortTransaction();
+        session.endSession();
         return res
           .status(404)
           .json({ error: "Transfer not found or not awaiting verification." });
@@ -544,6 +555,8 @@ const verifyTransfer = [
         transfer.otp === null ||
         transfer.otpExpires === null
       ) {
+        await session.abortTransaction();
+        session.endSession();
         return res.status(400).json({
           error: "Invalid OTP.",
         });
@@ -553,7 +566,9 @@ const verifyTransfer = [
         transfer.otp = null;
         transfer.otpExpires = null;
         transfer.status = "failed";
-        await transfer.save();
+        await transfer.save({ session });
+        await session.commitTransaction();
+        session.endSession();
         return res
           .status(400)
           .json({ error: "OTP has expired. Please re-initiate the transfer." });
@@ -569,12 +584,16 @@ const verifyTransfer = [
             Date.now() + LOCKOUT_DURATION_MINUTES * 60 * 1000
           );
           userPinRecord.failedAttempts = 0;
-          await userPinRecord.save();
+          await userPinRecord.save({ session });
+          await session.commitTransaction();
+          session.endSession();
           return res.status(400).json({
             error: `Incorrect Payment PIN. Account locked for ${LOCKOUT_DURATION_MINUTES} minutes due to too many failed attempts.`,
           });
         } else {
-          await userPinRecord.save();
+          await userPinRecord.save({ session });
+          await session.commitTransaction();
+          session.endSession();
           const attemptsLeft = MAX_PIN_ATTEMPTS - userPinRecord.failedAttempts;
           return res.status(400).json({
             error: `Incorrect Payment PIN. You have ${attemptsLeft} attempt(s) left before your account is locked.`,
@@ -584,12 +603,63 @@ const verifyTransfer = [
 
       userPinRecord.failedAttempts = 0;
       userPinRecord.lockedUntil = null;
-      await userPinRecord.save();
+      await userPinRecord.save({ session });
+
+      const user = await User.findById(userId).session(session);
+
+      if (!user) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(404).json({ error: "User not found." });
+      }
+
+      if (user.Balance < transfer.Amount) {
+        transfer.status = "failed";
+        await transfer.save({ session });
+        await session.commitTransaction();
+        session.endSession();
+        return res.status(400).json({
+          error: "Insufficient funds. Balance changed during verification.",
+        });
+      }
+
+      user.Balance -= transfer.Amount;
+      await user.save({ session });
+
+      const transactionHistory = new TransactionHistory({
+        userId: userId,
+        type: "debit",
+        amount: transfer.Amount,
+        currency: "USD",
+        description: `International Transfer to ${transfer.FullName} (${transfer.AccountNumber})`,
+        transferId: transfer._id,
+        referenceId: transfer.ReferenceId,
+        relatedUserId: null,
+        relatedAccount: transfer.AccountNumber,
+        relatedFullName: transfer.FullName,
+        status: "successful",
+      });
+
+      await transactionHistory.save({ session });
+
+      const notification = new Notification({
+        userId: userId,
+        type: "transfer_debit",
+        message: `You sent $${transfer.Amount.toLocaleString()} to ${transfer.FullName} (${transfer.AccountNumber}). Reference: ${transfer.ReferenceId}.`,
+        relatedEntity: transfer._id,
+        relatedReferenceId: transfer.ReferenceId,
+        read: false,
+      });
+
+      await notification.save({ session });
 
       transfer.status = "completed";
       transfer.otp = null;
       transfer.otpExpires = null;
-      await transfer.save();
+      await transfer.save({ session });
+
+      await session.commitTransaction();
+      session.endSession();
 
       res.status(200).json({
         message: "International Transfer Successful!",
@@ -597,6 +667,12 @@ const verifyTransfer = [
         status: transfer.status,
       });
     } catch (err) {
+      if (session && session.inTransaction()) {
+        await session.abortTransaction();
+      }
+      if (session) {
+        session.endSession();
+      }
       console.error("Error during transfer verification:", err);
       res
         .status(500)
