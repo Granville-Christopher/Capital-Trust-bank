@@ -85,7 +85,21 @@ router.get("/dashboard", async (req, res) => {
 });
 
 router.get("/finance", async (req, res) => {
-  return res.status(200).render("user/finance");
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(404).render("user/login", { error: "User not found" });
+    }
+
+    return res.status(200).render("user/finance", { user });
+  } catch (error) {
+    res.status(500).render("user/login", { error: "Server error", user: null });
+  }
 });
 
 router.get("/internationaltransfer", async (req, res) => {
