@@ -39,7 +39,9 @@
 <body class="bg-gradient-to-b relative from-blue-100 to-gray-100 min-h-screen pt-16 pb-24 px-6 space-y-8">
   <div class="text-center mb-8">
     <p class="text-sm text-gray-600">Total Balance</p>
-    <p class="text-4xl font-bold text-blue-600">$<%= user.AccountBalance %>
+    <p class="text-4xl font-bold text-blue-600">
+      <%= user.AccountBalance.toLocaleString('en-US', { style: 'currency' , currency: 'USD' }) %>
+
     </p>
   </div>
 

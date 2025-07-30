@@ -69,7 +69,6 @@ async function loadSavingsData() {
       totalInterestEl.textContent = `Total Interest: $${parseFloat(
         data.totalInterest
       ).toFixed(2)}`;
-      location.reload();
     } else {
       console.error("Error loading savings data:", data.error);
     }
