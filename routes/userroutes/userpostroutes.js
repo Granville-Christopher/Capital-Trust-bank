@@ -20,10 +20,12 @@ const {
   compoundInterest,
   viewSavings,
   cancelSavings,
+  getCreditScore,
 } = require("../../controllers/usercontrollers/financecontroller");
 
 router.get("/lookupaccount", lookupAccount);
 router.get("/viewsavings", viewSavings);
+router.get("/creditscore", getCreditScore);
 
 router.post("/signup", registerUser);
 router.post("/login", loginUser);

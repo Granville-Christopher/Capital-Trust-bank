@@ -45,6 +45,17 @@
     </p>
   </div>
 
+  <div class="creditScore-container" style="max-width: 350px; margin: auto; text-align: center;">
+    <canvas id="creditScoreGauge" width="300" height=""></canvas>
+
+    <h3 class="text-xl font-bold " style="margin-top: -100px">
+      Credit Score: <span id="creditscore-value"></span>
+    </h3>
+
+    <div id="creditScoreLegend" class="grid grid-cols-3 text-center items-center flex text-sm" ></div>
+  </div>
+
+
   <div class="flex justify-between max-w-md mx-auto mb-6">
     <button id="savingsBtn"
       class="flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">
@@ -225,6 +236,9 @@
 
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script> -->
+  <script src="/js/frontendfiles/creditscore.js"></script>
   <script src="/js/frontendfiles/finance.js"></script>
   <script src="/js/auth/savings.js"></script>
 </body>

@@ -36,8 +36,7 @@
 
 </head>
 
-<body
-    class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 text-gray-800 space-y-6 relative">
+<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 text-gray-800 space-y-6 relative">
 
     <div class="flex items-center">
         <button onclick="history.back()" class="text-blue-700 hover:text-blue-900 text-lg">
@@ -59,12 +58,12 @@
             class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Change Payment PIN</a>
         <a href="/secure/ctb/forgotpaymentpin"
             class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Forgot Payment PIN</a>
-        <a href="/secure/ctb/setcreditcardpin"
-            class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Set Credit Card PIN</a>
+        <a href="/secure/ctb/setcreditcardpin" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Set
+            Credit Card PIN</a>
         <a href="/secure/ctb/managecreditcardpin"
             class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Manage Credit Card PIN</a>
-        <a href="/secure/ctb/setdebitcardpin"
-            class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Set Debit Card PIN</a>
+        <a href="/secure/ctb/setdebitcardpin" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Set
+            Debit Card PIN</a>
         <a href="/secure/ctb/managedebitcardpin"
             class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Manage Debit Card PIN</a>
     </div>
@@ -79,6 +78,30 @@
             class="w-full py-3 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition">
             <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Log Out
         </button>
+    </div>
+    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
+        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
+
+            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="mt-1">Home</span>
+            </a>
+
+            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-chart-line text-lg"></i>
+                <span class="mt-1">Finance</span>
+            </a>
+
+            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-credit-card text-lg"></i>
+                <span class="mt-1">Cards</span>
+            </a>
+
+            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span class="mt-1">Me</span>
+            </a>
+        </div>
     </div>
 
     <script>

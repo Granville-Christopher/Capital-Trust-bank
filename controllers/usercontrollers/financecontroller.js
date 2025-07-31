@@ -285,10 +285,33 @@ const cancelSavings = async (req, res) => {
   }
 };
 
+const getCreditScore = async (req, res) => {
+  try {
+    if (!req.session.user || !req.session.user.id) {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+
+    const userId = req.session.user.id;
+    const user = await User.findById(userId).select("CreditScore");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    return res.status(200).json({
+      creditScore: user.CreditScore,
+    });
+  } catch (error) {
+    console.error("❌ Credit Score Fetch Error:", error);
+    return res.status(500).json({ error: "Server error." });
+  }
+};
+
 module.exports = {
   depositToSavings,
   withdrawInterest,
   compoundInterest,
   viewSavings,
   cancelSavings,
+  getCreditScore,
 };
