@@ -90,18 +90,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     creditScoreText.style.color = activeColor;
 
     // ✅ Add legend under chart
-const legend = document.getElementById("creditScoreLegend");
-
-legend.innerHTML = labels
-  .map((label, i) => {
-    const fullWidthClass = i >= 3 ? 'col-span-3 w-full text-center' : ''; 
-    return `
-      <div class="p-2 ${fullWidthClass}" style="color: ${colors[i]}; font-weight: bold; margin: 4px 0;">
-        ${label}: ${ranges[i]} - ${ranges[i + 1] || ""}
-      </div>
-    `;
-  })
-  .join("");
+    const legend = document.getElementById("creditScoreLegend");
+      
+    legend.innerHTML = labels
+      .map((label, i) => {
+        const fullWidthClass = i >= 3 ? 'col-span-3 w-full text-center' : ''; 
+        return `
+          <div class="p-2 ${fullWidthClass}" style="color: ${colors[i]}; font-weight: bold; margin: 4px 0;">
+            ${label}: ${ranges[i]} - ${ranges[i + 1] || ""}
+          </div>
+        `;
+      })
+      .join("");
 
   } catch (err) {
     console.error("Error fetching credit score:", err);
