@@ -118,17 +118,27 @@
 
   <section id="loansSection" class="max-w-md mx-auto hidden">
     <div class="bg-white rounded-xl shadow p-6 mb-4 relative">
-      <p class="text-lg font-semibold mb-2">Loan Balance</p>
-      <p class="text-3xl font-bold text-blue-600 mb-4">$15,000.00</p>
+      <div class="qlcredit">
+        <p class="text-lg font-semibold mb-2">Qualified loan credit</p>
+        <p class="text-3xl mb-8 font-bold text-green-600">0</p>
+      </div>
+      <p class="text-lg font-semibold mb-2">Outstanding Loan</p>
+      <p class="text-3xl font-bold text-red-600 mb-4">0</p>
       <div class="flex justify-between text-sm text-gray-600">
-        <span>Outstanding Loans</span>
-        <span>Next Payment Due: 10/15/2024</span>
+        <span></span>
+        <span>Outstanding Loan payment Due: 10/15/2024</span>
       </div>
     </div>
-    <button id="openLoanFormBtn"
-      class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition mb-4">
-      Request for Loan
-    </button>
+    <div class="loanBtns flex justify-between items-center gap-2">
+      <button id="openLoanFormBtn"
+        class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition mb-4">
+        Request for Loan
+      </button>
+      <button id="openPayLoanFormBtn"
+        class="w-full py-2 bg-red-600 text-white rounded-full hover:bg-blue-700 transition mb-4">
+        Pay Outstanding Loan
+      </button>
+    </div>
     <form id="loanForm" class="bg-white rounded-xl shadow p-6 max-w-md mx-auto hidden">
       <label for="loanAmount" class="block text-sm font-semibold mb-2">Loan Amount</label>
       <input type="number" id="loanAmount" name="loanAmount" placeholder="Enter loan amount"
@@ -142,6 +152,23 @@
         <option value="education">Education</option>
         <option value="business">Business</option>
         <option value="other">Other</option>
+      </select>
+      <label for="loanTerm" class="block text-sm font-semibold mb-2">Select Savings Term</label>
+      <select id="loanTerm" name="loanTerm"
+        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4">
+        <option value="7">7 days</option>
+        <option value="14">14 days</option>
+        <option value="30">1 month</option>
+        <option value="90">3 months</option>
+        <option value="120">4 months</option>
+        <option value="150">5 months</option>
+        <option value="180">6 months</option>
+        <option value="210">7 months</option>
+        <option value="240">8 months</option>
+        <option value="270">9 months</option>
+        <option value="300">10 months</option>
+        <option value="330">11 months</option>
+        <option value="365">12 months</option>
       </select>
       <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
         Submit Loan Request

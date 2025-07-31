@@ -137,6 +137,7 @@ router.get("/transactionhistory", async (req, res) => {
       return res.redirect("/secure/ctb/login");
     }
 
+    // ✅ Fetch transactions
     const internationalTransfers = await internationalTransferModel
       .find({ userId })
       .sort({ createdAt: -1 })
@@ -146,15 +147,32 @@ router.get("/transactionhistory", async (req, res) => {
       .sort({ transactionDate: -1, createdAt: -1 })
       .lean();
 
+    // ✅ Calculate totals
+    let totalIncome = 0;
+    let totalExpenses = 0;
+
+    transactionHistory.forEach((transaction) => {
+      if (transaction.type === "credit") {
+        totalIncome += transaction.amount;
+      } else if (transaction.type === "debit") {
+        totalExpenses += transaction.amount;
+      }
+    });
+
+    // ✅ Send data to the template
     return res.status(200).render("user/transactionhistory", {
-      internationalTransfers: internationalTransfers,
-      transactionHistory: transactionHistory,
+      internationalTransfers,
+      transactionHistory,
+      totalIncome,
+      totalExpenses,
     });
   } catch (error) {
-    console.error("Error fetching transaction history:", error);
+    console.error("❌ Error fetching transaction history:", error);
     return res.status(500).render("user/transactionhistory", {
       internationalTransfers: [],
       transactionHistory: [],
+      totalIncome: 0,
+      totalExpenses: 0,
     });
   }
 });

@@ -13,7 +13,7 @@ const savingSchema = new mongoose.Schema(
     },
     savingsTerm: {
       type: String,
-      required: true
+      required: true,
     },
     referenceId: {
       type: String,
@@ -31,6 +31,13 @@ const savingSchema = new mongoose.Schema(
     lastInterestDate: {
       type: Date,
       default: Date.now,
+    },
+    status: {
+      type: String,
+      default: "active",
+    },
+    completedAt: {
+      type: Date,
     },
   },
   { timestamps: true }

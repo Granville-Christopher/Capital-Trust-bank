@@ -26,6 +26,12 @@ const UserSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    CreditScore: {
+      type: Number,
+      default: 500,
+      min: 300,
+      max: 900,
+    },
     role: {
       type: String,
       enum: ["user", "admin"],

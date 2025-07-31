@@ -3,7 +3,7 @@ const User = require("../../models/usermodels/userSignup");
 const SavingsHistory = require("../../models/usermodels/savingshistory");
 const { body, validationResult } = require("express-validator");
 const escape = require("escape-html");
-const cron = require("node-cron");
+const CreditScoreHistory = require("../../models/usermodels/creditscore");
 
 function generateNumericReferenceId() {
   const timestamp = Date.now().toString();
@@ -42,24 +42,26 @@ const depositToSavings = [
       }
 
       const userId = req.session.user.id;
-
       const safeAmount = parseFloat(escape(amount));
-      const safeSavingsTerm = escape(savingsTerm);
+      const safeSavingsTerm = parseInt(escape(savingsTerm));
 
       if (isNaN(safeAmount) || safeAmount <= 0) {
         return res.status(400).json({ error: "Invalid amount." });
       }
 
       const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ error: "User not found." });
-      }
+      if (!user) return res.status(404).json({ error: "User not found." });
 
       if (user.AccountBalance < safeAmount) {
         return res.status(400).json({ error: "Insufficient funds." });
       }
 
       user.AccountBalance -= safeAmount;
+
+      const creditBoost = 2;
+      const oldCreditScore = user.CreditScore;
+      user.CreditScore = Math.min(user.CreditScore + creditBoost, 900);
+
       await user.save();
 
       const maturityDate = new Date();
@@ -67,37 +69,40 @@ const depositToSavings = [
 
       const referenceId = generateNumericReferenceId();
 
-      let savings = await Savings.findOne({ userId });
-      if (savings) {
-        savings.amount += safeAmount;
-        savings.maturityDate = maturityDate;
-      } else {
-        savings = new Savings({
-          userId,
-          amount: safeAmount,
-          savingsTerm: safeSavingsTerm,
-          referenceId,
-          totalInterest: 0,
-          interestBalance: 0,
-          createdAt: new Date(),
-          maturityDate,
-        });
-      }
+      const newSavings = new Savings({
+        userId,
+        amount: safeAmount,
+        savingsTerm: safeSavingsTerm,
+        referenceId,
+        totalInterest: 0,
+        interestBalance: 0,
+        createdAt: new Date(),
+        maturityDate,
+      });
 
-      await savings.save();
+      await newSavings.save();
 
       await SavingsHistory.create({
         userId,
         type: "deposit",
         amount: safeAmount,
-        balanceAfter: savings.amount,
+        balanceAfter: safeAmount,
         referenceId,
+      });
+
+      await CreditScoreHistory.create({
+        userId,
+        change: creditBoost,
+        reason: "User deposited to savings",
+        previousScore: oldCreditScore,
+        newScore: user.CreditScore,
       });
 
       res.status(200).json({
         message: "Deposit successful",
-        newSavingsAmount: savings.amount,
+        newSavingsAmount: safeAmount,
         newUserBalance: user.AccountBalance,
+        newCreditScore: user.CreditScore,
         referenceId,
       });
     } catch (error) {
@@ -122,7 +127,7 @@ const withdrawInterest = async (req, res) => {
     if (savings.interestBalance <= 0) {
       return res
         .status(400)
-        .json({ error: "No interest available to withdraw." });
+        .json({ error: "No interest matuerd for withdrawal." });
     }
 
     await User.findByIdAndUpdate(
@@ -162,7 +167,7 @@ const compoundInterest = async (req, res) => {
     const userId = req.session.user.id;
     const savings = await Savings.findOne({ userId });
     if (!savings) {
-      return res.status(404).json({ error: "No savings account found" });
+      return res.status(404).json({ error: "No savings found" });
     }
 
     if (savings.interestBalance <= 0) {
@@ -206,7 +211,7 @@ const viewSavings = async (req, res) => {
     const savings = await Savings.findOne({ userId });
 
     if (!savings) {
-      return res.status(404).json({ error: "No savings account found" });
+      return res.status(404).json({ error: "No savings found" });
     }
 
     const DAILY_INTEREST_RATE = 0.1 / 365;
@@ -243,8 +248,11 @@ const cancelSavings = async (req, res) => {
     }
 
     const principalAmount = savings.amount;
-
     user.AccountBalance += principalAmount;
+
+    const creditDeduction = 5;
+    user.CreditScore = Math.max(user.CreditScore - creditDeduction, 300);
+
     await user.save();
 
     await SavingsHistory.create({
@@ -255,6 +263,13 @@ const cancelSavings = async (req, res) => {
       referenceId: savings.referenceId,
     });
 
+    await CreditScoreHistory.create({
+      userId,
+      change: -creditDeduction,
+      reason: "Savings canceled early (interest forfeited)",
+      newScore: user.CreditScore,
+    });
+
     await Savings.deleteOne({ userId });
 
     return res.status(200).json({
@@ -262,6 +277,7 @@ const cancelSavings = async (req, res) => {
         "Savings canceled successfully. Interest removed. Principal refunded to your account.",
       refundedAmount: principalAmount,
       newBalance: user.AccountBalance,
+      newCreditScore: user.CreditScore,
     });
   } catch (error) {
     console.error("❌ Cancel Savings Error:", error);
