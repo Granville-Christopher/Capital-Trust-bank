@@ -37,7 +37,7 @@
 </head>
 
 <body class="bg-gradient-to-b relative from-blue-100 to-gray-100 min-h-screen pt-16 pb-24 px-6 space-y-8">
-  <div class="text-center mb-8">
+  <div class="text-center">
     <p class="text-sm text-gray-600">Total Balance</p>
     <p class="text-4xl font-bold text-blue-600">
       <%= user.AccountBalance.toLocaleString('en-US', { style: 'currency' , currency: 'USD' }) %>
@@ -45,14 +45,14 @@
     </p>
   </div>
 
-  <div class="creditScore-container" style="max-width: 350px; margin: auto; text-align: center;">
+  <div class="creditScore-container" style="max-width: 350px; margin: auto; text-align: center; margin-top: -80px; ">
     <canvas id="creditScoreGauge" width="300" height=""></canvas>
 
     <h3 class="text-xl font-bold " style="margin-top: -100px">
       Credit Score: <span id="creditscore-value"></span>
     </h3>
 
-    <div id="creditScoreLegend" class="grid grid-cols-3 text-center items-center text-sm" ></div>
+    <div id="creditScoreLegend" class="text-center items-center text-sm" ></div>
   </div>
 
 

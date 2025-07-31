@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     legend.style.display = "flex";
     legend.style.flexWrap = "wrap";
-      
+
     legend.innerHTML = labels
       .map((label, i) => {
         // ✅ First 3 items share equal width (33.3%)
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         // ✅ Last 2 items take full width
         return `
-          <div style="flex: 1 1 50%; text-align: center; color: ${colors[i]}; font-weight: bold; margin: 4px 0;">
+          <div style="flex: 1 1 100%; text-align: center; color: ${colors[i]}; font-weight: bold; margin: 4px 0;">
             ${label}: ${ranges[i]} - ${ranges[i + 1] || ""}
           </div>
         `;
