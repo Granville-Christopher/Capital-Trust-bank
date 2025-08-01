@@ -6,8 +6,8 @@ const Transactions = require("../../models/usermodels/transactionhistory");
 const User = require("../../models/usermodels/userSignup");
 
 const CREDIT_SCORE_BASE = [
-  { min: 300, max: 499, base: 0 },
-  { min: 500, max: 650, base: 100 },
+  { min: 300, max: 500, base: 0 },
+  { min: 501, max: 650, base: 100 },
   { min: 651, max: 750, base: 300 },
   { min: 751, max: 900, base: 500 },
 ];
@@ -94,6 +94,7 @@ const checkLoanEligibility = async (req, res) => {
       .json({ error: "Server error calculating loan eligibility." });
   }
 };
+
 const requestLoan = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -227,6 +228,9 @@ const requestLoan = async (req, res) => {
           reason,
           guarantor,
           guarantorContact,
+          amountRepaid: 0,
+          principalPaid: 0,
+          interestPaid: 0,
           status: "approved",
           dueDate: new Date(Date.now() + term * 24 * 60 * 60 * 1000),
         },
@@ -322,34 +326,91 @@ const repayLoan = async (req, res) => {
     }
 
     user.AccountBalance -= amount;
-    await user.save({ session });
 
-    loan.amountRepaid = (loan.amountRepaid || 0) + amount;
+    const remainingInterest = loan.interest - (loan.interestPaid || 0);
+    const remainingPrincipal = loan.amount - (loan.principalPaid || 0);
+    const totalRemaining = remainingInterest + remainingPrincipal;
+
+    let overpayment = 0;
+    let repaymentAmount = amount;
+
+    if (amount > totalRemaining) {
+      overpayment = amount - totalRemaining;
+      repaymentAmount = totalRemaining;
+      user.AccountBalance += overpayment;
+    }
+
+    let interestPayment = 0;
+    let principalPayment = 0;
+
+    if (repaymentAmount <= remainingInterest) {
+      interestPayment = repaymentAmount;
+    } else {
+      interestPayment = remainingInterest;
+      principalPayment = repaymentAmount - remainingInterest;
+    }
+
+    loan.interestPaid = (loan.interestPaid || 0) + interestPayment;
+    loan.principalPaid = (loan.principalPaid || 0) + principalPayment;
+    loan.amountRepaid = (loan.amountRepaid || 0) + repaymentAmount;
+
     if (loan.amountRepaid >= loan.totalRepayment) {
       loan.status = "repaid";
       user.CreditScore = Math.min(user.CreditScore + 10, 900);
     }
+
     await loan.save({ session });
+    await user.save({ session });
 
     await LoanHistory.create(
       [
         {
           userId,
           loanId: loan._id,
-          type: "loan_repayment",
-          amount,
-          details: `Repayment of $${amount} made.`,
+          action: "repaid",
+          amount: repaymentAmount,
+          reason: loan.reason,
+          term: loan.term,
+          guarantor: loan.guarantor,
+          guarantorContact: loan.guarantorContact,
+          statusNote: `Repayment of $${repaymentAmount} made. Principal: $${principalPayment.toFixed(
+            2
+          )}, Interest: $${interestPayment.toFixed(2)}.`,
         },
       ],
       { session }
     );
 
+    if (overpayment > 0) {
+      await LoanHistory.create(
+        [
+          {
+            userId,
+            loanId: loan._id,
+            action: "refund",
+            amount: overpayment,
+            statusNote: `User overpaid by $${overpayment}. Refunded to account balance.`,
+          },
+        ],
+        { session }
+      );
+    }
+
     await session.commitTransaction();
     session.endSession();
 
-    return res
-      .status(200)
-      .json({ message: "Loan repayment successful.", loan });
+    return res.status(200).json({
+      message:
+        overpayment > 0
+          ? `Loan repayment successful. You overpaid by $${overpayment}, which has been refunded to your balance.`
+          : "Loan repayment successful.",
+      breakdown: {
+        principalPaid: principalPayment,
+        interestPaid: interestPayment,
+      },
+      overpayment,
+      loan,
+    });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -381,15 +442,22 @@ const getLoanDetails = async (req, res) => {
     const boost = rolling30Days * 0.1;
     const eligibleAmount = baseLoan + boost;
 
+    const loanRemaining = activeLoan
+      ? (activeLoan.totalRepayment || 0) - (activeLoan.amountRepaid || 0)
+      : 0;
+
+    const availableCredit =
+      eligibleAmount - (activeLoan ? activeLoan.amount : 0);
+
     res.status(200).json({
       eligibleAmount: eligibleAmount.toFixed(2),
+      availableCredit: availableCredit.toFixed(2),
       activeLoan: activeLoan
         ? {
             amount: activeLoan.amount,
             status: activeLoan.status,
             dueDate: activeLoan.dueDate,
-            remaining:
-              activeLoan.totalRepayment - (activeLoan.amountRepaid || 0),
+            remaining: loanRemaining,
             loanId: activeLoan._id,
           }
         : null,

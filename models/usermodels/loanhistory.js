@@ -15,7 +15,7 @@ const LoanHistorySchema = new mongoose.Schema({
 
   action: {
     type: String,
-    enum: ["requested", "approved", "rejected", "repaid"],
+    enum: ["requested", "approved", "rejected", "repaid", "refund"],
     required: true,
   },
 
@@ -27,22 +27,22 @@ const LoanHistorySchema = new mongoose.Schema({
   reason: {
     type: String,
     enum: ["medical", "rent", "education", "business", "other"],
-    required: true,
+    required: false,
   },
 
   term: {
     type: Number,
-    required: true,
+    required: false,
   },
 
   guarantor: {
     type: String,
-    required: true,
+    required: false,
   },
 
   guarantorContact: {
     type: String,
-    required: true,
+    required: false,
   },
 
   statusNote: {

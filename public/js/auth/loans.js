@@ -1,10 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   const openPayLoanFormBtn = document.getElementById("openPayLoanFormBtn");
+  const qualifiedCreditField = document.getElementById("qualifiedCredit");
+  const outstandingLoanField = document.getElementById("outstandingLoan");
+  const availableCreditField = document.getElementById("availableCredit");
 
-  const qualifiedCreditField = document.querySelector(".qlcredit p.text-3xl");
-  const outstandingLoanField = document.querySelector(
-    ".bg-white p.text-3xl.font-bold.text-red-600"
-  );
   const dueDateField = document.getElementById("ddate");
 
   let activeLoanId = null;
@@ -35,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (res.ok) {
         qualifiedCreditField.textContent = `$${data.eligibleAmount}`;
+        availableCreditField.textContent = `$${data.availableCredit}`;
 
         if (data.activeLoan) {
           outstandingLoanField.textContent = `$${data.activeLoan.remaining}`;
@@ -53,8 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
           activeLoanId = null;
           dueDateField.textContent = "No active loan";
         }
-      } else {
-        showToast("error", data.error || "Unable to fetch loan details");
       }
     } catch (err) {
       console.error(err);

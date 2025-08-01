@@ -135,7 +135,7 @@
   </section>
 
   <section id="loansSection" class="max-w-md mx-auto hidden">
-    <div class="bg-white rounded-xl shadow p-4 mb-4 relative">
+    <!-- <div class="bg-white rounded-xl shadow p-4 mb-4 relative">
       <div class="qlcredit bg-gray-100 rounded p-2">
         <p class="text-lg font-semibold mb-2">Qualified loan credit</p>
         <p class="text-3xl mb-8 font-bold text-green-600">0</p>
@@ -148,7 +148,30 @@
         <span></span>
         <span id="ddate"></span>
       </div>
+    </div> -->
+    <div class="bg-white rounded-xl shadow p-4 mb-4 relative">
+      <div class="qlcredit bg-gray-100 rounded p-2">
+        <p class="text-lg font-semibold mb-2">Qualified loan credit</p>
+        <p class="text-3xl mb-2 font-bold text-green-600" id="qualifiedCredit">$0</p>
+      </div>
+
+      <div class="p-2">
+        <p class="text-lg font-semibold mb-2">Outstanding Loan</p>
+        <p class="text-3xl font-bold text-red-600 mb-2" id="outstandingLoan">$0</p>
+      </div>
+
+      <!-- ✅ NEW AVAILABLE CREDIT SECTION -->
+      <div class="p-2">
+        <p class="text-lg font-semibold mb-2">Available Credit</p>
+        <p class="text-3xl font-bold text-blue-600 mb-2" id="availableCredit">$0</p>
+      </div>
+
+      <div class="flex justify-between text-sm text-gray-600">
+        <span></span>
+        <span id="ddate"></span>
+      </div>
     </div>
+
     <div class="loanBtns flex justify-between items-center gap-2">
       <button id="openLoanFormBtn"
         class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition mb-4">
@@ -197,7 +220,8 @@
 
       <div class="flex items-center mb-4">
         <input type="checkbox" id="loanAgreement" name="loanAgreement" class="mr-2">
-        <label for="loanAgreement" class="text-sm">I agree to the loan <a href="loantc">terms and conditions</a>.</label>
+        <label for="loanAgreement" class="text-sm">I agree to the loan <a href="loantc">terms and
+            conditions</a>.</label>
       </div>
 
       <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
@@ -218,7 +242,7 @@
       <div id="loanSuccess" class="mb-4 hidden">
         <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
         <h3 class="mt-2 text-xl font-semibold text-gray-800">Loan Request Successful</h3>
-        <p class="text-sm text-gray-500">Your loan request has been submitted.</p>
+        <p class="text-sm text-gray-500">Your loan request has been approved.</p>
       </div>
       <div id="loanFailure" class="mb-4 hidden">
         <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>

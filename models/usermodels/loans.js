@@ -39,6 +39,11 @@ const LoanSchema = new mongoose.Schema({
     required: true,
   },
 
+  totalRepayment: {
+    type: Number,
+    required: true,
+  },
+
   status: {
     type: String,
     enum: ["pending", "approved", "rejected", "repaid", "defaulted"],
@@ -48,6 +53,16 @@ const LoanSchema = new mongoose.Schema({
   dueDate: {
     type: Date,
     required: true,
+  },
+
+  principalPaid: {
+    type: Number,
+    default: 0,
+  },
+
+  interestPaid: {
+    type: Number,
+    default: 0,
   },
 
   createdAt: {
