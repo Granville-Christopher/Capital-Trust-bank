@@ -9,6 +9,42 @@ const internationalTransferModel = require("../../models/usermodels/internationa
 const TransactionHistory = require("../../models/usermodels/transactionhistory");
 const Notification = require("../../models/usermodels/notifications");
 
+router.get("/savings", async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(404).render("user/login", { error: "User not found" });
+    }
+
+    return res.status(200).render("user/savings", { user });
+  } catch (error) {
+    res.status(500).render("user/login", { error: "Server error", user: null });
+  }
+});
+
+router.get("/loantc", async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(404).render("user/login", { error: "User not found" });
+    }
+
+    return res.status(200).render("user/loantc", { user });
+  } catch (error) {
+    res.status(500).render("user/login", { error: "Server error", user: null });
+  }
+});
+
 router.get("/cards", async (req, res) => {
   return res.status(200).render("user/cards");
 });
@@ -137,7 +173,6 @@ router.get("/transactionhistory", async (req, res) => {
       return res.redirect("/secure/ctb/login");
     }
 
-    // ✅ Fetch transactions
     const internationalTransfers = await internationalTransferModel
       .find({ userId })
       .sort({ createdAt: -1 })
@@ -147,7 +182,6 @@ router.get("/transactionhistory", async (req, res) => {
       .sort({ transactionDate: -1, createdAt: -1 })
       .lean();
 
-    // ✅ Calculate totals
     let totalIncome = 0;
     let totalExpenses = 0;
 
@@ -159,7 +193,6 @@ router.get("/transactionhistory", async (req, res) => {
       }
     });
 
-    // ✅ Send data to the template
     return res.status(200).render("user/transactionhistory", {
       internationalTransfers,
       transactionHistory,

@@ -6,7 +6,7 @@ const otpGenerator = require("otp-generator");
 const transporter = nodemailer.createTransport({
   host: "smtp.privateemail.com",
   port: 587,
-  secure: false, 
+  secure: false,
   requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
   },
 
   // tls: {
-  //     ciphers: 'SSLv3' // Use this only if you specifically get SSLv3 errors
+  //     ciphers: 'SSLv3'
   // }
 });
 transporter.verify((error, success) => {
@@ -34,7 +34,7 @@ const generateOtp = () => {
 
 const sendOtpEmail = async (email, otp) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: `"Capital Trust Bank" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "Your One-Time Password (OTP) for Transfer Confirmation",
     html: `

@@ -52,7 +52,7 @@
       Credit Score: <span id="creditscore-value"></span>
     </h3>
 
-    <div id="creditScoreLegend" class="text-center items-center text-sm" ></div>
+    <div id="creditScoreLegend" class="text-center items-center text-sm"></div>
   </div>
 
 
@@ -71,7 +71,10 @@
 
   <section id="savingsSection" class="max-w-md mx-auto">
     <div class="bg-white rounded-xl shadow p-6 mb-4 relative" id="savingsCard">
-      <p class="text-lg font-semibold mb-2">Savings Balance</p>
+      <div class="topsection flex justify-between items-center">
+        <p class="text-lg font-semibold mb-2">Savings Balance</p>
+        <p class="text-lg font-semibold mb-2 text-blue-400">savings history</p>
+      </div>
       <p class="text-3xl font-bold text-blue-600 mb-4" id="savingsBalance"> no savings yet</p>
 
       <div class="flex justify-between text-sm text-gray-600 mb-4">
@@ -90,10 +93,14 @@
           Compound Interest
         </button>
       </div>
-      <button id="cancelSavingsBtn"
-        class="mt-4 w-full py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">
-        Cancel Savings
-      </button>
+      <div class="flex gap-4 mt-4">
+        <a href="savings"
+          class=" text-center bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl font-medium w-full">
+          <button id="compoundInterestBtn" class="">
+            View all savings
+          </button>
+        </a>
+      </div>
     </div>
 
     <button id="openSavingsFormBtn"
@@ -128,16 +135,18 @@
   </section>
 
   <section id="loansSection" class="max-w-md mx-auto hidden">
-    <div class="bg-white rounded-xl shadow p-6 mb-4 relative">
-      <div class="qlcredit">
+    <div class="bg-white rounded-xl shadow p-4 mb-4 relative">
+      <div class="qlcredit bg-gray-100 rounded p-2">
         <p class="text-lg font-semibold mb-2">Qualified loan credit</p>
         <p class="text-3xl mb-8 font-bold text-green-600">0</p>
       </div>
-      <p class="text-lg font-semibold mb-2">Outstanding Loan</p>
-      <p class="text-3xl font-bold text-red-600 mb-4">0</p>
+      <div class="p-2">
+        <p class="text-lg font-semibold mb-2">Outstanding Loan</p>
+        <p class="text-3xl font-bold text-red-600 mb-4">0</p>
+      </div>
       <div class="flex justify-between text-sm text-gray-600">
         <span></span>
-        <span>Outstanding Loan payment Due: 10/15/2024</span>
+        <span id="ddate"></span>
       </div>
     </div>
     <div class="loanBtns flex justify-between items-center gap-2">
@@ -146,7 +155,7 @@
         Request for Loan
       </button>
       <button id="openPayLoanFormBtn"
-        class="w-full py-2 bg-red-600 text-white rounded-full hover:bg-blue-700 transition mb-4">
+        class="w-full py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition mb-4">
         Pay Outstanding Loan
       </button>
     </div>
@@ -154,6 +163,7 @@
       <label for="loanAmount" class="block text-sm font-semibold mb-2">Loan Amount</label>
       <input type="number" id="loanAmount" name="loanAmount" placeholder="Enter loan amount"
         class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4" />
+
       <label for="loanReason" class="block text-sm font-semibold mb-2">Reason for Loan</label>
       <select id="loanReason" name="loanReason"
         class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4">
@@ -164,27 +174,37 @@
         <option value="business">Business</option>
         <option value="other">Other</option>
       </select>
-      <label for="loanTerm" class="block text-sm font-semibold mb-2">Select Savings Term</label>
+
+      <label for="loanTerm" class="block text-sm font-semibold mb-2">Loan Term</label>
       <select id="loanTerm" name="loanTerm"
         class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4">
         <option value="7">7 days</option>
         <option value="14">14 days</option>
         <option value="30">1 month</option>
         <option value="90">3 months</option>
-        <option value="120">4 months</option>
-        <option value="150">5 months</option>
         <option value="180">6 months</option>
-        <option value="210">7 months</option>
-        <option value="240">8 months</option>
-        <option value="270">9 months</option>
-        <option value="300">10 months</option>
-        <option value="330">11 months</option>
         <option value="365">12 months</option>
       </select>
+
+      <label for="guarantor" class="block text-sm font-semibold mb-2">Guarantor Name </label>
+      <input type="text" id="guarantor" name="guarantor" placeholder="Enter guarantor name"
+        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4" />
+
+      <label for="guarantorContact" class="block text-sm font-semibold mb-2">Guarantor Contact (Phone or Email)</label>
+      <input type="text" id="guarantorContact" name="guarantorContact"
+        placeholder="Enter guarantor phone number (inc . country code) or email"
+        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4" />
+
+      <div class="flex items-center mb-4">
+        <input type="checkbox" id="loanAgreement" name="loanAgreement" class="mr-2">
+        <label for="loanAgreement" class="text-sm">I agree to the loan <a href="loantc">terms and conditions</a>.</label>
+      </div>
+
       <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
         Submit Loan Request
       </button>
     </form>
+
   </section>
 
   <div id="loanProcessingModal"
@@ -240,7 +260,8 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script> -->
   <script src="/js/frontendfiles/creditscore.js"></script>
   <script src="/js/frontendfiles/finance.js"></script>
-  <script src="/js/auth/savings.js"></script>
+  <script src="/js/auth/financesavings.js"></script>
+  <script src="/js/auth/loans.js"></script>
 </body>
 
 </html>

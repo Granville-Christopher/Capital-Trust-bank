@@ -1,12 +1,5 @@
 const API_BASE = "/user";
 
-const savingsBalanceEl = document.getElementById("savingsBalance");
-const todayInterestEl = document.getElementById("todayInterest");
-const totalInterestEl = document.getElementById("totalInterest");
-const withdrawBtn = document.getElementById("withdrawInterestBtn");
-const compoundBtn = document.getElementById("compoundInterestBtn");
-const cancelBtn = document.getElementById("cancelSavingsBtn");
-
 const toastContainer = document.createElement("div");
 toastContainer.id = "toast";
 toastContainer.className =
@@ -60,15 +53,64 @@ async function loadSavingsData() {
     const data = await res.json();
 
     if (res.ok) {
-      savingsBalanceEl.textContent = `$${parseFloat(
-        data.principal
-      ).toLocaleString()}`;
-      todayInterestEl.textContent = `Today's Interest: $${parseFloat(
-        data.todayInterest
-      ).toFixed(2)}`;
-      totalInterestEl.textContent = `Total Interest: $${parseFloat(
-        data.totalInterest
-      ).toFixed(2)}`;
+      const savingsSection = document.getElementById("savingsSection");
+      savingsSection.innerHTML = ""; 
+
+      data.forEach((saving) => {
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-xl shadow p-6 mb-4 relative";
+
+        card.innerHTML = `
+          <p class="text-lg font-semibold mb-2">Savings Balance</p>
+          <p class="text-3xl font-bold text-blue-600 mb-4">$${parseFloat(
+            saving.principal
+          ).toLocaleString()}</p>
+
+          <div class="flex justify-between text-sm text-gray-600 mb-4">
+            <span>Today's Interest: $${parseFloat(saving.todayInterest).toFixed(
+              2
+            )}</span>
+            <span>Total Interest: $${parseFloat(saving.totalInterest).toFixed(
+              2
+            )}</span>
+          </div>
+
+          <div class="flex gap-4 mt-4">
+            <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-medium w-1/2 withdraw-btn" data-id="${
+              saving.id
+            }">
+              Withdraw Interest
+            </button>
+            <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-medium w-1/2 compound-btn" data-id="${
+              saving.id
+            }">
+              Compound Interest
+            </button>
+          </div>
+
+          <div class="flex gap-4 mt-4">
+            <button class="mt-4 w-full py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition cancel-btn" data-id="${
+              saving.id
+            }">
+              Cancel Savings
+            </button>
+          </div>
+        `;
+
+        savingsSection.appendChild(card);
+      });
+
+      document.querySelectorAll(".withdraw-btn").forEach((btn) => {
+        btn.addEventListener("click", () => withdrawInterest(btn.dataset.id));
+      });
+
+      document.querySelectorAll(".compound-btn").forEach((btn) => {
+        btn.addEventListener("click", () => compoundInterest(btn.dataset.id));
+      });
+
+      document.querySelectorAll(".cancel-btn").forEach((btn) => {
+        btn.addEventListener("click", () => cancelSavings(btn.dataset.id));
+      });
     } else {
       console.error("Error loading savings data:", data.error);
     }
@@ -77,9 +119,10 @@ async function loadSavingsData() {
   }
 }
 
-async function withdrawInterest() {
+// ✅ Withdraw interest (specific savings)
+async function withdrawInterest(id) {
   try {
-    const res = await fetch(`${API_BASE}/secure/ctb/withdraw-interest`, {
+    const res = await fetch(`${API_BASE}/secure/ctb/${id}/withdraw-interest`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     });
@@ -88,7 +131,6 @@ async function withdrawInterest() {
     if (res.ok) {
       showToast(data.message, "success");
       loadSavingsData();
-      location.reload();
     } else {
       showToast(data.error || "Error withdrawing interest", "error");
     }
@@ -98,9 +140,9 @@ async function withdrawInterest() {
   }
 }
 
-async function compoundInterest() {
+async function compoundInterest(id) {
   try {
-    const res = await fetch(`${API_BASE}/secure/ctb/compound-interest`, {
+    const res = await fetch(`${API_BASE}/secure/ctb/${id}/compound-interest`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     });
@@ -109,7 +151,6 @@ async function compoundInterest() {
     if (res.ok) {
       showToast(data.message, "success");
       loadSavingsData();
-      location.reload();
     } else {
       showToast(data.error || "Error compounding interest", "error");
     }
@@ -119,7 +160,7 @@ async function compoundInterest() {
   }
 }
 
-async function cancelSavings() {
+async function cancelSavings(id) {
   if (
     !confirm(
       "Are you sure you want to cancel your savings? You will lose all interest earned."
@@ -129,20 +170,16 @@ async function cancelSavings() {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/secure/ctb/cancel-savings`, {
+    const res = await fetch(`${API_BASE}/secure/ctb/${id}/cancel-savings`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
     });
-
     const data = await res.json();
 
     if (res.ok) {
       showToast(data.message, "success");
       loadSavingsData();
-      location.reload();
     } else {
       showToast(data.error || "Error canceling savings", "error");
     }
@@ -152,11 +189,5 @@ async function cancelSavings() {
   }
 }
 
-if (cancelBtn) {
-  cancelBtn.addEventListener("click", cancelSavings);
-}
-
-withdrawBtn.addEventListener("click", withdrawInterest);
-compoundBtn.addEventListener("click", compoundInterest);
-
+// ✅ Initial load
 loadSavingsData();

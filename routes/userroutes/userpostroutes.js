@@ -22,10 +22,23 @@ const {
   cancelSavings,
   getCreditScore,
 } = require("../../controllers/usercontrollers/financecontroller");
+const {
+  getSavingsSummary,
+  compoundAllSavings,
+  withdrawAllSavings,
+} = require("../../controllers/usercontrollers/savingsummary");
+const {
+  requestLoan,
+  repayLoan,
+  checkLoanEligibility,
+  getLoanDetails,
+} = require("../../controllers/usercontrollers/loancontroller");
 
 router.get("/lookupaccount", lookupAccount);
 router.get("/viewsavings", viewSavings);
 router.get("/creditscore", getCreditScore);
+router.get("/eligibility", checkLoanEligibility);
+router.get("/loan-details", getLoanDetails);
 
 router.post("/signup", registerUser);
 router.post("/login", loginUser);
@@ -37,8 +50,16 @@ router.post("/confirmtransfer", verifyTransfer);
 router.post("/localtransfer", localTransfer);
 router.post("/confirmlocaltransfer", verifyLocalTransfer);
 router.post("/savings", depositToSavings);
-router.post("/withdraw-interest", withdrawInterest);
-router.post("/compound-interest", compoundInterest);
-router.post("/cancel-savings", cancelSavings);
+
+router.post("/:id/withdraw-interest", withdrawInterest);
+router.post("/:id/compound-interest", compoundInterest);
+router.post("/:id/cancel-savings", cancelSavings);
+
+router.get("/summary-savings", getSavingsSummary);
+router.post("/compound-all", compoundAllSavings);
+router.post("/withdraw-all", withdrawAllSavings);
+
+router.post("/request-loan", requestLoan);
+router.post("/repay-loan", repayLoan);
 
 module.exports = router;

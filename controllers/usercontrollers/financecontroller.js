@@ -4,6 +4,7 @@ const SavingsHistory = require("../../models/usermodels/savingshistory");
 const { body, validationResult } = require("express-validator");
 const escape = require("escape-html");
 const CreditScoreHistory = require("../../models/usermodels/creditscore");
+const mongoose = require("mongoose");
 
 function generateNumericReferenceId() {
   const timestamp = Date.now().toString();
@@ -113,91 +114,144 @@ const depositToSavings = [
 ];
 
 const withdrawInterest = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     if (!req.session.user || !req.session.user.id) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(401).json({ error: "Authentication required" });
     }
 
     const userId = req.session.user.id;
-    const savings = await Savings.findOne({ userId });
-    if (!savings) {
-      return res.status(404).json({ error: "No savings account found" });
+
+    const saving = await Savings.findOne({
+      _id: req.params.id,
+      userId,
+    }).session(session);
+    if (!saving) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ error: "No saving plan found" });
     }
 
-    if (savings.interestBalance <= 0) {
+    if (saving.interestBalance <= 0) {
+      await session.abortTransaction();
+      session.endSession();
       return res
         .status(400)
-        .json({ error: "No interest matuerd for withdrawal." });
+        .json({ error: "No interest matured for withdrawal." });
     }
 
-    await User.findByIdAndUpdate(
-      userId,
-      { $inc: { AccountBalance: savings.interestBalance } },
-      { new: true }
+    const withdrawnAmount = saving.interestBalance;
+
+    const user = await User.findById(userId).session(session);
+    if (!user) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    user.AccountBalance += withdrawnAmount;
+
+    saving.interestBalance = 0;
+
+    await saving.save({ session });
+    await user.save({ session });
+
+    await SavingsHistory.create(
+      [
+        {
+          userId,
+          type: "withdraw_interest",
+          amount: withdrawnAmount,
+          balanceAfter: saving.amount,
+        },
+      ],
+      { session }
     );
 
-    const withdrawnAmount = savings.interestBalance;
-
-    savings.interestBalance = 0;
-    await savings.save();
-
-    await SavingsHistory.create({
-      userId,
-      type: "withdraw_interest",
-      amount: withdrawnAmount,
-      balanceAfter: savings.amount,
-    });
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(200).json({
       message: `Successfully withdrew $${withdrawnAmount.toFixed(2)} interest.`,
       withdrawnAmount,
+      newBalance: user.AccountBalance,
     });
   } catch (error) {
-    console.error("❌ Withdraw Interest Error:", error);
-    res.status(500).json({ error: "Server error" });
+    await session.abortTransaction();
+    session.endSession();
+    console.error("❌ Withdraw Interest Error (Transaction):", error);
+    res.status(500).json({ error: "Server error. Transaction rolled back." });
   }
 };
 
 const compoundInterest = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     if (!req.session.user || !req.session.user.id) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(401).json({ error: "Authentication required" });
     }
 
     const userId = req.session.user.id;
-    const savings = await Savings.findOne({ userId });
-    if (!savings) {
-      return res.status(404).json({ error: "No savings found" });
+
+    const saving = await Savings.findOne({
+      _id: req.params.id,
+      userId,
+    }).session(session);
+    if (!saving) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ error: "No saving plan found" });
     }
 
-    if (savings.interestBalance <= 0) {
+    if (saving.interestBalance <= 0) {
+      await session.abortTransaction();
+      session.endSession();
       return res
         .status(400)
         .json({ error: "No interest available to compound." });
     }
 
-    savings.amount += savings.interestBalance;
-    const compoundedAmount = savings.interestBalance;
+    const compoundedAmount = saving.interestBalance;
+    saving.amount += compoundedAmount;
 
-    savings.interestBalance = 0;
-    await savings.save();
+    saving.interestBalance = 0;
 
-    await SavingsHistory.create({
-      userId,
-      type: "compound_interest",
-      amount: compoundedAmount,
-      balanceAfter: savings.amount,
-    });
+    await saving.save({ session });
+
+    await SavingsHistory.create(
+      [
+        {
+          userId,
+          type: "compound_interest",
+          amount: compoundedAmount,
+          balanceAfter: saving.amount,
+        },
+      ],
+      { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(200).json({
       message: `Successfully compounded $${compoundedAmount.toFixed(
         2
       )} into your savings.`,
-      newPrincipal: savings.amount,
+      newPrincipal: saving.amount,
     });
   } catch (error) {
-    console.error("❌ Compound Interest Error:", error);
-    res.status(500).json({ error: "Server error" });
+    await session.abortTransaction();
+    session.endSession();
+    console.error("❌ Compound Interest Error (Transaction):", error);
+    res.status(500).json({ error: "Server error. Transaction rolled back." });
   }
 };
 
@@ -208,21 +262,23 @@ const viewSavings = async (req, res) => {
     }
 
     const userId = req.session.user.id;
-    const savings = await Savings.findOne({ userId });
+    const savings = await Savings.find({ userId });
 
-    if (!savings) {
+    if (!savings || savings.length === 0) {
       return res.status(404).json({ error: "No savings found" });
     }
 
     const DAILY_INTEREST_RATE = 0.1 / 365;
-    const todayInterest = savings.amount * DAILY_INTEREST_RATE;
 
-    res.status(200).json({
-      principal: savings.amount.toFixed(2),
-      totalInterest: savings.totalInterest.toFixed(2),
-      interestBalance: savings.interestBalance.toFixed(2),
-      todayInterest: todayInterest.toFixed(2),
-    });
+    const savingsData = savings.map((s) => ({
+      principal: s.amount.toFixed(2),
+      totalInterest: s.totalInterest.toFixed(2),
+      interestBalance: s.interestBalance.toFixed(2),
+      todayInterest: (s.amount * DAILY_INTEREST_RATE).toFixed(2),
+      id: s._id,
+    }));
+
+    res.status(200).json(savingsData);
   } catch (error) {
     console.error("❌ View Savings Error:", error);
     res.status(500).json({ error: "Server error" });
@@ -230,58 +286,90 @@ const viewSavings = async (req, res) => {
 };
 
 const cancelSavings = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     if (!req.session.user || !req.session.user.id) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(401).json({ error: "Authentication required." });
     }
 
     const userId = req.session.user.id;
 
-    const savings = await Savings.findOne({ userId });
-    if (!savings) {
+    const saving = await Savings.findOne({
+      _id: req.params.id,
+      userId,
+    }).session(session);
+    if (!saving) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(404).json({ error: "No savings found." });
     }
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).session(session);
     if (!user) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(404).json({ error: "User not found." });
     }
 
-    const principalAmount = savings.amount;
+    const oldScore = user.CreditScore;
+
+    const principalAmount = saving.amount;
     user.AccountBalance += principalAmount;
 
     const creditDeduction = 5;
-    user.CreditScore = Math.max(user.CreditScore - creditDeduction, 300);
+    user.CreditScore = Math.max(oldScore - creditDeduction, 300);
 
-    await user.save();
+    await SavingsHistory.create(
+      [
+        {
+          userId,
+          type: "cancel",
+          amount: principalAmount,
+          balanceAfter: user.AccountBalance,
+          referenceId: saving.referenceId,
+        },
+      ],
+      { session }
+    );
 
-    await SavingsHistory.create({
-      userId,
-      type: "cancel",
-      amount: principalAmount,
-      balanceAfter: user.AccountBalance,
-      referenceId: savings.referenceId,
-    });
+    await CreditScoreHistory.create(
+      [
+        {
+          userId,
+          change: -creditDeduction,
+          reason: "Saving plan canceled early (interest forfeited)",
+          newScore: user.CreditScore,
+          previousScore: oldScore,
+        },
+      ],
+      { session }
+    );
 
-    await CreditScoreHistory.create({
-      userId,
-      change: -creditDeduction,
-      reason: "Savings canceled early (interest forfeited)",
-      newScore: user.CreditScore,
-    });
+    await Savings.deleteOne({ _id: req.params.id, userId }).session(session);
 
-    await Savings.deleteOne({ userId });
+    await user.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
 
     return res.status(200).json({
       message:
-        "Savings canceled successfully. Interest removed. Principal refunded to your account.",
+        "Saving plan canceled successfully. Interest removed. Principal refunded to your account.",
       refundedAmount: principalAmount,
       newBalance: user.AccountBalance,
       newCreditScore: user.CreditScore,
     });
   } catch (error) {
-    console.error("❌ Cancel Savings Error:", error);
-    return res.status(500).json({ error: "Server error." });
+    await session.abortTransaction();
+    session.endSession();
+    console.error("❌ Cancel Saving Error (Transaction):", error);
+    return res
+      .status(500)
+      .json({ error: "Server error. Transaction rolled back." });
   }
 };
 

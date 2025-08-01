@@ -60,7 +60,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const baseCircle = {
       id: "baseCircle",
       afterDatasetDraw(chart) {
-        const { ctx, chartArea: { width, height, top, left } } = chart;
+        const {
+          ctx,
+          chartArea: { width, height, top, left },
+        } = chart;
         ctx.save();
 
         // ✅ Position circle at bottom center of the semicircle
@@ -70,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // ✅ Draw small circle that matches score color
         ctx.beginPath();
         ctx.arc(cx, cy, 12, 0, Math.PI * 2);
-        ctx.fillStyle = activeColor;  // dynamically changes based on score
+        ctx.fillStyle = activeColor; // dynamically changes based on score
         ctx.fill();
 
         // ✅ Add a thin border for a clean look
@@ -100,21 +103,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         // ✅ First 3 items share equal width (33.3%)
         if (i < 3) {
           return `
-            <div style="flex: 1 1 33%; text-align: center; color: ${colors[i]}; font-weight: bold; margin: 4px 0;">
+            <div style="flex: 1 1 33%; text-align: center; color: ${
+              colors[i]
+            }; font-weight: bold; margin: 4px 0;">
               ${label}: ${ranges[i]} - ${ranges[i + 1] || ""}
             </div>
           `;
         }
         // ✅ Last 2 items take full width
         return `
-          <div style="flex: 1 1 100%; text-align: center; color: ${colors[i]}; font-weight: bold; margin: 4px 0;">
+          <div style="flex: 1 1 100%; text-align: center; color: ${
+            colors[i]
+          }; font-weight: bold; margin: 4px 0;">
             ${label}: ${ranges[i]} - ${ranges[i + 1] || ""}
           </div>
         `;
       })
       .join("");
-
-
   } catch (err) {
     console.error("Error fetching credit score:", err);
     creditScoreText.textContent = "Error loading credit score";

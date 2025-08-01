@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const openLoanFormBtn = document.getElementById("openLoanFormBtn");
   const loanForm = document.getElementById("loanForm");
+  const loanAmountInput = document.getElementById("loanAmount");
+  const loanReasonInput = document.getElementById("loanReason");
+  const loanTermInput = document.getElementById("loanTerm");
 
   const loanProcessingModal = document.getElementById("loanProcessingModal");
   const loanSpinner = document.getElementById("loanSpinner");
@@ -149,29 +152,94 @@ document.addEventListener("DOMContentLoaded", function () {
       loanForm.classList.toggle("hidden");
     });
   }
-
   if (loanForm) {
-    loanForm.addEventListener("submit", (e) => {
+    loanForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      const amount = loanAmountInput.value.trim();
+      const reason = loanReasonInput.value.trim();
+      const term = loanTermInput.value.trim();
+      const guarantor = document.getElementById("guarantor").value.trim();
+      const guarantorContact = document
+        .getElementById("guarantorContact")
+        .value.trim();
+      const agreement = document.getElementById("loanAgreement").checked;
+
+      if (!amount || Number(amount) <= 0 || isNaN(amount)) {
+        showModal(false, "Please enter a valid loan amount.");
+        return;
+      }
+
+      if (!reason) {
+        showModal(false, "Please select a loan reason.");
+        return;
+      }
+
+      if (!term) {
+        showModal(false, "Please select a loan term.");
+        return;
+      }
+
+      if (!guarantor || !guarantorContact) {
+        showModal(false, "Please provide guarantor details.");
+        return;
+      }
+
+      if (!agreement) {
+        showModal(false, "You must agree to the loan terms.");
+        return;
+      }
+
+      loanProcessingModal.classList.remove("hidden");
       loanSpinner.classList.remove("hidden");
       loanSuccess.classList.add("hidden");
       loanFailure.classList.add("hidden");
-      loanProcessingModal.classList.remove("hidden");
 
-      setTimeout(() => {
+      try {
+        const response = await fetch("/user/secure/ctb/request-loan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: Number(amount),
+            reason,
+            term,
+            guarantor,
+            guarantorContact,
+          }),
+          credentials: "include",
+        });
+
+        const data = await response.json();
+
         loanSpinner.classList.add("hidden");
-        if (Math.random() < 0.8) {
+
+        if (response.ok) {
           loanSuccess.classList.remove("hidden");
+          loanFailure.classList.add("hidden");
+
+          loanForm.reset();
+          loanForm.classList.add("hidden");
+
+          setTimeout(() => {
+            loanProcessingModal.classList.add("hidden");
+          }, 5000);
         } else {
+          loanFailure.querySelector("p").textContent =
+            data.error || "Loan request failed.";
           loanFailure.classList.remove("hidden");
+          loanSuccess.classList.add("hidden");
         }
-      }, 3000);
+      } catch (error) {
+        console.error("Loan Request Error:", error);
+
+        loanSpinner.classList.add("hidden");
+        loanFailure.classList.remove("hidden");
+        loanSuccess.classList.add("hidden");
+      }
     });
   }
 
-  if (closeLoanModalBtn) {
-    closeLoanModalBtn.addEventListener("click", () => {
-      loanProcessingModal.classList.add("hidden");
-    });
-  }
+  closeLoanModalBtn.addEventListener("click", () => {
+    loanProcessingModal.classList.add("hidden");
+  });
 });
