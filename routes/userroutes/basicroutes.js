@@ -44,6 +44,23 @@ router.get("/loantc", async (req, res) => {
     res.status(500).render("user/login", { error: "Server error", user: null });
   }
 });
+router.get("/loans", async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(404).render("user/login", { error: "User not found" });
+    }
+
+    return res.status(200).render("user/loans", { user });
+  } catch (error) {
+    res.status(500).render("user/login", { error: "Server error", user: null });
+  }
+});
 
 router.get("/cards", async (req, res) => {
   return res.status(200).render("user/cards");

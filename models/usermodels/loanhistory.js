@@ -10,7 +10,7 @@ const LoanHistorySchema = new mongoose.Schema({
   loanId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Loan",
-    required: false,
+    required: true,
   },
 
   action: {
@@ -27,22 +27,22 @@ const LoanHistorySchema = new mongoose.Schema({
   reason: {
     type: String,
     enum: ["medical", "rent", "education", "business", "other"],
-    required: false,
+    required: true,
   },
 
   term: {
     type: Number,
-    required: false,
+    required: true,
   },
 
   guarantor: {
     type: String,
-    required: false,
+    required: true,
   },
 
   guarantorContact: {
     type: String,
-    required: false,
+    required: true,
   },
 
   statusNote: {

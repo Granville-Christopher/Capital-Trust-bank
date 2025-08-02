@@ -274,7 +274,6 @@ const requestLoan = async (req, res) => {
       .json({ error: "Loan request failed. Transaction rolled back." });
   }
 };
-
 const repayLoan = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -300,6 +299,7 @@ const repayLoan = async (req, res) => {
     }
 
     const { loanId, amount } = req.body;
+    const repaymentAmount = Number(amount);
     const userId = req.session.user.id;
 
     const user = await User.findById(userId).session(session);
@@ -317,7 +317,7 @@ const repayLoan = async (req, res) => {
       return res.status(400).json({ error: "Loan already repaid." });
     }
 
-    if (user.AccountBalance < amount) {
+    if (user.AccountBalance < repaymentAmount) {
       await session.abortTransaction();
       session.endSession();
       return res
@@ -325,36 +325,42 @@ const repayLoan = async (req, res) => {
         .json({ error: "Insufficient balance to repay loan." });
     }
 
-    user.AccountBalance -= amount;
+    const totalRepayment = Number(loan.totalRepayment) || 0;
+    const interestPaid = Number(loan.interestPaid) || 0;
+    const principalPaid = Number(loan.principalPaid) || 0;
+    const loanAmount = Number(loan.amount) || 0;
+    const interestRate = Number(loan.interestRate) || 0;
 
-    const remainingInterest = loan.interest - (loan.interestPaid || 0);
-    const remainingPrincipal = loan.amount - (loan.principalPaid || 0);
+    const totalInterest = (loanAmount * interestRate) / 100;
+    const remainingInterest = Math.max(totalInterest - interestPaid, 0);
+    const remainingPrincipal = Math.max(loanAmount - principalPaid, 0);
     const totalRemaining = remainingInterest + remainingPrincipal;
 
     let overpayment = 0;
-    let repaymentAmount = amount;
+    let amountToApply = repaymentAmount;
 
-    if (amount > totalRemaining) {
-      overpayment = amount - totalRemaining;
-      repaymentAmount = totalRemaining;
+    if (repaymentAmount > totalRemaining) {
+      overpayment = repaymentAmount - totalRemaining;
+      amountToApply = totalRemaining;
       user.AccountBalance += overpayment;
     }
+
+    user.AccountBalance -= repaymentAmount;
 
     let interestPayment = 0;
     let principalPayment = 0;
 
-    if (repaymentAmount <= remainingInterest) {
-      interestPayment = repaymentAmount;
+    if (amountToApply <= remainingInterest) {
+      interestPayment = amountToApply;
     } else {
       interestPayment = remainingInterest;
-      principalPayment = repaymentAmount - remainingInterest;
+      principalPayment = amountToApply - remainingInterest;
     }
 
-    loan.interestPaid = (loan.interestPaid || 0) + interestPayment;
-    loan.principalPaid = (loan.principalPaid || 0) + principalPayment;
-    loan.amountRepaid = (loan.amountRepaid || 0) + repaymentAmount;
+    loan.interestPaid = interestPaid + interestPayment;
+    loan.principalPaid = principalPaid + principalPayment;
 
-    if (loan.amountRepaid >= loan.totalRepayment) {
+    if (loan.interestPaid + loan.principalPaid >= totalRepayment) {
       loan.status = "repaid";
       user.CreditScore = Math.min(user.CreditScore + 10, 900);
     }
@@ -368,12 +374,12 @@ const repayLoan = async (req, res) => {
           userId,
           loanId: loan._id,
           action: "repaid",
-          amount: repaymentAmount,
+          amount: amountToApply,
           reason: loan.reason,
           term: loan.term,
           guarantor: loan.guarantor,
           guarantorContact: loan.guarantorContact,
-          statusNote: `Repayment of $${repaymentAmount} made. Principal: $${principalPayment.toFixed(
+          statusNote: `Repayment of $${amountToApply} made. Principal: $${principalPayment.toFixed(
             2
           )}, Interest: $${interestPayment.toFixed(2)}.`,
         },
@@ -468,9 +474,39 @@ const getLoanDetails = async (req, res) => {
   }
 };
 
+const getAllLoans = async (req, res) => {
+  try {
+    if (!req.session.user || !req.session.user.id) {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+
+    const userId = req.session.user.id;
+
+    const loans = await Loan.find({ userId }).sort({ createdAt: -1 });
+
+    const formattedLoans = loans.map((loan) => ({
+      id: loan._id,
+      amount: loan.amount,
+      interest: loan.interest,
+      totalRepayment: loan.totalRepayment,
+      amountRepaid: loan.amountRepaid || 0,
+      status: loan.status,
+      dueDate: loan.dueDate,
+      reason: loan.reason,
+      outstanding: (loan.totalRepayment || 0) - (loan.amountRepaid || 0),
+    }));
+
+    res.status(200).json({ loans: formattedLoans });
+  } catch (error) {
+    console.error("❌ Error fetching all loans:", error);
+    res.status(500).json({ error: "Server error fetching loans." });
+  }
+};
+
 module.exports = {
   checkLoanEligibility,
   requestLoan,
   repayLoan,
   getLoanDetails,
+  getAllLoans,
 };

@@ -135,23 +135,12 @@
   </section>
 
   <section id="loansSection" class="max-w-md mx-auto hidden">
-    <!-- <div class="bg-white rounded-xl shadow p-4 mb-4 relative">
-      <div class="qlcredit bg-gray-100 rounded p-2">
-        <p class="text-lg font-semibold mb-2">Qualified loan credit</p>
-        <p class="text-3xl mb-8 font-bold text-green-600">0</p>
-      </div>
-      <div class="p-2">
-        <p class="text-lg font-semibold mb-2">Outstanding Loan</p>
-        <p class="text-3xl font-bold text-red-600 mb-4">0</p>
-      </div>
-      <div class="flex justify-between text-sm text-gray-600">
-        <span></span>
-        <span id="ddate"></span>
-      </div>
-    </div> -->
     <div class="bg-white rounded-xl shadow p-4 mb-4 relative">
       <div class="qlcredit bg-gray-100 rounded p-2">
-        <p class="text-lg font-semibold mb-2">Qualified loan credit</p>
+        <div class="flex justify-between items-center">
+          <p class="text-lg font-semibold mb-2">Qualified loan credit</p>
+          <p class="text-lg font-semibold mb-2 text-blue-400">loan history</p>
+        </div>
         <p class="text-3xl mb-2 font-bold text-green-600" id="qualifiedCredit">$0</p>
       </div>
 
@@ -160,7 +149,6 @@
         <p class="text-3xl font-bold text-red-600 mb-2" id="outstandingLoan">$0</p>
       </div>
 
-      <!-- ✅ NEW AVAILABLE CREDIT SECTION -->
       <div class="p-2">
         <p class="text-lg font-semibold mb-2">Available Credit</p>
         <p class="text-3xl font-bold text-blue-600 mb-2" id="availableCredit">$0</p>
@@ -168,8 +156,13 @@
 
       <div class="flex justify-between text-sm text-gray-600">
         <span></span>
-        <span id="ddate"></span>
+        <span id="ddate" class="text-red-600"></span>
       </div>
+
+      <a href="loans" class="w-full bg-blue-600 hover:bg-blue-700 flex py-2 my-3 rounded">
+        <button class="text-gray-200 text-center mx-auto text-base ">
+          view loans
+        </button></a>
     </div>
 
     <div class="loanBtns flex justify-between items-center gap-2">
@@ -220,7 +213,7 @@
 
       <div class="flex items-center mb-4">
         <input type="checkbox" id="loanAgreement" name="loanAgreement" class="mr-2">
-        <label for="loanAgreement" class="text-sm">I agree to the loan <a href="loantc">terms and
+        <label for="loanAgreement" class="text-sm text-blue-500">I agree to the loan <a href="loantc">terms and
             conditions</a>.</label>
       </div>
 

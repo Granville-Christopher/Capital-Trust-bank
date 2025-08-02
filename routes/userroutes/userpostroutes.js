@@ -32,6 +32,7 @@ const {
   repayLoan,
   checkLoanEligibility,
   getLoanDetails,
+  getAllLoans,
 } = require("../../controllers/usercontrollers/loancontroller");
 
 router.get("/lookupaccount", lookupAccount);
@@ -39,6 +40,7 @@ router.get("/viewsavings", viewSavings);
 router.get("/creditscore", getCreditScore);
 router.get("/eligibility", checkLoanEligibility);
 router.get("/loan-details", getLoanDetails);
+router.get("/loans", getAllLoans);
 
 router.post("/signup", registerUser);
 router.post("/login", loginUser);

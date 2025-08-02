@@ -223,6 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
           setTimeout(() => {
             loanProcessingModal.classList.add("hidden");
           }, 5000);
+          location.reload();
         } else {
           loanFailure.querySelector("p").textContent =
             data.error || "Loan request failed.";
