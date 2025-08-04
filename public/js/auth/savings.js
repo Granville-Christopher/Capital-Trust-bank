@@ -118,8 +118,6 @@ async function loadSavingsData() {
     console.error("Fetch Error:", error);
   }
 }
-
-// ✅ Withdraw interest (specific savings)
 async function withdrawInterest(id) {
   try {
     const res = await fetch(`${API_BASE}/secure/ctb/${id}/withdraw-interest`, {
@@ -189,5 +187,4 @@ async function cancelSavings(id) {
   }
 }
 
-// ✅ Initial load
 loadSavingsData();

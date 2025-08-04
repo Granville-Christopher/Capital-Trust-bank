@@ -37,9 +37,9 @@
 </head>
 
 <body class="bg-gradient-to-b relative from-blue-100 to-gray-100 min-h-screen pt-16 pb-24 px-6 space-y-8">
-  <div class="text-center">
+  <div class="text-left">
     <p class="text-sm text-gray-600">Total Balance</p>
-    <p class="text-4xl font-bold text-blue-600">
+    <p class="text-2xl font-bold text-blue-600">
       <%= user.AccountBalance.toLocaleString('en-US', { style: 'currency' , currency: 'USD' }) %>
 
     </p>
@@ -73,7 +73,7 @@
     <div class="bg-white rounded-xl shadow p-6 mb-4 relative" id="savingsCard">
       <div class="topsection flex justify-between items-center">
         <p class="text-lg font-semibold mb-2">Savings Balance</p>
-        <p class="text-lg font-semibold mb-2 text-blue-400">savings history</p>
+        <p class="text-lg font-semibold mb-2 text-blue-400"><a href="financehistory">savings history</a></p>
       </div>
       <p class="text-3xl font-bold text-blue-600 mb-4" id="savingsBalance"> no savings yet</p>
 
@@ -104,7 +104,7 @@
     </div>
 
     <button id="openSavingsFormBtn"
-      class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition mb-4">
+      class="SavingsScrollToBottom w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition mb-4">
       Add to Savings
     </button>
     <form id="savingsForm" class="bg-white rounded-xl shadow p-6 max-w-md mx-auto hidden">
@@ -139,7 +139,7 @@
       <div class="qlcredit bg-gray-100 rounded p-2">
         <div class="flex justify-between items-center">
           <p class="text-lg font-semibold mb-2">Qualified loan credit</p>
-          <p class="text-lg font-semibold mb-2 text-blue-400">loan history</p>
+          <p class="text-lg font-semibold mb-2 text-blue-400"><a href="financehistory">loan history</a></p>
         </div>
         <p class="text-3xl mb-2 font-bold text-green-600" id="qualifiedCredit">$0</p>
       </div>
@@ -159,22 +159,19 @@
         <span id="ddate" class="text-red-600"></span>
       </div>
 
-      <a href="loans" class="w-full bg-blue-600 hover:bg-blue-700 flex py-2 my-3 rounded">
-        <button class="text-gray-200 text-center mx-auto text-base ">
-          view loans
-        </button></a>
+      <div class="loanBtns flex justify-between items-center gap-2 mt-3">
+        <button id="openLoanFormBtn"
+          class="LoanScrollToBottom w-full py-2 bg-blue-600 text-gray-100 rounded-full hover:bg-blue-700 transition">
+          Request for Loan
+        </button>
+        <a href="loans" class="w-full bg-blue-600 hover:bg-blue-700 flex py-2 rounded-full">
+          <button class="text-gray-100 text-center mx-auto text-base ">
+            View loans
+          </button>
+        </a>
+      </div>
     </div>
 
-    <div class="loanBtns flex justify-between items-center gap-2">
-      <button id="openLoanFormBtn"
-        class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition mb-4">
-        Request for Loan
-      </button>
-      <button id="openPayLoanFormBtn"
-        class="w-full py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition mb-4">
-        Pay Outstanding Loan
-      </button>
-    </div>
     <form id="loanForm" class="bg-white rounded-xl shadow p-6 max-w-md mx-auto hidden">
       <label for="loanAmount" class="block text-sm font-semibold mb-2">Loan Amount</label>
       <input type="number" id="loanAmount" name="loanAmount" placeholder="Enter loan amount"
@@ -273,6 +270,32 @@
 
     </div>
   </div>
+  <script>
+    let savingsscroll = document.getElementsByClassName("SavingsScrollToBottom")[0];
+    if (savingsscroll) {
+      savingsscroll.addEventListener("click", () => {
+        setTimeout(() => {
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: "smooth"
+          });
+        }, 50);
+      });
+    }
+
+    let loanscroll = document.getElementsByClassName("LoanScrollToBottom")[0];
+    if (loanscroll) {
+      loanscroll.addEventListener("click", () => {
+        setTimeout(() => {
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: "smooth"
+          });
+        }, 50);
+      });
+    }
+
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script> -->
   <script src="/js/frontendfiles/creditscore.js"></script>

@@ -78,6 +78,12 @@ const LoanSchema = new mongoose.Schema({
 
 LoanSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
+
+  if (!this.totalRepayment && this.amount && this.interestRate) {
+    this.totalRepayment = this.amount + (this.amount * this.interestRate) / 100;
+    console.log(`✅ Auto-calculated totalRepayment: ${this.totalRepayment}`);
+  }
+
   next();
 });
 

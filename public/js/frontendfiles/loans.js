@@ -1,13 +1,154 @@
 document.addEventListener("DOMContentLoaded", () => {
   const loanContainer = document.getElementById("loanContainer");
 
+  // ✅ Inject Loan Processing Modal
+  const loanModal = document.createElement("div");
+  loanModal.innerHTML = `
+    <div id="loanProcessingModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative">
+        <div id="loanSpinner" class="mb-4">
+          <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
+          <h3 class="text-lg font-semibold text-gray-800">Processing...</h3>
+          <p class="text-sm text-gray-500">Please wait...</p>
+        </div>
+        <div id="loanSuccess" class="mb-4 hidden">
+          <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
+          <h3 class="mt-2 text-xl font-semibold text-gray-800">Success</h3>
+          <p class="text-sm text-gray-500">Your action was successful.</p>
+        </div>
+        <div id="loanFailure" class="mb-4 hidden">
+          <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
+          <h3 class="mt-2 text-xl font-semibold text-gray-800">Failed</h3>
+          <p class="text-sm text-gray-500">Something went wrong. Please try again.</p>
+        </div>
+        <button id="closeLoanModalBtn"
+          class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+          Close
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(loanModal);
+
+  // ✅ Inject Repayment Modal
+  const repayModal = document.createElement("div");
+  repayModal.innerHTML = `
+    <div id="repayModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative">
+        <h3 class="text-xl font-semibold text-gray-800">Repay Loan</h3>
+        <p class="text-sm text-gray-500 mb-4">Enter the amount you want to repay:</p>
+        <input type="number" id="repayAmountInput" placeholder="Enter amount"
+          class="w-full p-2 border rounded mb-4 text-center" />
+        <div class="flex gap-3">
+          <button id="confirmRepayBtn"
+            class="flex-1 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition">
+            Confirm
+          </button>
+          <button id="cancelRepayBtn"
+            class="flex-1 py-2 bg-gray-400 text-white rounded-full hover:bg-gray-500 transition">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(repayModal);
+
+  // ✅ Modal Elements
+  const processingModal = document.getElementById("loanProcessingModal");
+  const spinnerDiv = document.getElementById("loanSpinner");
+  const successDiv = document.getElementById("loanSuccess");
+  const failureDiv = document.getElementById("loanFailure");
+  const closeModalBtn = document.getElementById("closeLoanModalBtn");
+
+  const repayModalEl = document.getElementById("repayModal");
+  const repayAmountInput = document.getElementById("repayAmountInput");
+  const confirmRepayBtn = document.getElementById("confirmRepayBtn");
+  const cancelRepayBtn = document.getElementById("cancelRepayBtn");
+
+  let currentLoanId = null;
+
+  // ✅ Modal helper functions
+  function showProcessing() {
+    spinnerDiv.classList.remove("hidden");
+    successDiv.classList.add("hidden");
+    failureDiv.classList.add("hidden");
+    processingModal.classList.remove("hidden");
+  }
+
+  function showSuccess(message) {
+    spinnerDiv.classList.add("hidden");
+    successDiv.classList.remove("hidden");
+    failureDiv.classList.add("hidden");
+    successDiv.querySelector("p").textContent = message;
+  }
+
+  function showFailure(message) {
+    spinnerDiv.classList.add("hidden");
+    successDiv.classList.add("hidden");
+    failureDiv.classList.remove("hidden");
+    failureDiv.querySelector("p").textContent = message;
+  }
+
+  closeModalBtn.addEventListener("click", () => {
+    processingModal.classList.add("hidden");
+  });
+
+  // ✅ Repay Modal functions
+  function openRepayModal(loanId) {
+    currentLoanId = loanId;
+    repayAmountInput.value = "";
+    repayModalEl.classList.remove("hidden");
+  }
+
+  function closeRepayModal() {
+    repayModalEl.classList.add("hidden");
+  }
+
+  cancelRepayBtn.addEventListener("click", closeRepayModal);
+
+  confirmRepayBtn.addEventListener("click", async () => {
+    const amount = repayAmountInput.value.trim();
+
+    if (!amount || isNaN(amount) || amount <= 0) {
+      showFailure("Enter a valid repayment amount.");
+      closeRepayModal();
+      return;
+    }
+
+    showProcessing();
+    closeRepayModal();
+
+    try {
+      const repayRes = await fetch("/user/secure/ctb/repay-loan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loanId: currentLoanId, amount }),
+      });
+
+      const repayData = await repayRes.json();
+      if (repayRes.ok) {
+        showSuccess(repayData.message);
+        fetchLoans();
+      } else {
+        showFailure(repayData.error || "Repayment failed.");
+      }
+    } catch (err) {
+      console.error(err);
+      showFailure("Server error processing repayment");
+    }
+  });
+
+  // ✅ Main fetchLoans function (kept your original working logic)
   async function fetchLoans() {
     try {
       const res = await fetch("/user/secure/ctb/loans");
       const data = await res.json();
 
       if (!res.ok) {
-        return alert(data.error || "Error loading loans");
+        return showFailure(data.error || "Error loading loans");
       }
 
       loanContainer.innerHTML = "";
@@ -56,38 +197,16 @@ document.addEventListener("DOMContentLoaded", () => {
         loanContainer.appendChild(card);
       });
 
+      // ✅ Add event listeners for repay buttons
       document.querySelectorAll(".repayBtn").forEach((btn) => {
-        btn.addEventListener("click", async (e) => {
+        btn.addEventListener("click", (e) => {
           const loanId = e.target.dataset.id;
-          const amount = prompt("Enter repayment amount:");
-
-          if (!amount || isNaN(amount) || amount <= 0) {
-            return alert("Enter a valid repayment amount.");
-          }
-
-          try {
-            const repayRes = await fetch("/user/secure/ctb/repay-loan", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ loanId, amount }),
-            });
-
-            const repayData = await repayRes.json();
-            if (repayRes.ok) {
-              alert(repayData.message);
-              fetchLoans();
-            } else {
-              alert(repayData.error || "Repayment failed.");
-            }
-          } catch (err) {
-            console.error(err);
-            alert("Server error processing repayment");
-          }
+          openRepayModal(loanId);
         });
       });
     } catch (err) {
       console.error("❌ Error fetching loans:", err);
-      loanContainer.innerHTML = `<p class="text-red-600">Failed to load loans.</p>`;
+      showFailure("Failed to load loans.");
     }
   }
 

@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const openPayLoanFormBtn = document.getElementById("openPayLoanFormBtn");
   const qualifiedCreditField = document.getElementById("qualifiedCredit");
   const outstandingLoanField = document.getElementById("outstandingLoan");
   const availableCreditField = document.getElementById("availableCredit");
@@ -33,13 +32,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
 
       if (res.ok) {
-        qualifiedCreditField.textContent = `$${data.eligibleAmount}`;
-        availableCreditField.textContent = `$${data.availableCredit}`;
+        qualifiedCreditField.textContent = `$${data.eligibleAmount.toFixed(2)}`;
+        outstandingLoanField.textContent = `$${data.outstandingLoanTotal.toFixed(
+          2
+        )}`;
+        availableCreditField.textContent = `$${data.availableCredit.toFixed(
+          2
+        )}`;
 
         if (data.activeLoan) {
-          outstandingLoanField.textContent = `$${data.activeLoan.remaining}`;
           activeLoanId = data.activeLoan.loanId;
-
           const formattedDate = new Date(
             data.activeLoan.dueDate
           ).toLocaleDateString("en-US", {
@@ -49,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           dueDateField.textContent = `Outstanding Loan payment Due: ${formattedDate}`;
         } else {
-          outstandingLoanField.textContent = "$0";
           activeLoanId = null;
           dueDateField.textContent = "No active loan";
         }
@@ -61,37 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   fetchLoanDetails();
-
-  openPayLoanFormBtn.addEventListener("click", async () => {
-    if (!activeLoanId) {
-      return showToast("error", "You have no outstanding loans to repay.");
-    }
-
-    const amount = prompt("Enter amount you want to repay:");
-
-    if (!amount || isNaN(amount) || amount <= 0) {
-      return showToast("error", "Enter a valid repayment amount.");
-    }
-
-    try {
-      const res = await fetch("/user/secure/ctb/repay-loan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ loanId: activeLoanId, amount }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        showToast("success", data.message);
-        fetchLoanDetails();
-      } else {
-        showToast("error", data.error || "Repayment failed.");
-      }
-    } catch (err) {
-      console.error(err);
-      showToast("error", "Server error processing repayment");
-    }
-  });
 
   function showToast(type, message) {
     const existingToast = document.getElementById("loanToast");

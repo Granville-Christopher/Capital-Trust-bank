@@ -160,7 +160,7 @@ const requestLoan = async (req, res) => {
           term,
           guarantor,
           guarantorContact,
-          statusNote: `Loan request of $${amount} for ${term} days has been submitted.`,
+          statusNote: `Loan request of $${amount} for ${term} days submitted.`,
         },
       ],
       { session }
@@ -171,31 +171,61 @@ const requestLoan = async (req, res) => {
     const boost = rolling30Days * 0.1;
     const eligibleAmount = baseLoan + boost;
 
-    const activeLoans = await Loan.aggregate([
-      {
-        $match: {
-          userId: new mongoose.Types.ObjectId(userId),
-          status: { $in: ["approved", "pending"] },
-        },
-      },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
+    const activeLoans = await Loan.find({
+      userId,
+      status: { $in: ["approved", "pending"] },
+    }).session(session);
 
-    const activeLoanTotal = activeLoans.length ? activeLoans[0].total : 0;
+    const activeLoanTotal = activeLoans.reduce(
+      (sum, loan) => sum + loan.amount,
+      0
+    );
     const remainingEligibility = eligibleAmount - activeLoanTotal;
 
-    if (amount > remainingEligibility) {
+    if (activeLoans.length >= 2) {
       await LoanHistory.create(
         [
           {
             userId,
+            loanId: null,
             action: "rejected",
             amount,
             reason,
             term,
             guarantor,
             guarantorContact,
-            statusNote: `Loan request of $${amount} rejected. Eligible only for $${remainingEligibility.toFixed(
+            statusNote: `Loan request of $${amount} rejected — user already has 2 active loans.`,
+          },
+        ],
+        { session }
+      );
+
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({
+        error:
+          "You already have 2 active loans. Please repay one or both before requesting another loan.",
+      });
+    }
+
+    let maxAllowed = remainingEligibility;
+    if (activeLoans.length === 1) {
+      maxAllowed = remainingEligibility * 0.5;
+    }
+
+    if (amount > maxAllowed) {
+      await LoanHistory.create(
+        [
+          {
+            userId,
+            loanId: null,
+            action: "rejected",
+            amount,
+            reason,
+            term,
+            guarantor,
+            guarantorContact,
+            statusNote: `Loan request of $${amount} rejected. Max you can take now is $${maxAllowed.toFixed(
               2
             )}.`,
           },
@@ -206,9 +236,9 @@ const requestLoan = async (req, res) => {
       await session.abortTransaction();
       session.endSession();
       return res.status(400).json({
-        error: `You only qualify for up to $${remainingEligibility.toFixed(
+        error: `You only qualify for up to $${maxAllowed.toFixed(
           2
-        )} more based on your credit score and transaction history.`,
+        )} at this time.`,
       });
     }
 
@@ -274,6 +304,7 @@ const requestLoan = async (req, res) => {
       .json({ error: "Loan request failed. Transaction rolled back." });
   }
 };
+
 const repayLoan = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -309,6 +340,11 @@ const repayLoan = async (req, res) => {
       await session.abortTransaction();
       session.endSession();
       return res.status(404).json({ error: "Loan not found." });
+    }
+
+    if (!loan.totalRepayment) {
+      loan.totalRepayment =
+        loan.amount + (loan.amount * loan.interestRate) / 100;
     }
 
     if (loan.status === "repaid") {
@@ -362,6 +398,8 @@ const repayLoan = async (req, res) => {
 
     if (loan.interestPaid + loan.principalPaid >= totalRepayment) {
       loan.status = "repaid";
+      loan.interestPaid = totalInterest;
+      loan.principalPaid = loanAmount;
       user.CreditScore = Math.min(user.CreditScore + 10, 900);
     }
 
@@ -408,7 +446,7 @@ const repayLoan = async (req, res) => {
     return res.status(200).json({
       message:
         overpayment > 0
-          ? `Loan repayment successful. You overpaid by $${overpayment}, which has been refunded to your balance.`
+          ? `Loan repayment successful. You overpaid by $${overpayment}, which has been refunded.`
           : "Loan repayment successful.",
       breakdown: {
         principalPaid: principalPayment,
@@ -434,42 +472,46 @@ const getLoanDetails = async (req, res) => {
     }
 
     const userId = req.session.user.id;
-
-    const activeLoan = await Loan.findOne({
-      userId,
-      status: { $in: ["approved", "pending"] },
-    }).sort({ createdAt: -1 });
-
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).lean();
     if (!user) return res.status(404).json({ error: "User not found." });
+
+    const loans = await Loan.find({ userId }).lean();
+
+    const outstandingLoanTotal = loans.reduce((sum, loan) => {
+      const unpaid =
+        (loan.totalRepayment || 0) -
+        ((loan.principalPaid || 0) + (loan.interestPaid || 0));
+      return sum + (unpaid > 0 ? unpaid : 0);
+    }, 0);
 
     const baseLoan = getBaseLoanAmount(user.CreditScore);
     const rolling30Days = await getRolling30DaysTransactions(userId);
     const boost = rolling30Days * 0.1;
     const eligibleAmount = baseLoan + boost;
 
-    const loanRemaining = activeLoan
-      ? (activeLoan.totalRepayment || 0) - (activeLoan.amountRepaid || 0)
-      : 0;
+    const availableCredit = eligibleAmount - outstandingLoanTotal;
 
-    const availableCredit =
-      eligibleAmount - (activeLoan ? activeLoan.amount : 0);
+    const activeLoan = loans.find((loan) =>
+      ["approved", "pending"].includes(loan.status)
+    );
 
     res.status(200).json({
-      eligibleAmount: eligibleAmount.toFixed(2),
-      availableCredit: availableCredit.toFixed(2),
+      eligibleAmount,
+      outstandingLoanTotal,
+      availableCredit,
       activeLoan: activeLoan
         ? {
-            amount: activeLoan.amount,
-            status: activeLoan.status,
-            dueDate: activeLoan.dueDate,
-            remaining: loanRemaining,
             loanId: activeLoan._id,
+            remaining:
+              (activeLoan.totalRepayment || 0) -
+              ((activeLoan.principalPaid || 0) +
+                (activeLoan.interestPaid || 0)),
+            dueDate: activeLoan.dueDate,
           }
         : null,
     });
   } catch (error) {
-    console.error("❌ Loan Details Fetch Error:", error);
+    console.error("❌ Error fetching loan details:", error);
     res.status(500).json({ error: "Server error fetching loan details." });
   }
 };
@@ -481,7 +523,6 @@ const getAllLoans = async (req, res) => {
     }
 
     const userId = req.session.user.id;
-
     const loans = await Loan.find({ userId }).sort({ createdAt: -1 });
 
     const formattedLoans = loans.map((loan) => ({
@@ -489,11 +530,13 @@ const getAllLoans = async (req, res) => {
       amount: loan.amount,
       interest: loan.interest,
       totalRepayment: loan.totalRepayment,
-      amountRepaid: loan.amountRepaid || 0,
+      amountRepaid: loan.principalPaid + loan.interestPaid,
       status: loan.status,
       dueDate: loan.dueDate,
       reason: loan.reason,
-      outstanding: (loan.totalRepayment || 0) - (loan.amountRepaid || 0),
+      outstanding:
+        (loan.totalRepayment || 0) -
+        ((loan.principalPaid || 0) + (loan.interestPaid || 0)),
     }));
 
     res.status(200).json({ loans: formattedLoans });

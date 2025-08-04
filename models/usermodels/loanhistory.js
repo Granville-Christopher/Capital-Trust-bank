@@ -6,11 +6,12 @@ const LoanHistorySchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-
   loanId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Loan",
-    required: true,
+    required: function () {
+      return !["requested", "rejected"].includes(this.action);
+    },
   },
 
   action: {
@@ -18,41 +19,34 @@ const LoanHistorySchema = new mongoose.Schema({
     enum: ["requested", "approved", "rejected", "repaid", "refund"],
     required: true,
   },
-
-  amount: {
-    type: Number,
-    required: true,
-  },
-
+  amount: { type: Number, required: true },
   reason: {
     type: String,
     enum: ["medical", "rent", "education", "business", "other"],
-    required: true,
+    required: function () {
+      return this.action !== "refund";
+    },
   },
-
   term: {
     type: Number,
-    required: true,
+    required: function () {
+      return this.action !== "refund";
+    },
   },
-
   guarantor: {
     type: String,
-    required: true,
+    required: function () {
+      return this.action !== "refund";
+    },
   },
-
   guarantorContact: {
     type: String,
-    required: true,
+    required: function () {
+      return this.action !== "refund";
+    },
   },
-
-  statusNote: {
-    type: String,
-  },
-
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  statusNote: { type: String },
+  createdAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("LoanHistory", LoanHistorySchema);

@@ -8,6 +8,8 @@ const User = require("../../models/usermodels/userSignup");
 const internationalTransferModel = require("../../models/usermodels/internationaltf");
 const TransactionHistory = require("../../models/usermodels/transactionhistory");
 const Notification = require("../../models/usermodels/notifications");
+const TotalSavings = require("../../models/usermodels/savingshistory");
+const LoanHistory = require("../../models/usermodels/loanhistory");
 
 router.get("/savings", async (req, res) => {
   try {
@@ -44,6 +46,7 @@ router.get("/loantc", async (req, res) => {
     res.status(500).render("user/login", { error: "Server error", user: null });
   }
 });
+
 router.get("/loans", async (req, res) => {
   try {
     const userId = req.session.user?.id;
@@ -59,6 +62,119 @@ router.get("/loans", async (req, res) => {
     return res.status(200).render("user/loans", { user });
   } catch (error) {
     res.status(500).render("user/login", { error: "Server error", user: null });
+  }
+});
+
+// router.get("/financehistory", async (req, res) => {
+//   try {
+//     const userId = req.session.user?.id;
+//     if (!userId) {
+//       return res.redirect("/secure/ctb/login");
+//     }
+
+//     const user = await User.findById(userId).lean();
+//     if (!user) {
+//       return res.status(404).render("user/login", { error: "User not found" });
+//     }
+
+//     const savingsHistory = await TotalSavings.find({ userId }).sort({ createdAt: -1}).lean();
+//     const loanHistory = await LoanHistory.find({ userId }).sort({ createdAt: -1}).lean();
+
+//     const totalSavings = savingsHistory.reduce(
+//       (sum, s) => sum + (s.amount || 0),
+//       0
+//     );
+//     const totalLoans = loanHistory.reduce((sum, l) => sum + (l.amount || 0), 0);
+
+//     return res.status(200).render("user/financehistory", {
+//       user,
+//       savingsHistory: savingsHistory,
+//       loanHistory: loanHistory,
+//       totalSavings: totalSavings,
+//       totalLoans: totalLoans,
+//     });
+//   } catch (error) {
+//     console.error("❌ Finance History Error:", error);
+//     res.status(500).render("user/login", {
+//       error: "Server error",
+//       user: null,
+//       savingsHistory: [],
+//       loanHistory: [],
+//       totalSavings: 0,
+//       totalLoans: 0,
+//     });
+//   }
+// });
+
+router.get("/financehistory", async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) return res.redirect("/secure/ctb/login");
+
+    const user = await User.findById(userId).lean();
+    if (!user)
+      return res.status(404).render("user/login", { error: "User not found" });
+
+    const savingsHistory = await TotalSavings.find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .lean();
+
+    const loanHistory = await LoanHistory.find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .lean();
+
+    const totalSavings = await TotalSavings.aggregate([
+      { $match: { userId } },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    const totalLoans = await LoanHistory.aggregate([
+      { $match: { userId } },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    return res.status(200).render("user/financehistory", {
+      user,
+      savingsHistory,
+      loanHistory,
+      totalSavings: totalSavings[0]?.total || 0,
+      totalLoans: totalLoans[0]?.total || 0,
+    });
+  } catch (error) {
+    console.error("❌ Finance History Error:", error);
+    res.status(500).render("user/login", { error: "Server error" });
+  }
+});
+
+router.get("/financehistory/load", async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    const { type, skip } = req.query;
+    const limit = 100;
+
+    let data;
+    if (type === "savings") {
+      data = await TotalSavings.find({ userId })
+        .sort({ createdAt: -1 })
+        .skip(Number(skip))
+        .limit(limit)
+        .lean();
+    } else if (type === "loans") {
+      data = await LoanHistory.find({ userId })
+        .sort({ createdAt: -1 })
+        .skip(Number(skip))
+        .limit(limit)
+        .lean();
+    }
+
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error("❌ Load More Error:", err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 });
 
