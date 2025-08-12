@@ -52,4 +52,29 @@ cron.schedule("0 0 * * *", () => {
   processMaturedSavings();
 });
 
-module.exports = { processMaturedSavings };
+const DAILY_INTEREST_RATE = 0.1 / 365;
+
+async function accrueDailyInterest() {
+  try {
+    const activeSavings = await Savings.find({ status: "active" });
+
+    for (const s of activeSavings) {
+      const interest = s.amount * DAILY_INTEREST_RATE;
+      s.interestBalance += interest;
+      s.totalInterest += interest;
+      await s.save();
+    }
+
+    console.log(`✅ Accrued interest for ${activeSavings.length} savings`);
+  } catch (err) {
+    console.error("❌ Interest Accrual Error:", err);
+  }
+}
+
+
+cron.schedule("0 0 * * *", () => {
+  console.log("📅 Running daily interest accrual job...");
+  accrueDailyInterest();
+});
+
+module.exports = { processMaturedSavings, accrueDailyInterest };

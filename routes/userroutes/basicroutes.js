@@ -10,6 +10,9 @@ const TransactionHistory = require("../../models/usermodels/transactionhistory")
 const Notification = require("../../models/usermodels/notifications");
 const TotalSavings = require("../../models/usermodels/savingshistory");
 const LoanHistory = require("../../models/usermodels/loanhistory");
+const DebitCard = require("../../models/usermodels/debitcard");
+const CreditCard = require("../../models/usermodels/creditcard");
+const KYC = require("../../models/usermodels/kyc")
 
 router.get("/savings", async (req, res) => {
   try {
@@ -65,85 +68,41 @@ router.get("/loans", async (req, res) => {
   }
 });
 
-// router.get("/financehistory", async (req, res) => {
-//   try {
-//     const userId = req.session.user?.id;
-//     if (!userId) {
-//       return res.redirect("/secure/ctb/login");
-//     }
-
-//     const user = await User.findById(userId).lean();
-//     if (!user) {
-//       return res.status(404).render("user/login", { error: "User not found" });
-//     }
-
-//     const savingsHistory = await TotalSavings.find({ userId }).sort({ createdAt: -1}).lean();
-//     const loanHistory = await LoanHistory.find({ userId }).sort({ createdAt: -1}).lean();
-
-//     const totalSavings = savingsHistory.reduce(
-//       (sum, s) => sum + (s.amount || 0),
-//       0
-//     );
-//     const totalLoans = loanHistory.reduce((sum, l) => sum + (l.amount || 0), 0);
-
-//     return res.status(200).render("user/financehistory", {
-//       user,
-//       savingsHistory: savingsHistory,
-//       loanHistory: loanHistory,
-//       totalSavings: totalSavings,
-//       totalLoans: totalLoans,
-//     });
-//   } catch (error) {
-//     console.error("❌ Finance History Error:", error);
-//     res.status(500).render("user/login", {
-//       error: "Server error",
-//       user: null,
-//       savingsHistory: [],
-//       loanHistory: [],
-//       totalSavings: 0,
-//       totalLoans: 0,
-//     });
-//   }
-// });
-
 router.get("/financehistory", async (req, res) => {
   try {
-    const userId = req.session.user?.id;
-    if (!userId) return res.redirect("/secure/ctb/login");
+    const userSession = req.session.user;
+    if (!userSession?.id) return res.redirect("/secure/ctb/login");
+
+    const userId = userSession.id;
 
     const user = await User.findById(userId).lean();
-    if (!user)
-      return res.status(404).render("user/login", { error: "User not found" });
+    if (!user) return res.redirect("/secure/ctb/login");
 
     const savingsHistory = await TotalSavings.find({ userId })
       .sort({ createdAt: -1 })
-      .limit(100)
       .lean();
-
     const loanHistory = await LoanHistory.find({ userId })
       .sort({ createdAt: -1 })
-      .limit(100)
       .lean();
 
-    const totalSavings = await TotalSavings.aggregate([
-      { $match: { userId } },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
-
-    const totalLoans = await LoanHistory.aggregate([
-      { $match: { userId } },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
+    const totalSavings = savingsHistory.reduce(
+      (sum, entry) => sum + (entry.amount || 0),
+      0
+    );
+    const totalLoans = loanHistory.reduce(
+      (sum, entry) => sum + (entry.amount || 0),
+      0
+    );
 
     return res.status(200).render("user/financehistory", {
       user,
-      savingsHistory,
-      loanHistory,
-      totalSavings: totalSavings[0]?.total || 0,
-      totalLoans: totalLoans[0]?.total || 0,
+      savingsHistory: savingsHistory.slice(0, 100),
+      loanHistory: loanHistory.slice(0, 100),
+      totalSavings,
+      totalLoans,
     });
   } catch (error) {
-    console.error("❌ Finance History Error:", error);
+    console.error("❌ Finance History Error:", error.stack || error);
     res.status(500).render("user/login", { error: "Server error" });
   }
 });
@@ -179,7 +138,22 @@ router.get("/financehistory/load", async (req, res) => {
 });
 
 router.get("/cards", async (req, res) => {
-  return res.status(200).render("user/cards");
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) return res.redirect("/secure/ctb/login");
+
+    const creditCard = await CreditCard.findOne({ userId }).lean();
+    const debitCard = await DebitCard.findOne({ userId }).lean();
+    const user = await User.findById(userId).lean();
+
+    res.render("user/cards", {
+      creditCard,
+      debitCard,
+      userName: user?.Name || "",
+    });
+  } catch (err) {
+    res.status(500).send("Server error");
+  }
 });
 
 router.get("/notifications", async (req, res) => {
@@ -208,16 +182,43 @@ router.get("/confirmtransfer/:transferId", transferPage);
 router.get("/confirmlocaltransfer/:transferId", localTransferPage);
 
 router.get("/creditcard", async (req, res) => {
-  return res.status(200).render("user/creditcard");
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(404).render("user/login", { error: "User not found" });
+    }
+    return res.status(200).render("user/creditcard", { user });
+  } catch (error) {
+    console.error("Credit card error:", error);
+    return res.status(500).render("user/login", { error: "Server error" });
+  }
 });
 
 router.get("/debitcard", async (req, res) => {
-  return res.status(200).render("user/debitcard");
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(404).render("user/login", { error: "User not found" });
+    }
+    return res.status(200).render("user/debitcard", { user });
+  } catch (error) {
+    console.error("Debit card error:", error);
+    return res.status(500).render("user/login", { error: "Server error" });
+  }
 });
 
 router.get("/customerservicecenter", async (req, res) => {
   return res.status(200).render("user/customerservicecenter");
 });
+
 
 router.get("/dashboard", async (req, res) => {
   try {
@@ -231,7 +232,13 @@ router.get("/dashboard", async (req, res) => {
       console.log("User not found");
       return res
         .status(404)
-        .render("user/dashboard", { error: "User not found" });
+        .render("user/login", { error: "User not found" });
+    }
+
+    const kyc = await KYC.findOne({ userId }).lean();
+    if (!kyc) {
+      console.log("KYC not found for user");
+      return res.status(404).render("user/login", { error: "KYC not found" });
     }
 
     const recentTransactions = await TransactionHistory.find({ userId })
@@ -242,6 +249,7 @@ router.get("/dashboard", async (req, res) => {
     res.status(200).render("user/dashboard", {
       user,
       recentTransactions,
+      kyc,
     });
   } catch (error) {
     console.error("Dashboard error:", error);
@@ -249,6 +257,7 @@ router.get("/dashboard", async (req, res) => {
       error: "Server error",
       user: null,
       recentTransactions: [],
+      kyc: null,
     });
   }
 });
@@ -296,7 +305,26 @@ router.get("/localtransfer", async (req, res) => {
 });
 
 router.get("/settings", async (req, res) => {
-  return res.status(200).render("user/settings");
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(404).render("user/login", { error: "User not found" });
+    }
+
+    const kyc = await KYC.findOne({ userId }).lean();
+    if (!kyc) {
+      return res.status(404).render("user/login", { error: "KYC not found" });
+    }
+
+    return res.status(200).render("user/settings", { user, kyc });
+  } catch (error) {
+    console.error("Settings error:", error);
+    return res.status(500).render("user/login", { error: "Server error", user: null, kyc: null });
+  }
 });
 
 router.get("/transactionhistory", async (req, res) => {
@@ -344,7 +372,22 @@ router.get("/transactionhistory", async (req, res) => {
 });
 
 router.get("/profile", async (req, res) => {
-  return res.status(200).render("user/profile");
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.redirect("/secure/ctb/login");
+    }
+
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(404).render("user/login", { error: "User not found" });
+    }
+
+    return res.status(200).render("user/profile", { user });
+  } catch (error) {
+    console.error("Profile error:", error);
+    return res.status(500).render("user/login", { error: "Server error", user: null });
+  }
 });
 
 module.exports = router;

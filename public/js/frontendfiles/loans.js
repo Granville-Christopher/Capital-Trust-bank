@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const loanContainer = document.getElementById("loanContainer");
 
-  // ✅ Inject Loan Processing Modal
   const loanModal = document.createElement("div");
   loanModal.innerHTML = `
     <div id="loanProcessingModal"
@@ -31,11 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
   document.body.appendChild(loanModal);
 
-  // ✅ Inject Repayment Modal
   const repayModal = document.createElement("div");
   repayModal.innerHTML = `
     <div id="repayModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      class="fixed inset-0 top-0  bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
       <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative">
         <h3 class="text-xl font-semibold text-gray-800">Repay Loan</h3>
         <p class="text-sm text-gray-500 mb-4">Enter the amount you want to repay:</p>
@@ -56,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
   document.body.appendChild(repayModal);
 
-  // ✅ Modal Elements
   const processingModal = document.getElementById("loanProcessingModal");
   const spinnerDiv = document.getElementById("loanSpinner");
   const successDiv = document.getElementById("loanSuccess");
@@ -70,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentLoanId = null;
 
-  // ✅ Modal helper functions
   function showProcessing() {
     spinnerDiv.classList.remove("hidden");
     successDiv.classList.add("hidden");
@@ -96,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
     processingModal.classList.add("hidden");
   });
 
-  // ✅ Repay Modal functions
   function openRepayModal(loanId) {
     currentLoanId = loanId;
     repayAmountInput.value = "";
@@ -141,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ✅ Main fetchLoans function (kept your original working logic)
   async function fetchLoans() {
     try {
       const res = await fetch("/user/secure/ctb/loans");
@@ -197,7 +191,6 @@ document.addEventListener("DOMContentLoaded", () => {
         loanContainer.appendChild(card);
       });
 
-      // ✅ Add event listeners for repay buttons
       document.querySelectorAll(".repayBtn").forEach((btn) => {
         btn.addEventListener("click", (e) => {
           const loanId = e.target.dataset.id;

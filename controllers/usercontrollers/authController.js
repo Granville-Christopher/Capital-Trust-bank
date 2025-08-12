@@ -4,6 +4,7 @@ const escape = require("escape-html");
 const bcrypt = require("bcrypt");
 const { ExplainVerbosity } = require("mongodb");
 const generateAccountNumber = require("../../config/accountnumbergenerator");
+const KYC = require("../../models/usermodels/kyc");
 
 const registerUser = [
   body("Email")
@@ -105,7 +106,6 @@ const registerUser = [
     }
   },
 ];
-
 const loginUser = [
   body("Email")
     .isEmail()
@@ -142,12 +142,30 @@ const loginUser = [
         return res.status(401).json({ error: "Invalid password" });
       }
 
+      const kyc = await KYC.findOne({ userId: user._id });
+
       req.session.user = {
         id: user._id,
         name: user.Name,
         email: user.Email,
         role: user.role,
       };
+
+      if (!kyc) {
+        return res.status(403).json({
+          error: "Please update your KYC",
+          kycStatus: "not_submitted",
+        });
+      }
+
+      if (!kyc.verified) {
+        return res.status(403).json({
+          error:
+            "Please wait, your KYC is under review. This process could take up to 24 hours. If you do not get an email within 24 hours, please contact support.",
+          kycStatus: "under_review",
+        });
+      }
+      req.session.user.kycStatus = "verified";
 
       req.session.save((err) => {
         if (err) {

@@ -63,12 +63,17 @@ const compoundAllSavings = async (req, res) => {
       return res.status(404).json({ error: "No savings found" });
     }
 
-    const totalInterestToCompound = savings.reduce((sum, s) => sum + s.interestBalance, 0);
+    const totalInterestToCompound = savings.reduce(
+      (sum, s) => sum + s.interestBalance,
+      0
+    );
 
     if (totalInterestToCompound <= 0) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(400).json({ error: "No interest available to compound at this time." });
+      return res
+        .status(400)
+        .json({ error: "No interest available to compound at this time." });
     }
 
     let compoundedLogs = [];
@@ -99,11 +104,12 @@ const compoundAllSavings = async (req, res) => {
     session.endSession();
 
     res.status(200).json({
-      message: `Successfully compounded $${totalInterestToCompound.toFixed(2)} into your savings.`,
+      message: `Successfully compounded $${totalInterestToCompound.toFixed(
+        2
+      )} into your savings.`,
       totalCompounded: totalInterestToCompound,
       logsCreated: compoundedLogs.length,
     });
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -111,7 +117,6 @@ const compoundAllSavings = async (req, res) => {
     res.status(500).json({ error: "Server error. Transaction rolled back." });
   }
 };
-
 
 const withdrawAllSavings = async (req, res) => {
   const session = await mongoose.startSession();

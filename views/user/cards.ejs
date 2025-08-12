@@ -51,22 +51,35 @@
 </head>
 
 <body class="bg-gradient-to-b relative from-blue-100 to-gray-100 min-h-screen pt-4 pb-24 px-6 space-y-4">
+
+
   <section>
     <h2 class="text-xl font-semibold mb-4 md:text-center">Credit Card</h2>
     <div class="relative max-w-md w-full mx-auto">
       <div id="creditCard" class="card-face w-full flex flex-col justify-between">
         <div class="flex justify-between items-center">
-          <span><i class="fa-brands fa-cc-mastercard text-2xl"></i></span>
+          <span>
+            <i class="fa-brands fa-cc-<%= creditCard ? creditCard.cardType : 'mastercard' %> text-2xl"></i>
+          </span>
           <span class="text-sm">Credit Card</span>
         </div>
         <div>
-          <p id="creditCardNumber" class="text-lg tracking-widest mb-2">1234 5678 9012 3456</p>
+          <p id="creditCardNumber" class="text-lg tracking-widest mb-2">
+            <%= creditCard ? creditCard.cardNumber.replace(/(.{4})/g, "$1 " ) : "1234 5678 9012 3456" %>
+          </p>
           <div class="flex justify-between text-sm">
-            <span>Exp: 12/27</span>
-            <span id="creditCardCVV">CVV: 123</span>
+            <span>
+              Exp: <%= creditCard ? (new Date(creditCard.expiryDate)).toLocaleDateString("en-US", { month: "2-digit" ,
+                year: "numeric" }) : "12/27" %>
+            </span>
+            <span id="creditCardCVV">
+              CVV: <%= creditCard ? creditCard.cvv : "123" %>
+            </span>
           </div>
         </div>
-        <p class="text-sm mt-2 font-medium">Granville Banks</p>
+        <p class="text-sm mt-2 font-medium">
+          <%= userName || "Granville Banks" %>
+        </p>
       </div>
     </div>
   </section>
@@ -76,17 +89,28 @@
     <div class="relative w-full max-w-md mx-auto">
       <div id="debitCard" class="card-face w-full flex flex-col justify-between">
         <div class="flex justify-between items-center">
-          <span><i class="fa-brands fa-cc-visa text-2xl"></i></span>
+          <span>
+            <i class="fa-brands fa-cc-<%= debitCard ? debitCard.cardType : 'visa' %> text-2xl"></i>
+          </span>
           <span class="text-sm">Debit Card</span>
         </div>
         <div>
-          <p id="debitCardNumber" class="text-lg tracking-widest mb-2">9876 5432 1098 7654</p>
+          <p id="debitCardNumber" class="text-lg tracking-widest mb-2">
+            <%= debitCard ? debitCard.cardNumber.replace(/(.{4})/g, "$1 " ) : "9876 5432 1098 7654" %>
+          </p>
           <div class="flex justify-between text-sm">
-            <span>Exp: 10/26</span>
-            <span id="debitCardCVV">CVV: 456</span>
+            <span>
+              Exp: <%= debitCard ? (new Date(debitCard.expiryDate)).toLocaleDateString("en-US", { month: "2-digit" ,
+                year: "numeric" }) : "10/26" %>
+            </span>
+            <span id="debitCardCVV">
+              CVV: <%= debitCard ? debitCard.cvv : "456" %>
+            </span>
           </div>
         </div>
-        <p class="text-sm mt-2 font-medium">Granville Banks</p>
+        <p class="text-sm mt-2 font-medium">
+          <%= userName || "Granville Banks" %>
+        </p>
       </div>
     </div>
   </section>

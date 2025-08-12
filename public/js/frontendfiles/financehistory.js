@@ -4,16 +4,16 @@ const savingsSection = document.getElementById("savingsHistorySection");
 const loanSection = document.getElementById("loanHistorySection");
 
 btnSavings.addEventListener("click", () => {
-  btnSavings.classList.add("border-blue-600", "text-blue-600");
-  btnLoans.classList.remove("border-blue-600", "text-blue-600");
+  btnSavings.classList.add("border-b-blue-600", "text-blue-600");
+  btnLoans.classList.remove("border-b-blue-600", "text-blue-600");
   btnLoans.classList.add("text-gray-600", "border-transparent");
   savingsSection.classList.remove("hidden");
   loanSection.classList.add("hidden");
 });
 
 btnLoans.addEventListener("click", () => {
-  btnLoans.classList.add("border-blue-600", "text-blue-600");
-  btnSavings.classList.remove("border-blue-600", "text-blue-600");
+  btnLoans.classList.add("border-b-blue-600", "text-blue-600");
+  btnSavings.classList.remove("border-b-blue-600", "text-blue-600");
   btnSavings.classList.add("text-gray-600", "border-transparent");
   loanSection.classList.remove("hidden");
   savingsSection.classList.add("hidden");

@@ -54,12 +54,53 @@
           <i id="balanceIcon" class="fa-solid fa-eye"></i>
         </button>
       </div>
-      <p id="balanceAmount" class="mt-2 text-2xl font-bold text-gray-800">$50,250.00</p>
+      <p id="balanceAmount" class="mt-2 text-2xl font-bold text-gray-800">
+        <%= user.AccountBalance.toLocaleString('en-US', { style: 'currency' , currency: 'USD' }) %>
+      </p>
     </div>
 
-    <div class="bg-blue-200 text-blue-600 rounded-full px-6 py-3 text-center font-medium">
-      Interest Credited Today: $1,200.00
+    <div class="bg-white rounded-xl shadow p-6 relative">
+      <div class="accountid mt-3">
+        <p class="text-gray-400 text-xs">Account number:</p>
+        <style>
+          .account-id-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 5px;
+          }
+
+          .copy-feedback {
+            position: absolute;
+            top: 100%;
+            left: 70%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            padding: 4px 8px;
+            background-color: #18aaf3;
+            color: #ffffff;
+            border-radius: 4px;
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none;
+            z-index: 10;
+          }
+
+          .copy-feedback.show {
+            opacity: 1;
+          }
+        </style>
+        <p id="copyAccountId" class="inline-flex items-center text-lg cursor-pointer hover:text-blue-600 transition font-bold">
+          <i class="fas fa-copy text-blue-400 mr-2 font-bold"></i>
+          <%= user.AccountNumber%>
+        </p>
+        <span id="copyFeedback" class="copy-feedback">Copied!</span>
+      </div>
     </div>
+
+
+
+
 
     <div class="space-y-4 text-sm">
       <a href="transactionhistory" class="block bg-white rounded-xl shadow px-6 py-4 hover:bg-blue-50 transition">
@@ -69,7 +110,7 @@
 
       <a href="#" class="block bg-white rounded-xl shadow px-6 py-4 hover:bg-blue-50 transition">
         <span class="font-semibold text-gray-700">Account Type</span>
-        <p class="text-xs text-gray-500">Personal - Savings</p>
+        <p class="text-xs text-gray-500"> <%= user.AccountCategory %> - <%= user.AccountType %></p>
       </a>
 
       <a href="cards" class="block bg-white rounded-xl shadow px-6 py-4 hover:bg-blue-50 transition">
