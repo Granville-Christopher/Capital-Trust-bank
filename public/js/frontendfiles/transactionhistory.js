@@ -24,36 +24,46 @@ document.addEventListener("DOMContentLoaded", function () {
   );
   const receiptContent = document.getElementById("receiptContent");
 
-  const currencyCode = "<%= currencyCode %>" || "USD"; // default fallback
+  // ✅ Read currency from DOM (set in EJS) so external JS can use it
+  const currencyCode = (
+    document.body.dataset.currencyCode || "USD"
+  ).toUpperCase();
 
-  async function formatAmount(amount) {
+  let rateCache = null;
+  async function getUsdToLocalRate() {
+    if (currencyCode === "USD") return 1;
+    if (rateCache) return rateCache;
     try {
       const res = await fetch(
-        `https://api.exchangerate.host/latest?base=USD&symbols=${currencyCode}`
+        `https://api.exchangerate.host/latest?base=USD&symbols=${encodeURIComponent(
+          currencyCode
+        )}`
       );
       const data = await res.json();
-      const rate = data.rates?.[currencyCode] || 1;
-      const localAmount = parseFloat(amount) * rate;
-      return localAmount.toLocaleString(undefined, {
-        style: "currency",
-        currency: currencyCode,
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-    } catch (err) {
-      console.error("Currency conversion failed:", err);
-      return parseFloat(amount).toLocaleString(undefined, {
-        style: "currency",
-        currency: "USD",
-      });
+      rateCache = data?.rates?.[currencyCode] || 1;
+      return rateCache;
+    } catch (e) {
+      console.error("FX fetch failed:", e);
+      return 1;
     }
+  }
+
+  async function formatLocalCurrency(amountUsdAbs) {
+    const rate = await getUsdToLocalRate();
+    const local = Number(amountUsdAbs) * rate;
+    return local.toLocaleString(undefined, {
+      style: "currency",
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   }
 
   async function showReceiptModal(data) {
     const {
-      amount,
+      amount, // assumed USD numeric string/number
       description,
-      type,
+      type, // "debit" | "credit"
       status,
       dateString,
       relatedName,
@@ -75,35 +85,33 @@ document.addEventListener("DOMContentLoaded", function () {
     receiptDescription.textContent = description;
     receiptType.textContent = type;
 
-    const formattedAmount = await formatAmount(amount);
-    receiptAmount.textContent = formattedAmount;
-    receiptAmount.className = "font-bold text-lg";
-    if (type === "debit") {
-      receiptAmount.classList.add("text-red-600");
-    } else {
-      receiptAmount.classList.add("text-green-600");
-    }
+    const amtNum = Number(amount) || 0;
+    const formattedAbs = await formatLocalCurrency(Math.abs(amtNum));
+    receiptAmount.textContent =
+      type === "debit" ? `-${formattedAbs}` : formattedAbs;
+    receiptAmount.className =
+      "font-bold text-lg " +
+      (type === "debit" ? "text-red-600" : "text-green-600");
 
     receiptStatus.textContent = status;
-    receiptStatus.className = "capitalize";
-    if (status === "successful") {
-      receiptStatus.classList.add("text-green-600");
-    } else if (status === "failed") {
-      receiptStatus.classList.add("text-red-600");
-    } else {
-      receiptStatus.classList.add("text-yellow-600");
-    }
+    receiptStatus.className =
+      "capitalize " +
+      (status === "successful"
+        ? "text-green-600"
+        : status === "failed"
+        ? "text-red-600"
+        : "text-yellow-600");
 
     if (type === "debit") {
       recipientDetails.classList.remove("hidden");
       senderDetails.classList.add("hidden");
-      receiptRelatedName.textContent = relatedName;
-      receiptRelatedAccount.textContent = relatedAccount;
+      receiptRelatedName.textContent = relatedName || "N/A";
+      receiptRelatedAccount.textContent = relatedAccount || "N/A";
     } else if (type === "credit") {
       recipientDetails.classList.add("hidden");
       senderDetails.classList.remove("hidden");
-      receiptRelatedNameSender.textContent = relatedName;
-      receiptRelatedAccountSender.textContent = relatedAccount;
+      receiptRelatedNameSender.textContent = relatedName || "N/A";
+      receiptRelatedAccountSender.textContent = relatedAccount || "N/A";
     } else {
       recipientDetails.classList.add("hidden");
       senderDetails.classList.add("hidden");
@@ -112,6 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
     receiptModal.classList.remove("hidden");
   }
 
+  // ✅ Use the correct dataset key for hyphenated attributes: data-reference-id => dataset.referenceId
   document
     .querySelectorAll(".view-receipt-btn, .view-international-receipt-btn")
     .forEach((button) => {
@@ -124,23 +133,19 @@ document.addEventListener("DOMContentLoaded", function () {
           dateString: this.dataset.date,
           relatedName: this.dataset.relatedname,
           relatedAccount: this.dataset.relatedaccount,
-          referenceId: this.dataset.referenceid, // ensure lowercase in HTML
+          referenceId: this.dataset.referenceId, // <-- camelCase
         });
       });
     });
 
-  closeReceiptModalBtn.addEventListener("click", () => {
-    receiptModal.classList.add("hidden");
-  });
-
-  receiptModal.addEventListener("click", (event) => {
-    if (event.target === receiptModal) {
-      receiptModal.classList.add("hidden");
-    }
+  closeReceiptModalBtn.addEventListener("click", () =>
+    receiptModal.classList.add("hidden")
+  );
+  receiptModal.addEventListener("click", (e) => {
+    if (e.target === receiptModal) receiptModal.classList.add("hidden");
   });
 
   downloadReceiptPdfBtn.addEventListener("click", function () {
-    const element = receiptContent;
     const options = {
       margin: 0.5,
       filename: "CTBank_transaction_receipt.pdf",
@@ -152,6 +157,6 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
     };
-    html2pdf().set(options).from(element).save();
+    html2pdf().set(options).from(receiptContent).save();
   });
 });

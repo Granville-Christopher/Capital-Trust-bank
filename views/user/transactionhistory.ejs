@@ -33,316 +33,245 @@
         content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
     <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
 
+<body data-currency-code="<%= currencyCode %>">
 
-</head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 space-y-6 relative">
+    </head>
 
-    <div class="flex justify-between px-3 fixed right-0 left-0 top-0 bg-blue-100 items-center mb-4">
-        <h2 class="text-xl  py-4 font-semibold text-gray-800">
-            <i class="fa-solid fa-file-invoice-dollar text-blue-600 mr-2"></i>
-            Transaction History
-        </h2>
-        <p class="text-blue-600">
-            <a href="dashboard">back to dashboard</a>
-        </p>
-    </div>
+    <body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 space-y-6 relative">
 
-    <div class="flex justify-between mb-4 pt-3 px-4">
-        <button id="btnInternational" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">
-            International Transaction History
-        </button>
-        <button id="btnLocal"
-            class="text-gray-600 font-semibold border-b-2 border-transparent pb-1 hover:text-blue-600">
-            Local Transaction History
-        </button>
-    </div>
-
-    <div id="internationalSection" class="block">
-        <div class="flex justify-end mb-2 px-4">
-            <button id="downloadInternational" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Download Statement
-            </button>
+        <div class="flex justify-between px-3 fixed right-0 left-0 top-0 bg-blue-100 items-center mb-4">
+            <h2 class="text-xl  py-4 font-semibold text-gray-800">
+                <i class="fa-solid fa-file-invoice-dollar text-blue-600 mr-2"></i>
+                Transaction History
+            </h2>
+            <p class="text-blue-600">
+                <a href="dashboard">back to dashboard</a>
+            </p>
         </div>
-        <div class="overflow-x-auto rounded-xl pt-0 px-6 pb-6 overflow-y-auto h-[650px]">
-            <table class="min-w-full text-sm">
-                <thead class="bg-blue-100 text-gray-700 sticky top-0 z-10">
-                    <tr>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Date</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Reference ID</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Description</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Type</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Amount</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="text-gray-800">
-                    <% if (internationalTransfers && internationalTransfers.length> 0) { %>
-                        <% internationalTransfers.forEach(function(transfer) { %>
-                            <tr class="border-b">
-                                <td class="py-2 px-4 whitespace-nowrap">
-                                    <%= new Date(transfer.createdAt).toLocaleDateString() %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap">
-                                    <%= transfer.ReferenceId %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap">International Transfer to <%= transfer.FullName
-                                        %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap">Debit</td>
-                                <td class="py-2 px-4 whitespace-nowrap text-red-600">
-                                    -<%= currencyCode %>
-                                        <%= transfer.Amount.toLocaleString(undefined, { minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2 }) %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap text-green-600">
-                                    <%= transfer.status==='completed' ? 'Completed' : transfer.status %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap">
-                                    <button
-                                        class="view-international-receipt-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
-                                        data-amount="<%= transfer.Amount %>"
-                                        data-description="International Transfer to <%= transfer.FullName %>"
-                                        data-reference-id="<%= transfer.ReferenceId %>" data-type="debit"
-                                        data-status="<%= transfer.status %>"
-                                        data-date="<%= transfer.createdAt.toISOString() %>"
-                                        data-relatedname="<%= transfer.FullName %>"
-                                        data-relatedaccount="<%= transfer.AccountNumber || 'N/A' %>">
-                                        View Receipt
-                                    </button>
-                                </td>
-                            </tr>
-                            <% }); %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="6" class="py-4 text-center text-gray-500">No international
-                                            transactions found.</td>
-                                    </tr>
-                                    <% } %>
-                </tbody>
-            </table>
-        </div>
-    </div>
 
-    <div id="localSection" class="hidden">
-        <div class="flex justify-end mb-2">
-            <button id="downloadLocal" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Download Statement
-            </button>
-        </div>
-        <div class="flex justify-between items-center px-2 py-2 w-full bg-gray-500 text-gray-100 rounded">
-            <div class="totalincome">
-                <p>Total income: </p>
-                <p class="text-center">
-                    <%= totalIncome.toLocaleString('en-US', { style: 'currency' , currency: currencyCode || 'USD' }) %>
-                </p>
+        <div id="localSection" class="pt-8">
+            <div class="flex justify-end mb-2">
+                <button id="downloadLocal" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Download Statement
+                </button>
             </div>
-            <div class="totalexpenses">
-                <p>Total expenses: </p>
-                <p class="text-center">
-                    <%= totalExpenses.toLocaleString('en-US', { style: 'currency' , currency: currencyCode || 'USD' })
-                        %>
-                </p>
+            <div class="flex justify-between items-center px-2 py-2 w-full bg-gray-500 text-gray-100 rounded">
+                <div class="totalincome">
+                    <p>Total income: </p>
+                    <p class="text-center">
+                        <%= totalIncome.toLocaleString('en-US', { style: 'currency' , currency: currencyCode || 'USD' })
+                            %>
+                    </p>
+                </div>
+                <div class="totalexpenses">
+                    <p>Total expenses: </p>
+                    <p class="text-center">
+                        <%= totalExpenses.toLocaleString('en-US', { style: 'currency' , currency: currencyCode || 'USD'
+                            }) %>
+                    </p>
+                </div>
             </div>
-        </div>
 
-        <div class="overflow-x-auto rounded-xl pt-0 px-6 pb-6 overflow-y-auto h-[650px]">
-            <table class="min-w-full text-sm">
-                <thead class="bg-blue-100 text-gray-700 sticky top-0 z-10">
-                    <tr>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Date</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Description</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Type</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Reference Id</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Amount</th>
-                        <th class="py-2 px-4 whitespace-nowrap text-left">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="text-gray-800">
-                    <% if (transactionHistory && transactionHistory.length> 0) { %>
-                        <% transactionHistory.forEach(transaction=> { %>
-                            <tr class="border-b">
-                                <td class="py-2 px-4 whitespace-nowrap">
-                                    <%= new Date(transaction.transactionDate).toLocaleDateString('en-US', {
-                                        month: 'short' , day: 'numeric' , year: 'numeric' }) %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap">
-                                    <%= transaction.description %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap capitalize">
-                                    <%= transaction.type %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap capitalize">
-                                    <%= transaction.referenceId %>
-                                </td>
-                                <td
-                                    class="py-2 px-4 whitespace-nowrap
+            <div class="overflow-x-auto rounded-xl pt-0 px-6 pb-6 overflow-y-auto h-[650px]">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-blue-100 text-gray-700 sticky top-0 z-10">
+                        <tr>
+                            <th class="py-2 px-4 whitespace-nowrap text-left">Date</th>
+                            <th class="py-2 px-4 whitespace-nowrap text-left">Description</th>
+                            <th class="py-2 px-4 whitespace-nowrap text-left">Type</th>
+                            <th class="py-2 px-4 whitespace-nowrap text-left">Reference Id</th>
+                            <th class="py-2 px-4 whitespace-nowrap text-left">Amount</th>
+                            <th class="py-2 px-4 whitespace-nowrap text-left">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-800">
+                        <% if (transactionHistory && transactionHistory.length> 0) { %>
+                            <% transactionHistory.forEach(transaction=> { %>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4 whitespace-nowrap">
+                                        <%= new Date(transaction.transactionDate).toLocaleDateString('en-US', {
+                                            month: 'short' , day: 'numeric' , year: 'numeric' }) %>
+                                    </td>
+                                    <td class="py-2 px-4 whitespace-nowrap">
+                                        <%= transaction.description %>
+                                    </td>
+                                    <td class="py-2 px-4 whitespace-nowrap capitalize">
+                                        <%= transaction.type %>
+                                    </td>
+                                    <td class="py-2 px-4 whitespace-nowrap capitalize">
+                                        <%= transaction.referenceId %>
+                                    </td>
+                                    <td
+                                        class="py-2 px-4 whitespace-nowrap
                                 <% if (transaction.type === 'debit') { %> text-red-600 <% } else { %> text-green-600 <% } %>">
-                                    <% if (transaction.type==='debit' ) { %>-<% } %>
-                                            <%= currencyCode %>
-                                                <%= transaction.amount.toLocaleString(undefined, {
-                                                    minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap capitalize
+                                        <% if (transaction.type==='debit' ) { %>-<% } %>
+                                                <%= currencyCode %>
+                                                    <%= transaction.amount.toLocaleString(undefined, {
+                                                        minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+                                    </td>
+                                    <td class="py-2 px-4 whitespace-nowrap capitalize
                                 <% if (transaction.status === 'successful') { %> text-green-600 <% } 
                                    else if (transaction.status === 'failed') { %> text-red-600 <% } 
                                    else { %> text-yellow-600 <% } %>">
-                                    <%= transaction.status %>
-                                </td>
-                                <td class="py-2 px-4 whitespace-nowrap">
-                                    <button
-                                        class="view-receipt-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
-                                        data-amount="<%= transaction.amount %>"
-                                        data-description="<%= transaction.description %>"
-                                        data-reference-id="<%= transaction.referenceId %>"
-                                        data-type="<%= transaction.type %>" data-status="<%= transaction.status %>"
-                                        data-date="<%= transaction.transactionDate.toISOString() %>"
-                                        data-relatedname="<%= transaction.relatedFullName || 'N/A' %>"
-                                        data-relatedaccount="<%= transaction.relatedAccount || 'N/A' %>">
-                                        View Receipt
-                                    </button>
-                                </td>
-                            </tr>
-                            <% }) %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="6" class="py-4 px-4 text-center text-gray-500">No transactions
-                                            found.</td>
-                                    </tr>
-                                    <% } %>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-
-    <div id="receiptModal"
-        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-blue-100 rounded-lg shadow-xl w-full max-w-md mx-auto p-6 relative">
-            <button id="closeReceiptModal"
-                class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl font-bold">&times;</button>
-
-            <div class="flex justify-start mb-4 receipt-exclude"> <button id="downloadReceiptPdfBtn"
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
-                    Download Receipt
-                </button>
-            </div>
-
-            <div id="receiptContent">
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-extrabold text-blue-800 uppercase tracking-wider">Capital Trust Bank</h2>
-                    <p class="text-sm text-gray-600 mt-1">Transaction Receipt</p>
-                </div>
-
-                <div class="space-y-3 text-gray-800">
-                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                        <span class="font-semibold">Date:</span>
-                        <span id="receiptDate"></span>
-                    </div>
-                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                        <span class="font-semibold text-gray-700">Reference ID:</span>
-                        <span id="referenceId" class="text-gray-900"></span>
-                    </div>
-                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                        <span class="font-semibold text-xs">Description:</span>
-                        <span id="receiptDescription" class="text-xs"></span>
-                    </div>
-                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                        <span class="font-semibold">Transaction Type:</span>
-                        <span id="receiptType" class="capitalize"></span>
-                    </div>
-                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                        <span class="font-semibold">Amount:</span>
-                        <span id="receiptAmount" class="font-bold text-lg"></span>
-                    </div>
-                    <div id="recipientDetails" class="hidden">
-                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                            <span class="font-semibold">Recipient Name:</span>
-                            <span id="receiptRelatedName"></span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                            <span class="font-semibold">Recipient Account:</span>
-                            <span id="receiptRelatedAccount"></span>
-                        </div>
-                    </div>
-                    <div id="senderDetails" class="hidden">
-                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                            <span class="font-semibold">Sender Name:</span>
-                            <span id="receiptRelatedNameSender"></span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                            <span class="font-semibold">Sender Account:</span>
-                            <span id="receiptRelatedAccountSender"></span>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center border-b border-gray-300 pb-2">
-                        <span class="font-semibold">Status:</span>
-                        <span id="receiptStatus" class="capitalize"></span>
-                    </div>
-                </div>
-
-                <div class="text-center mt-6 text-xs text-gray-500">
-                    &copy; <%= new Date().getFullYear() %> Capital Trust Bank. All Rights Reserved.
-                </div>
+                                        <%= transaction.status %>
+                                    </td>
+                                    <td class="py-2 px-4 whitespace-nowrap">
+                                        <button
+                                            class="view-receipt-btn bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
+                                            data-amount="<%= transaction.amount %>"
+                                            data-description="<%= transaction.description %>"
+                                            data-reference-id="<%= transaction.referenceId %>"
+                                            data-type="<%= transaction.type %>" data-status="<%= transaction.status %>"
+                                            data-date="<%= transaction.transactionDate.toISOString() %>"
+                                            data-relatedname="<%= transaction.relatedFullName || 'N/A' %>"
+                                            data-relatedaccount="<%= transaction.relatedAccount || 'N/A' %>">
+                                            View Receipt
+                                        </button>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="6" class="py-4 px-4 text-center text-gray-500">No transactions
+                                                found.</td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
 
-    <div id="statementModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Download Statement</h3>
 
-            <form>
-                <div class="mb-4">
-                    <label class="block text-sm text-gray-700 mb-1" for="fromDate">From Date</label>
-                    <input type="date" id="fromDate"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <div id="receiptModal"
+            class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+            <div class="bg-blue-100 rounded-lg shadow-xl w-full max-w-md mx-auto p-6 relative">
+                <button id="closeReceiptModal"
+                    class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-2xl font-bold">&times;</button>
+
+                <div class="flex justify-start mb-4 receipt-exclude"> <button id="downloadReceiptPdfBtn"
+                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                        Download Receipt
+                    </button>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm text-gray-700 mb-1" for="toDate">To Date</label>
-                    <input type="date" id="toDate"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+                <div id="receiptContent">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-extrabold text-blue-800 uppercase tracking-wider">Capital Trust Bank
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-1">Transaction Receipt</p>
+                    </div>
+
+                    <div class="space-y-3 text-gray-800">
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold">Date:</span>
+                            <span id="receiptDate"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold text-gray-700">Reference ID:</span>
+                            <span id="referenceId" class="text-gray-900"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold text-xs">Description:</span>
+                            <span id="receiptDescription" class="text-xs"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold">Transaction Type:</span>
+                            <span id="receiptType" class="capitalize"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold">Amount:</span>
+                            <span id="receiptAmount" class="font-bold text-lg"></span>
+                        </div>
+                        <div id="recipientDetails" class="hidden">
+                            <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                                <span class="font-semibold">Recipient Name:</span>
+                                <span id="receiptRelatedName"></span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                                <span class="font-semibold">Recipient Account:</span>
+                                <span id="receiptRelatedAccount"></span>
+                            </div>
+                        </div>
+                        <div id="senderDetails" class="hidden">
+                            <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                                <span class="font-semibold">Sender Name:</span>
+                                <span id="receiptRelatedNameSender"></span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                                <span class="font-semibold">Sender Account:</span>
+                                <span id="receiptRelatedAccountSender"></span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-300 pb-2">
+                            <span class="font-semibold">Status:</span>
+                            <span id="receiptStatus" class="capitalize"></span>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-6 text-xs text-gray-500">
+                        &copy; <%= new Date().getFullYear() %> Capital Trust Bank. All Rights Reserved.
+                    </div>
                 </div>
-                <button type="submit"
-                    class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-                    Submit Request
+            </div>
+        </div>
+
+        <div id="statementModal"
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Download Statement</h3>
+
+                <form>
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-700 mb-1" for="fromDate">From Date</label>
+                        <input type="date" id="fromDate"
+                            class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-700 mb-1" for="toDate">To Date</label>
+                        <input type="date" id="toDate"
+                            class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    </div>
+                    <button type="submit"
+                        class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+                        Submit Request
+                    </button>
+                </form>
+
+                <button onclick="closeModal()" class="absolute top-3 right-4 text-gray-500 hover:text-gray-700">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
-            </form>
-
-            <button onclick="closeModal()" class="absolute top-3 right-4 text-gray-500 hover:text-gray-700">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
+            </div>
         </div>
-    </div>
 
-    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
+        <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
+            <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
 
-            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="mt-1">Home</span>
-            </a>
+                <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                    <i class="fa-solid fa-house text-lg"></i>
+                    <span class="mt-1">Home</span>
+                </a>
 
-            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-chart-line text-lg"></i>
-                <span class="mt-1">Finance</span>
-            </a>
+                <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                    <span class="mt-1">Finance</span>
+                </a>
 
-            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-credit-card text-lg"></i>
-                <span class="mt-1">Cards</span>
-            </a>
+                <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                    <i class="fa-solid fa-credit-card text-lg"></i>
+                    <span class="mt-1">Cards</span>
+                </a>
 
-            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="mt-1">Me</span>
-            </a>
+                <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
+                    <i class="fa-solid fa-user text-lg"></i>
+                    <span class="mt-1">Me</span>
+                </a>
 
+            </div>
         </div>
-    </div>
 
-    <script src="/js/frontendfiles/transactionhistory.js"></script>
-    <script src="/js/frontendfiles/transactionhistoryswitch.js"></script>
-</body>
+        <script src="/js/frontendfiles/transactionhistory.js"></script>
+        <script src="/js/frontendfiles/transactionhistoryswitch.js"></script>
+    </body>
 
 </html>

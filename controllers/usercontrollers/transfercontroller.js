@@ -613,7 +613,7 @@ const verifyTransfer = [
         return res.status(404).json({ error: "User not found." });
       }
 
-      if (user.Balance < transfer.Amount) {
+      if (user.AccountBalance < transfer.Amount) {
         transfer.status = "failed";
         await transfer.save({ session });
         await session.commitTransaction();
@@ -623,7 +623,7 @@ const verifyTransfer = [
         });
       }
 
-      user.Balance -= transfer.Amount;
+      user.AccountBalance -= transfer.Amount;
       await user.save({ session });
 
       const transactionHistory = new TransactionHistory({
