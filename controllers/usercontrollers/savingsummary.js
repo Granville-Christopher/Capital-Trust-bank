@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Savings = require("../../models/usermodels/savings");
 const User = require("../../models/usermodels/userSignup");
+const SavingsHistory = require("../../models/usermodels/savingshistory")
 
 const DAILY_INTEREST_RATE = 0.1 / 365;
 
@@ -161,6 +162,14 @@ const withdrawAllSavings = async (req, res) => {
     for (const s of savings) {
       s.interestBalance = 0;
       await s.save({ session });
+
+      SavingsHistory.create({
+        userId,
+        type: "withdraw_interest",
+        amount: s.interestBalance,
+        balanceAfter: user.AccountBalance,
+        referenceId: s.referenceId,
+      });
     }
 
     user.AccountBalance += totalWithdrawableInterest;

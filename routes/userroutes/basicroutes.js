@@ -383,10 +383,15 @@ router.get("/profile", async (req, res) => {
       return res.status(404).render("user/login", { error: "User not found" });
     }
 
-    return res.status(200).render("user/profile", { user });
+    const kyc = await KYC.findOne({ userId }).lean();
+    if(!kyc) {
+      return res.status(404).render("user/login", { error: "KYC not found" });
+    }
+
+    return res.status(200).render("user/profile", { user, kyc });
   } catch (error) {
     console.error("Profile error:", error);
-    return res.status(500).render("user/login", { error: "Server error", user: null });
+    return res.status(500).render("user/login", { error: "Server error", user: null, kyc: null });
   }
 });
 
