@@ -23,7 +23,7 @@
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:site_name" content="Capital Trust Bank" />
-    <meta property="og:locale" content="en_NG" />
+    <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@CTBankOfficial" />
     <meta name="twitter:creator" content="@CTBankOfficial" />
@@ -50,9 +50,26 @@
 
     <div class="bg-black text-white rounded-xl p-6 relative shadow-lg h-[180px]">
         <div class="absolute top-4 right-6 text-right">
-            <p class="text-sm font-semibold"><%= kyc.accountCategory %></p>
-            <p class="text-xs text-gray-300"><%= kyc.accountType %></p>
-            <div class="accountid mt-3">
+            <%- kyc.country %>
+        </div>
+
+        <div class="absolute top-4 left-6">
+            <p class="text-xs text-gray-400">Available Balance <button onclick="toggleBalance()"
+                    class="text-blue-400 ml-2 text-sm">
+                    <i id="balanceIcon" class="fa-solid fa-eye"></i>
+                </button></p>
+            <div class="flex items-center space-x-2 mt-1">
+                <p id="balanceAmount" class="text-2xl font-bold" 
+                    data-balance="<%= Number(user?.AccountBalance ?? 0) %>" 
+                    data-currency="<%= currencyCode %>">
+                    Loading...
+                </p>
+
+            </div>
+            <script src="/js/currencydisplaycountry.js"></script>
+        </div>
+        <div class="flex">
+            <div class="accountid bottom-4 absolute">
                 <p class="text-gray-400 text-xs">Account number:</p>
                 <style>
                     .account-id-wrapper {
@@ -89,25 +106,11 @@
                 </p>
                 <span id="copyFeedback" class="copy-feedback">Copied!</span>
             </div>
-        </div>
-
-        <div class="absolute top-4 left-6">
-            <p class="text-xs text-gray-400">Available Balance <button onclick="toggleBalance()"
-                    class="text-blue-400 ml-2 text-sm">
-                    <i id="balanceIcon" class="fa-solid fa-eye"></i>
-                </button></p>
-            <div class="flex items-center space-x-2 mt-1">
-                <p id="balanceAmount" class="text-2xl font-bold"><%= user.AccountBalance.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) %>
-
-                </p>
+            <div class="absolute bottom-4 right-6 text-sm text-gray-300 text-right">
+                <p class="text-sm font-semibold"><%= kyc.accountCategory %></p>
+                <p class="text-xs text-gray-300"><%= kyc.accountType %></p>
             </div>
         </div>
-
-        <div class="absolute bottom-4 left-6 text-sm">
-            <a href="transactionhistory" class="text-blue-400 hover:underline">View Transaction History</a>
-        </div>
-
-        <div class="absolute bottom-4 right-6 text-sm text-gray-300">Nigeria</div>
     </div>
 
     <div class="grid grid-cols-2 gap-4">
@@ -129,10 +132,16 @@
     </div>
 
     <div class="bg-white rounded-xl shadow p-3 h-[180px] ">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Transactions</h3>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">Recent Transactions</h3>
+            <div class=" text-sm">
+               <a href="transactionhistory" class="text-blue-400 hover:underline">View Transaction History</a>
+            </div>
+        </div>
+    </div>
         <ul class="space-y-3 text-sm">
-            <% if (recentTransactions && recentTransactions.length > 0) { %>
-                <% recentTransactions.forEach(transaction => { %>
+            <% if (recentTransactions && recentTransactions.length> 0) { %>
+                <% recentTransactions.forEach(transaction=> { %>
                     <li class="flex justify-between border-b pb-2">
                         <span>
                             <% // Ensure the ' type' comparison is exact, no leading/trailing spaces %>

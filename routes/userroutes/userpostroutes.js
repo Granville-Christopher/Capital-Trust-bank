@@ -56,24 +56,6 @@ const {
   submitKYC,
 } = require("../../controllers/usercontrollers/kyccontroller");
 
-// router.post(
-//   "/submit-kyc",
-//   (req, res, next) => {
-//     console.log("📂 KYC Upload Middleware Triggered");
-//     upload.fields([
-//       { name: "idFront", maxCount: 1 },
-//       { name: "idBack", maxCount: 1 },
-//     ])(req, res, function (err) {
-//       if (err instanceof multer.MulterError) {
-//         return res.status(400).json({ error: err.message });
-//       } else if (err) {
-//         return res.status(400).json({ error: err.message });
-//       }
-//       next();
-//     });
-//   },
-//   submitKYC
-// );
 router.post(
   "/submit-kyc",
   upload.fields([

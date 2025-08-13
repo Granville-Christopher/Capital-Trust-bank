@@ -47,6 +47,35 @@ function showToast(message, type = "info", duration = 3000) {
   }, duration);
 }
 
+async function convertAndFormat(amountUSD, currencyCode) {
+  if (!currencyCode || currencyCode === "USD") {
+    return amountUSD.toLocaleString(undefined, {
+      style: "currency",
+      currency: "USD",
+    });
+  }
+
+  try {
+    const res = await fetch(
+      `https://api.exchangerate.host/latest?base=USD&symbols=${currencyCode}`
+    );
+    const data = await res.json();
+    const rate = data.rates?.[currencyCode] || 1;
+    const localAmount = amountUSD * rate;
+
+    return localAmount.toLocaleString(undefined, {
+      style: "currency",
+      currency: currencyCode,
+    });
+  } catch (error) {
+    console.error("Error converting currency:", error);
+    return amountUSD.toLocaleString(undefined, {
+      style: "currency",
+      currency: "USD",
+    });
+  }
+}
+
 async function loadSavingsData() {
   try {
     const res = await fetch(`${API_BASE}/secure/ctb/viewsavings`);
@@ -54,51 +83,52 @@ async function loadSavingsData() {
 
     if (res.ok) {
       const savingsSection = document.getElementById("savingsSection");
-      savingsSection.innerHTML = ""; 
+      savingsSection.innerHTML = "";
 
-      data.forEach((saving) => {
+      for (const saving of data) {
+        const principalFormatted = await convertAndFormat(
+          parseFloat(saving.principal),
+          currencyCode
+        );
+        const todayInterestFormatted = await convertAndFormat(
+          parseFloat(saving.todayInterest),
+          currencyCode
+        );
+        const totalInterestFormatted = await convertAndFormat(
+          parseFloat(saving.totalInterest),
+          currencyCode
+        );
+
         const card = document.createElement("div");
         card.className = "bg-white rounded-xl shadow p-6 mb-4 relative";
 
         card.innerHTML = `
           <p class="text-lg font-semibold mb-2">Savings Balance</p>
-          <p class="text-3xl font-bold text-blue-600 mb-4">$${parseFloat(
-            saving.principal
-          ).toLocaleString()}</p>
+          <p class="text-3xl font-bold text-blue-600 mb-4">${principalFormatted}</p>
 
           <div class="flex justify-between text-sm text-gray-600 mb-4">
-            <span>Today's Interest: $${parseFloat(saving.todayInterest).toFixed(
-              2
-            )}</span>
-            <span>Total Interest: $${parseFloat(saving.totalInterest).toFixed(
-              2
-            )}</span>
+            <span>Today's Interest: ${todayInterestFormatted}</span>
+            <span>Total Interest: ${totalInterestFormatted}</span>
           </div>
 
           <div class="flex gap-4 mt-4">
-            <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-medium w-1/2 withdraw-btn" data-id="${
-              saving.id
-            }">
+            <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-medium w-1/2 withdraw-btn" data-id="${saving.id}">
               Withdraw Interest
             </button>
-            <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-medium w-1/2 compound-btn" data-id="${
-              saving.id
-            }">
+            <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-medium w-1/2 compound-btn" data-id="${saving.id}">
               Compound Interest
             </button>
           </div>
 
           <div class="flex gap-4 mt-4">
-            <button class="mt-4 w-full py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition cancel-btn" data-id="${
-              saving.id
-            }">
+            <button class="mt-4 w-full py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition cancel-btn" data-id="${saving.id}">
               Cancel Savings
             </button>
           </div>
         `;
 
         savingsSection.appendChild(card);
-      });
+      }
 
       document.querySelectorAll(".withdraw-btn").forEach((btn) => {
         btn.addEventListener("click", () => withdrawInterest(btn.dataset.id));
@@ -118,6 +148,78 @@ async function loadSavingsData() {
     console.error("Fetch Error:", error);
   }
 }
+
+// async function loadSavingsData() {
+//   try {
+//     const res = await fetch(`${API_BASE}/secure/ctb/viewsavings`);
+//     const data = await res.json();
+
+//     if (res.ok) {
+//       const savingsSection = document.getElementById("savingsSection");
+//       savingsSection.innerHTML = "";
+
+//       data.forEach((saving) => {
+//         const card = document.createElement("div");
+//         card.className = "bg-white rounded-xl shadow p-6 mb-4 relative";
+
+//         card.innerHTML = `
+//           <p class="text-lg font-semibold mb-2">Savings Balance</p>
+//           <p class="text-3xl font-bold text-blue-600 mb-4">$${parseFloat(
+//             saving.principal
+//           ).toLocaleString()}</p>
+
+//           <div class="flex justify-between text-sm text-gray-600 mb-4">
+//             <span>Today's Interest: $${parseFloat(saving.todayInterest).toFixed(
+//               2
+//             )}</span>
+//             <span>Total Interest: $${parseFloat(saving.totalInterest).toFixed(
+//               2
+//             )}</span>
+//           </div>
+
+//           <div class="flex gap-4 mt-4">
+//             <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-medium w-1/2 withdraw-btn" data-id="${
+//               saving.id
+//             }">
+//               Withdraw Interest
+//             </button>
+//             <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-medium w-1/2 compound-btn" data-id="${
+//               saving.id
+//             }">
+//               Compound Interest
+//             </button>
+//           </div>
+
+//           <div class="flex gap-4 mt-4">
+//             <button class="mt-4 w-full py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition cancel-btn" data-id="${
+//               saving.id
+//             }">
+//               Cancel Savings
+//             </button>
+//           </div>
+//         `;
+
+//         savingsSection.appendChild(card);
+//       });
+
+//       document.querySelectorAll(".withdraw-btn").forEach((btn) => {
+//         btn.addEventListener("click", () => withdrawInterest(btn.dataset.id));
+//       });
+
+//       document.querySelectorAll(".compound-btn").forEach((btn) => {
+//         btn.addEventListener("click", () => compoundInterest(btn.dataset.id));
+//       });
+
+//       document.querySelectorAll(".cancel-btn").forEach((btn) => {
+//         btn.addEventListener("click", () => cancelSavings(btn.dataset.id));
+//       });
+//     } else {
+//       console.error("Error loading savings data:", data.error);
+//     }
+//   } catch (error) {
+//     console.error("Fetch Error:", error);
+//   }
+// }
 async function withdrawInterest(id) {
   try {
     const res = await fetch(`${API_BASE}/secure/ctb/${id}/withdraw-interest`, {

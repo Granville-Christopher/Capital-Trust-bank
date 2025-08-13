@@ -19,13 +19,37 @@ document.addEventListener("DOMContentLoaded", function () {
   const receiptRelatedAccountSender = document.getElementById(
     "receiptRelatedAccountSender"
   );
-
   const downloadReceiptPdfBtn = document.getElementById(
     "downloadReceiptPdfBtn"
   );
   const receiptContent = document.getElementById("receiptContent");
 
-  function showReceiptModal(data) {
+  const currencyCode = "<%= currencyCode %>" || "USD"; // default fallback
+
+  async function formatAmount(amount) {
+    try {
+      const res = await fetch(
+        `https://api.exchangerate.host/latest?base=USD&symbols=${currencyCode}`
+      );
+      const data = await res.json();
+      const rate = data.rates?.[currencyCode] || 1;
+      const localAmount = parseFloat(amount) * rate;
+      return localAmount.toLocaleString(undefined, {
+        style: "currency",
+        currency: currencyCode,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    } catch (err) {
+      console.error("Currency conversion failed:", err);
+      return parseFloat(amount).toLocaleString(undefined, {
+        style: "currency",
+        currency: "USD",
+      });
+    }
+  }
+
+  async function showReceiptModal(data) {
     const {
       amount,
       description,
@@ -47,22 +71,14 @@ document.addEventListener("DOMContentLoaded", function () {
       second: "2-digit",
     });
 
-    if (referenceIdElement && referenceId) {
-      referenceIdElement.textContent = referenceId;
-    } else if (referenceIdElement) {
-      referenceIdElement.textContent = "N/A";
-    }
+    referenceIdElement.textContent = referenceId || "N/A";
     receiptDescription.textContent = description;
     receiptType.textContent = type;
 
-    let formattedAmount = `$${parseFloat(amount).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
+    const formattedAmount = await formatAmount(amount);
     receiptAmount.textContent = formattedAmount;
     receiptAmount.className = "font-bold text-lg";
     if (type === "debit") {
-      receiptAmount.textContent = `-${formattedAmount}`;
       receiptAmount.classList.add("text-red-600");
     } else {
       receiptAmount.classList.add("text-green-600");
@@ -96,41 +112,28 @@ document.addEventListener("DOMContentLoaded", function () {
     receiptModal.classList.remove("hidden");
   }
 
-  document.querySelectorAll(".view-receipt-btn").forEach((button) => {
-    button.addEventListener("click", function () {
-      showReceiptModal({
-        amount: this.dataset.amount,
-        description: this.dataset.description,
-        type: this.dataset.type,
-        status: this.dataset.status,
-        dateString: this.dataset.date,
-        relatedName: this.dataset.relatedname,
-        relatedAccount: this.dataset.relatedaccount,
-        referenceId: this.dataset.referenceId,
+  document
+    .querySelectorAll(".view-receipt-btn, .view-international-receipt-btn")
+    .forEach((button) => {
+      button.addEventListener("click", function () {
+        showReceiptModal({
+          amount: this.dataset.amount,
+          description: this.dataset.description,
+          type: this.dataset.type,
+          status: this.dataset.status,
+          dateString: this.dataset.date,
+          relatedName: this.dataset.relatedname,
+          relatedAccount: this.dataset.relatedaccount,
+          referenceId: this.dataset.referenceid, // ensure lowercase in HTML
+        });
       });
     });
-  });
 
-  document.querySelectorAll(".view-international-receipt-btn").forEach((button) => {
-    button.addEventListener("click", function () {
-      showReceiptModal({
-        amount: this.dataset.amount,
-        description: this.dataset.description,
-        type: this.dataset.type,
-        status: this.dataset.status,
-        dateString: this.dataset.date,
-        relatedName: this.dataset.relatedname,
-        relatedAccount: this.dataset.relatedaccount,
-        referenceId: this.dataset.referenceId,
-      });
-    });
-  });
-
-  closeReceiptModalBtn.addEventListener("click", function () {
+  closeReceiptModalBtn.addEventListener("click", () => {
     receiptModal.classList.add("hidden");
   });
 
-  receiptModal.addEventListener("click", function (event) {
+  receiptModal.addEventListener("click", (event) => {
     if (event.target === receiptModal) {
       receiptModal.classList.add("hidden");
     }
@@ -138,22 +141,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   downloadReceiptPdfBtn.addEventListener("click", function () {
     const element = receiptContent;
-
     const options = {
       margin: 0.5,
       filename: "CTBank_transaction_receipt.pdf",
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
       html2canvas: {
-        onrendered: function (canvas) {},
-        useCORS: true,
         scale: 2,
-        ignoreElements: (element) =>
-          element.classList.contains("receipt-exclude"),
+        useCORS: true,
+        ignoreElements: (el) => el.classList.contains("receipt-exclude"),
       },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
     };
-
     html2pdf().set(options).from(element).save();
   });
 });

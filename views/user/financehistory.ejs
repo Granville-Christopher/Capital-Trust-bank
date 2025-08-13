@@ -40,8 +40,8 @@
         <div class="flex justify-between items-center px-4">
             <p class="font-semibold text-gray-700">Total Amount Saved:</p>
             <p class="font-semibold text-blue-600">
-                $<%= totalSavings ? totalSavings.toLocaleString(undefined, { minimumFractionDigits: 2,
-                    maximumFractionDigits: 2 }) : '0.00' %>
+                <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
+                    .format(totalSavings || 0) %>
             </p>
         </div>
 
@@ -59,30 +59,30 @@
                         <div class="text-gray-700 font-semibold whitespace-nowrap p-4">
                             <p>Total Deposits:</p>
                             <span class="text-green-600">
-                                $<%= savingsHistory.filter(s=> s.type === 'deposit')
+                                <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
+                                    .format( savingsHistory.filter(s=> s.type === 'deposit')
                                     .reduce((sum, s) => sum + (s.amount || 0), 0)
-                                    .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                    %>
+                                    ) %>
                             </span>
                         </div>
 
                         <div class="text-gray-700 font-semibold whitespace-nowrap p-4">
                             <p>Total Withdrawals:</p>
                             <span class="text-red-600">
-                                $<%= savingsHistory.filter(s=> s.type === 'withdraw_interest')
+                                <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
+                                    .format( savingsHistory.filter(s=> s.type === 'withdraw_interest')
                                     .reduce((sum, s) => sum + (s.amount || 0), 0)
-                                    .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                    %>
+                                    ) %>
                             </span>
                         </div>
 
                         <div class="text-gray-700 font-semibold whitespace-nowrap p-4">
                             <p>Total Compound Interest:</p>
                             <span class="text-blue-600">
-                                $<%= savingsHistory.filter(s=> s.type === 'compound_interest')
+                                <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
+                                    .format( savingsHistory.filter(s=> s.type === 'compound_interest')
                                     .reduce((sum, s) => sum + (s.amount || 0), 0)
-                                    .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                    %>
+                                    ) %>
                             </span>
                         </div>
                     </div>
@@ -102,21 +102,21 @@
                                     <%= new Date(saving.createdAt).toLocaleDateString() %>
                                 </td>
                                 <td class="py-2 px-4 capitalize
-                            <% if (saving.type === 'deposit') { %> text-green-600 
-                            <% } else if (saving.type === 'withdraw_interest') { %> text-red-600 
-                            <% } else if (saving.type === 'compound_interest') { %> text-blue-600 
-                            <% } else { %> text-gray-600 <% } %>">
+                                <% if (saving.type === 'deposit') { %> text-green-600 
+                                <% } else if (saving.type === 'withdraw_interest') { %> text-red-600 
+                                <% } else if (saving.type === 'compound_interest') { %> text-blue-600 
+                                <% } else { %> text-gray-600 <% } %>">
                                     <%= saving.type.replace('_', ' ' ) %>
                                 </td>
                                 <td class="py-2 px-4 font-semibold 
-                            <% if (saving.type === 'deposit') { %> text-green-600 
-                            <% } else if (saving.type === 'withdraw_interest') { %> text-red-600 <% } %>">
-                                    $<%= (saving.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2 }) %>
+                                <% if (saving.type === 'deposit') { %> text-green-600 
+                                <% } else if (saving.type === 'withdraw_interest') { %> text-red-600 <% } %>">
+                                    <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
+                                        .format(saving.amount || 0) %>
                                 </td>
                                 <td class="py-2 px-4 text-blue-600 font-semibold">
-                                    $<%= (saving.balanceAfter || 0).toLocaleString(undefined, { minimumFractionDigits:
-                                        2, maximumFractionDigits: 2 }) %>
+                                    <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
+                                        .format(saving.balanceAfter || 0) %>
                                 </td>
                                 <td class="py-2 px-4 text-gray-600">
                                     <%= saving.referenceId ? saving.referenceId : 'N/A' %>
@@ -135,13 +135,15 @@
         </div>
     </div>
 
+
     <div id="loanHistorySection" class="max-w-7xl mx-auto hidden space-y-4">
 
         <div class="flex justify-between items-center px-4">
             <p class="font-semibold text-gray-700">Total Loans:</p>
             <p class="font-semibold text-red-600">
-                $<%= totalLoans ? totalLoans.toLocaleString(undefined, { minimumFractionDigits: 2,
-                    maximumFractionDigits: 2 }) : '0.00' %>
+                <%= currencyCode %>
+                    <%= totalLoans ? totalLoans.toLocaleString(undefined, { minimumFractionDigits: 2,
+                        maximumFractionDigits: 2 }) : '0.00' %>
             </p>
         </div>
 
@@ -173,13 +175,14 @@
                                     <%= loan.reason %>
                                 </td>
                                 <td class="py-2 px-4 text-red-600 font-semibold">
-                                    $<%= (loan.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2 }) %>
+                                    <%= currencyCode %>
+                                        <%= (loan.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2 }) %>
                                 </td>
                                 <td class="py-2 px-4 capitalize
-                            <% if (loan.action === 'approved' || loan.action === 'repaid') { %> text-green-600 
-                            <% } else if (loan.action === 'rejected') { %> text-red-600 
-                            <% } else { %> text-yellow-600 <% } %>">
+                        <% if (loan.action === 'approved' || loan.action === 'repaid') { %> text-green-600 
+                        <% } else if (loan.action === 'rejected') { %> text-red-600 
+                        <% } else { %> text-yellow-600 <% } %>">
                                     <%= loan.action %>
                                 </td>
                                 <td class="py-2 px-4 text-gray-600 whitespace-nowrap">
@@ -198,6 +201,7 @@
             </table>
         </div>
     </div>
+
 
     <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
         <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">

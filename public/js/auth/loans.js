@@ -26,19 +26,61 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
   document.head.appendChild(style);
 
+  // async function fetchLoanDetails() {
+  //   try {
+  //     const res = await fetch("/user/secure/ctb/loan-details");
+  //     const data = await res.json();
+
+  //     if (res.ok) {
+  //       qualifiedCreditField.textContent = `$${data.eligibleAmount.toFixed(2)}`;
+  //       outstandingLoanField.textContent = `$${data.outstandingLoanTotal.toFixed(
+  //         2
+  //       )}`;
+  //       availableCreditField.textContent = `$${data.availableCredit.toFixed(
+  //         2
+  //       )}`;
+
+  //       if (data.activeLoan) {
+  //         activeLoanId = data.activeLoan.loanId;
+  //         const formattedDate = new Date(
+  //           data.activeLoan.dueDate
+  //         ).toLocaleDateString("en-US", {
+  //           year: "numeric",
+  //           month: "long",
+  //           day: "numeric",
+  //         });
+  //         dueDateField.textContent = `Outstanding Loan payment Due: ${formattedDate}`;
+  //       } else {
+  //         activeLoanId = null;
+  //         dueDateField.textContent = "No active loan";
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     showToast("error", "Error fetching loan details.");
+  //   }
+  // }
+
   async function fetchLoanDetails() {
     try {
+      const currencyCode =
+        document.getElementById("qualifiedCredit").dataset.currency;
       const res = await fetch("/user/secure/ctb/loan-details");
       const data = await res.json();
 
       if (res.ok) {
-        qualifiedCreditField.textContent = `$${data.eligibleAmount.toFixed(2)}`;
-        outstandingLoanField.textContent = `$${data.outstandingLoanTotal.toFixed(
-          2
-        )}`;
-        availableCreditField.textContent = `$${data.availableCredit.toFixed(
-          2
-        )}`;
+        qualifiedCreditField.textContent = await convertAndFormat(
+          data.eligibleAmount,
+          currencyCode
+        );
+        outstandingLoanField.textContent = await convertAndFormat(
+          data.outstandingLoanTotal,
+          currencyCode
+        );
+        availableCreditField.textContent = await convertAndFormat(
+          data.availableCredit,
+          currencyCode
+        );
 
         if (data.activeLoan) {
           activeLoanId = data.activeLoan.loanId;
@@ -58,6 +100,35 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error(err);
       showToast("error", "Error fetching loan details.");
+    }
+  }
+
+  async function convertAndFormat(amountUSD, currencyCode) {
+    if (!currencyCode || currencyCode === "USD") {
+      return amountUSD.toLocaleString(undefined, {
+        style: "currency",
+        currency: "USD",
+      });
+    }
+
+    try {
+      const res = await fetch(
+        `https://api.exchangerate.host/latest?base=USD&symbols=${currencyCode}`
+      );
+      const data = await res.json();
+      const rate = data.rates?.[currencyCode] || 1;
+      const localAmount = amountUSD * rate;
+
+      return localAmount.toLocaleString(undefined, {
+        style: "currency",
+        currency: currencyCode,
+      });
+    } catch (error) {
+      console.error("Error converting currency:", error);
+      return amountUSD.toLocaleString(undefined, {
+        style: "currency",
+        currency: "USD",
+      });
     }
   }
 

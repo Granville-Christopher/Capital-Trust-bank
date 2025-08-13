@@ -52,21 +52,67 @@ document.addEventListener("DOMContentLoaded", () => {
     }, duration);
   }
 
+  // async function loadSavingsSummary() {
+  //   try {
+  //     const res = await fetch(`${API_BASE}/secure/ctb/summary-savings`);
+  //     const data = await res.json();
+
+  //     if (res.ok) {
+  //       savingsBalanceEl.textContent = `$${parseFloat(
+  //         data.totalPrincipal
+  //       ).toLocaleString()}`;
+  //       todayInterestEl.textContent = `Today's Interest: $${parseFloat(
+  //         data.todayInterest
+  //       ).toFixed(2)}`;
+  //       totalInterestEl.textContent = `Total Interest: $${parseFloat(
+  //         data.totalInterest
+  //       ).toFixed(2)}`;
+  //     } else {
+  //       console.error("Error loading savings summary:", data.error);
+  //     }
+  //   } catch (error) {
+  //     console.error("Fetch Error:", error);
+  //   }
+  // }
+
   async function loadSavingsSummary() {
     try {
+      const currencyCode =
+        document.getElementById("savingsBalance").dataset.currency;
       const res = await fetch(`${API_BASE}/secure/ctb/summary-savings`);
       const data = await res.json();
 
       if (res.ok) {
-        savingsBalanceEl.textContent = `$${parseFloat(
-          data.totalPrincipal
-        ).toLocaleString()}`;
-        todayInterestEl.textContent = `Today's Interest: $${parseFloat(
-          data.todayInterest
-        ).toFixed(2)}`;
-        totalInterestEl.textContent = `Total Interest: $${parseFloat(
-          data.totalInterest
-        ).toFixed(2)}`;
+        const exchangeRes = await fetch(
+          `https://api.exchangerate.host/latest?base=USD&symbols=${currencyCode}`
+        );
+        const exchangeData = await exchangeRes.json();
+        const rate = exchangeData.rates?.[currencyCode] || 1;
+
+        const savingsLocal = parseFloat(data.totalPrincipal) * rate;
+        const todayInterestLocal = parseFloat(data.todayInterest) * rate;
+        const totalInterestLocal = parseFloat(data.totalInterest) * rate;
+
+        savingsBalanceEl.textContent = savingsLocal.toLocaleString(undefined, {
+          style: "currency",
+          currency: currencyCode,
+        });
+
+        todayInterestEl.textContent = `Today's Interest: ${todayInterestLocal.toLocaleString(
+          undefined,
+          {
+            style: "currency",
+            currency: currencyCode,
+          }
+        )}`;
+
+        totalInterestEl.textContent = `Total Interest: ${totalInterestLocal.toLocaleString(
+          undefined,
+          {
+            style: "currency",
+            currency: currencyCode,
+          }
+        )}`;
       } else {
         console.error("Error loading savings summary:", data.error);
       }

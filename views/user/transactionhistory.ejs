@@ -24,7 +24,7 @@
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
     <meta property="og:site_name" content="Capital Trust Bank" />
-    <meta property="og:locale" content="en_NG" />
+    <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@CTBankOfficial" />
     <meta name="twitter:creator" content="@CTBankOfficial" />
@@ -90,7 +90,10 @@
                                         %>
                                 </td>
                                 <td class="py-2 px-4 whitespace-nowrap">Debit</td>
-                                <td class="py-2 px-4 whitespace-nowrap text-red-600">-$<%= transfer.Amount %>
+                                <td class="py-2 px-4 whitespace-nowrap text-red-600">
+                                    -<%= currencyCode %>
+                                        <%= transfer.Amount.toLocaleString(undefined, { minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2 }) %>
                                 </td>
                                 <td class="py-2 px-4 whitespace-nowrap text-green-600">
                                     <%= transfer.status==='completed' ? 'Completed' : transfer.status %>
@@ -131,13 +134,14 @@
             <div class="totalincome">
                 <p>Total income: </p>
                 <p class="text-center">
-                    <%= totalIncome.toLocaleString('en-US', { style: 'currency' , currency: 'USD' }) %>
+                    <%= totalIncome.toLocaleString('en-US', { style: 'currency' , currency: currencyCode || 'USD' }) %>
                 </p>
             </div>
             <div class="totalexpenses">
                 <p>Total expenses: </p>
                 <p class="text-center">
-                    <%= totalExpenses.toLocaleString('en-US', { style: 'currency' , currency: 'USD' }) %>
+                    <%= totalExpenses.toLocaleString('en-US', { style: 'currency' , currency: currencyCode || 'USD' })
+                        %>
                 </p>
             </div>
         </div>
@@ -171,26 +175,18 @@
                                 <td class="py-2 px-4 whitespace-nowrap capitalize">
                                     <%= transaction.referenceId %>
                                 </td>
-                                <td class="py-2 px-4 whitespace-nowrap
-                                <% if (transaction.type === 'debit') { %>
-                                    text-red-600
-                                <% } else { %>
-                                    text-green-600
-                                <% } %>
-                            ">
+                                <td
+                                    class="py-2 px-4 whitespace-nowrap
+                                <% if (transaction.type === 'debit') { %> text-red-600 <% } else { %> text-green-600 <% } %>">
                                     <% if (transaction.type==='debit' ) { %>-<% } %>
-                                            $<%= transaction.amount.toLocaleString(undefined, { minimumFractionDigits:
-                                                2, maximumFractionDigits: 2 }) %>
+                                            <%= currencyCode %>
+                                                <%= transaction.amount.toLocaleString(undefined, {
+                                                    minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
                                 </td>
                                 <td class="py-2 px-4 whitespace-nowrap capitalize
-                                <% if (transaction.status === 'successful') { %>
-                                    text-green-600
-                                <% } else if (transaction.status === 'failed') { %>
-                                    text-red-600
-                                <% } else { %>
-                                    text-yellow-600
-                                <% } %>
-                            ">
+                                <% if (transaction.status === 'successful') { %> text-green-600 <% } 
+                                   else if (transaction.status === 'failed') { %> text-red-600 <% } 
+                                   else { %> text-yellow-600 <% } %>">
                                     <%= transaction.status %>
                                 </td>
                                 <td class="py-2 px-4 whitespace-nowrap">
@@ -218,6 +214,7 @@
             </table>
         </div>
     </div>
+
 
     <div id="receiptModal"
         class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">

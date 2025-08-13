@@ -24,7 +24,7 @@
   <meta property="og:image:width" content="512" />
   <meta property="og:image:height" content="512" />
   <meta property="og:site_name" content="Capital Trust Bank" />
-  <meta property="og:locale" content="en_NG" />
+  <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@CTBankOfficial" />
   <meta name="twitter:creator" content="@CTBankOfficial" />
@@ -37,7 +37,6 @@
 
 <body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen relative">
 
-
   <div class="fixed top-0 left-0 right-0 bg-blue-100 px-6 py-4 flex justify-between items-center z-50">
     <h2 class="text-lg font-semibold"> <span id="greeting">Welcome</span>, Granville</h2>
     <a href="settings" class="text-blue-700 text-xl hover:text-blue-900">
@@ -45,7 +44,7 @@
     </a>
   </div>
 
-  <div class="pt-16 px-6 space-y-6">
+  <div class="pt-16 px-6 space-y-6 pb-16">
 
     <div class="bg-white rounded-xl shadow p-6 relative">
       <div class="flex justify-between items-center">
@@ -54,12 +53,15 @@
           <i id="balanceIcon" class="fa-solid fa-eye"></i>
         </button>
       </div>
-      <p id="balanceAmount" class="mt-2 text-2xl font-bold text-gray-800">
-        <%= user.AccountBalance.toLocaleString('en-US', { style: 'currency' , currency: 'USD' }) %>
+      <p id="balanceAmount" class="mt-2 text-2xl font-bold text-gray-800"
+        data-balance="<%= Number(user?.AccountBalance ?? 0) %>" data-currency="<%= currencyCode %>">
+        Loading...
       </p>
+      <script src="/js/currencydisplaycountry.js"></script>
+
     </div>
 
-    <div class="bg-white rounded-xl shadow p-6 relative">
+    <div class="bg-white rounded-xl shadow p-6">
       <div class="accountid">
         <p class="text-gray-600 text-sm">Account number:</p>
         <style>
@@ -95,8 +97,8 @@
           <i class="fas fa-copy text-blue-400 mr-2 font-bold"></i>
           <%= user.AccountNumber%>
         </p>
+        <span id="copyFeedback" class="copy-feedback">Copied!</span>
       </div>
-      <span id="copyFeedback" class="copy-feedback">Copied!</span>
     </div>
     <script>
       const copyAccountId = document.getElementById("copyAccountId");
