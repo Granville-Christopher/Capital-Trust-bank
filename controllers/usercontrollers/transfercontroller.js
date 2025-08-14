@@ -512,9 +512,11 @@ const verifyTransfer = [
 
       const userId = req.session.user.id;
 
-      const userPinRecord = await transactionPinModel.findOne({
-        userId: userId,
-      }).session(session);
+      const userPinRecord = await transactionPinModel
+        .findOne({
+          userId: userId,
+        })
+        .session(session);
 
       if (!userPinRecord) {
         await session.abortTransaction();
@@ -535,11 +537,13 @@ const verifyTransfer = [
         });
       }
 
-      const transfer = await internationalTransferModel.findOne({
-        _id: transferId,
-        userId: userId,
-        status: "pending_otp",
-      }).session(session);
+      const transfer = await internationalTransferModel
+        .findOne({
+          _id: transferId,
+          userId: userId,
+          status: "pending_otp",
+        })
+        .session(session);
 
       if (!transfer) {
         await session.abortTransaction();
@@ -645,7 +649,9 @@ const verifyTransfer = [
       const notification = new Notification({
         userId: userId,
         type: "transfer_debit",
-        message: `You sent $${transfer.Amount.toLocaleString()} to ${transfer.FullName} (${transfer.AccountNumber}). Reference: ${transfer.ReferenceId}.`,
+        message: `You sent $${transfer.Amount.toLocaleString()} to ${
+          transfer.FullName
+        } (${transfer.AccountNumber}). Reference: ${transfer.ReferenceId}.`,
         relatedEntity: transfer._id,
         relatedReferenceId: transfer.ReferenceId,
         read: false,

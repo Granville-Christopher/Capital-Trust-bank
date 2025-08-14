@@ -131,35 +131,36 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-xl shadow p-3 h-[180px] ">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">Recent Transactions</h3>
-            <div class=" text-sm">
-               <a href="transactionhistory" class="text-blue-400 hover:underline">View Transaction History</a>
-            </div>
-        </div>
-        <ul class="space-y-3 text-sm">
-  <% if (recentTransactions && recentTransactions.length > 0) { %>
-    <% recentTransactions.forEach(function(transaction) { 
-         // original description
-         var desc = (transaction.description || '').toString();
+    <div class="bg-white rounded-xl shadow p-3 h-[180px]">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-lg font-semibold text-gray-800">Recent Transactions</h3>
+    <div class="text-sm">
+      <a href="transactionhistory" class="text-blue-400 hover:underline">View Transaction History</a>
+    </div>
+  </div>
 
-         // detect transfers like "Transfer to" or "Transfer from"
-         var isTransfer = /Transfer\s+(to|from)/i.test(desc);
+  <ul class="space-y-3 text-sm">
+    <% if (recentTransactions && recentTransactions.length > 0) { %>
+      <% recentTransactions.forEach(function(transaction) { 
+           // original description
+           var desc = (transaction.description || '').toString();
 
-         // remove any parentheses and their contents
-         var cleaned = desc.replace(/\s*\([^)]*\)/g, '').trim();
+           // detect transfers like "Transfer to" or "Transfer from"
+           var isTransfer = /Transfer\s+(to|from)/i.test(desc);
 
-         // show cleaned only for transfers; otherwise show original
-         var displayDesc = isTransfer ? cleaned : desc;
-    %>
-      <li class="flex justify-between border-b pb-2">
-        <span><%= displayDesc %></span>
+           // remove any parentheses and their contents
+           var cleaned = desc.replace(/\s*\([^)]*\)/g, '').trim();
 
-        <span class="font-semibold
-                     <% if (transaction.type === ' debit') { %>
+           // show cleaned only for transfers; otherwise show original
+           var displayDesc = isTransfer ? cleaned : desc;
+      %>
+        <li class="flex justify-between border-b pb-2">
+          <span><%= displayDesc %></span>
+
+          <span class="font-semibold
+                       <% if (transaction.type === 'debit') { %>
                         text-red-600
-                        <% } else if (transaction.type==='credit' ) { %>
+                        <% } else if (transaction.type === 'credit') { %>
                             text-green-600
                             <% } else { %>
                                 text-gray-800
@@ -175,10 +176,8 @@
                         <li class="text-gray-500 text-center">No recent transactions.</li>
                         <% } %>
                             </ul>
-
-
-
     </div>
+
 
     <div class="grid grid-cols-2 gap-4">
         <a href="creditcard" class="bg-white rounded-xl p-6 shadow hover:shadow-md hover:bg-blue-50 transition">
