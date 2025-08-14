@@ -160,7 +160,7 @@
           <span class="font-semibold
                        <% if (transaction.type === 'debit') { %>
                         text-red-600
-                        <% } else if (transaction.type === 'credit') { %>
+                        <% } else if (transaction.type==='credit' ) { %>
                             text-green-600
                             <% } else { %>
                                 text-gray-800
@@ -213,8 +213,8 @@
         <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
 
             <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="mt-1">Home</span>
+                <i class="fa-solid fa-house text-3xl"></i>
+                <!-- <span class="mt-1">Home</span> -->
             </a>
 
             <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
