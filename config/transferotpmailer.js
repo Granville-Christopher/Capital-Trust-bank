@@ -4,19 +4,13 @@ const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.privateemail.com",
-  port: 587,
-  secure: false,
-  requireTLS: true,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-
-  // tls: {
-  //     ciphers: 'SSLv3'
-  // }
 });
+
 transporter.verify((error, success) => {
   if (error) {
     console.error("Nodemailer connection error:", error);
