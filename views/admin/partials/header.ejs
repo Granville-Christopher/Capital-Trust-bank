@@ -1,0 +1,16 @@
+<div
+  class="fixed top-0 left-0 right-0 bg-blue-100 flex justify-between items-center px-4 py-4 z-20"
+>
+  <a href="/admin/dashboard" class="flex justify-start gap-2 items-center">
+    <span class="text-blue-50 bg-blue-600 rounded-full px-2 py-1">
+      <i class="fa-solid fa-user-shield"></i>
+    </span>
+    <h2 class="text-lg font-semibold text-gray-800">
+      Admin,
+      <span class="text-lg font-semibold"> <%= admin?.name || 'Admin' %> </span>
+    </h2>
+  </a>
+  <a href="/admin/logout" class="text-blue-600 hover:text-blue-800">
+    <i class="fa fa-sign-out text-2xl"></i>
+  </a>
+</div>

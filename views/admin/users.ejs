@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - Users Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank"
+    />
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <%- include('partials/header') %> <%- include('partials/sidebar') %>
+
+    <main class="ml-0 lg:ml-64 mt-20 p-6">
+      <h1 class="text-2xl font-bold text-gray-800 mb-6">Users Management</h1>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <div class="overflow-x-auto">
+          <table class="min-w-full table-auto">
+            <thead>
+              <tr class="bg-gray-50">
+                <th
+                  class="px-4 py-2 text-left text-sm font-medium text-gray-700"
+                >
+                  Name
+                </th>
+                <th
+                  class="px-4 py-2 text-left text-sm font-medium text-gray-700"
+                >
+                  Email
+                </th>
+                <th
+                  class="px-4 py-2 text-left text-sm font-medium text-gray-700"
+                >
+                  Balance
+                </th>
+                <th
+                  class="px-4 py-2 text-left text-sm font-medium text-gray-700"
+                >
+                  Account Number
+                </th>
+                <th
+                  class="px-4 py-2 text-left text-sm font-medium text-gray-700"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <% users.forEach(user => { %>
+              <tr class="border-t">
+                <td class="px-4 py-2 text-sm text-gray-900">
+                  <%= user.Name %>
+                </td>
+                <td class="px-4 py-2 text-sm text-gray-900">
+                  <%= user.Email %>
+                </td>
+                <td class="px-4 py-2 text-sm text-gray-900">
+                  $<%= user.AccountBalance %>
+                </td>
+                <td class="px-4 py-2 text-sm text-gray-900">
+                  <%= user.AccountNumber %>
+                </td>
+                <td class="px-4 py-2 text-sm">
+                  <a
+                    href="/admin/users/<%= user._id %>"
+                    class="text-blue-600 hover:text-blue-800 mr-2"
+                    >View</a
+                  >
+                  <form
+                    action="/admin/users/<%= user._id %>/delete"
+                    method="POST"
+                    class="inline"
+                  >
+                    <button
+                      type="submit"
+                      class="text-red-600 hover:text-red-800"
+                      onclick="return confirm('Are you sure?')"
+                    >
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %> <%- include('partials/toastalerts') %>
+  </body>
+</html>

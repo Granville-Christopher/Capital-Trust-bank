@@ -1,0 +1,60 @@
+<nav
+  class="fixed left-0 top-20 bottom-0 w-64 bg-white shadow-lg z-30 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out"
+>
+  <div class="p-4">
+    <ul class="space-y-2">
+      <li>
+        <a
+          href="/admin/dashboard"
+          class="flex items-center p-2 text-gray-800 rounded-lg hover:bg-blue-100"
+        >
+          <i class="fa-solid fa-tachometer-alt w-6 text-blue-600"></i>
+          <span class="ml-3">Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="/admin/users"
+          class="flex items-center p-2 text-gray-800 rounded-lg hover:bg-blue-100"
+        >
+          <i class="fa-solid fa-users w-6 text-blue-600"></i>
+          <span class="ml-3">Users Management</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="/admin/kyc"
+          class="flex items-center p-2 text-gray-800 rounded-lg hover:bg-blue-100"
+        >
+          <i class="fa-solid fa-id-card w-6 text-blue-600"></i>
+          <span class="ml-3">KYC Verification</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="/admin/loans"
+          class="flex items-center p-2 text-gray-800 rounded-lg hover:bg-blue-100"
+        >
+          <i class="fa-solid fa-hand-holding-dollar w-6 text-blue-600"></i>
+          <span class="ml-3">Loans Management</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Mobile menu button -->
+<button
+  id="mobile-menu-btn"
+  class="lg:hidden fixed top-20 left-0 p-2 bg-blue-600 text-white z-40"
+>
+  <i class="fa-solid fa-bars"></i>
+</button>
+
+<script>
+  const mobileBtn = document.getElementById("mobile-menu-btn");
+  const sidebar = document.querySelector("nav");
+  mobileBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("-translate-x-full");
+  });
+</script>

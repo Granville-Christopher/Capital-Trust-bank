@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank"
+    />
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <%- include('partials/header') %> <%- include('partials/sidebar') %>
+
+    <main class="ml-0 lg:ml-64 mt-20 p-6">
+      <h1 class="text-2xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Users -->
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-md transition">
+          <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-full">
+              <i class="fa-solid fa-users text-blue-600 text-2xl"></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm text-gray-600">Total Users</p>
+              <p class="text-2xl font-bold text-gray-800"><%= totalUsers %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending KYC -->
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-md transition">
+          <div class="flex items-center">
+            <div class="p-3 bg-yellow-100 rounded-full">
+              <i class="fa-solid fa-id-card text-yellow-600 text-2xl"></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm text-gray-600">Pending KYC</p>
+              <p class="text-2xl font-bold text-gray-800"><%= pendingKYC %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Loans -->
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-md transition">
+          <div class="flex items-center">
+            <div class="p-3 bg-green-100 rounded-full">
+              <i
+                class="fa-solid fa-hand-holding-dollar text-green-600 text-2xl"
+              ></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm text-gray-600">Active Loans</p>
+              <p class="text-2xl font-bold text-gray-800"><%= activeLoans %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verified Users -->
+        <div class="bg-white rounded-xl p-6 shadow hover:shadow-md transition">
+          <div class="flex items-center">
+            <div class="p-3 bg-purple-100 rounded-full">
+              <i class="fa-solid fa-check-circle text-purple-600 text-2xl"></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm text-gray-600">Verified Users</p>
+              <p class="text-2xl font-bold text-gray-800">
+                <%= verifiedUsers %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %> <%- include('partials/toastalerts') %>
+  </body>
+</html>

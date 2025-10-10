@@ -5,6 +5,8 @@ const { body, validationResult } = require("express-validator");
 const escape = require("escape-html");
 const CreditScoreHistory = require("../../models/usermodels/creditscore");
 const mongoose = require("mongoose");
+const Notification = require("../../models/usermodels/notifications");
+const sendEmail = require("../../config/loanremindermailer");
 
 function generateNumericReferenceId() {
   const timestamp = Date.now().toString();
@@ -99,6 +101,18 @@ const depositToSavings = [
         newScore: user.CreditScore,
       });
 
+      // Send notification and email for savings deposit
+      const depositMessage = `You have successfully deposited $${safeAmount} to your savings account.`;
+      await Notification.create({
+        userId,
+        type: "success",
+        message: depositMessage,
+      });
+      const subject = "Savings Deposit Successful";
+      const text = depositMessage;
+      const htmlContent = `<p>Dear ${user.Name},</p><p>${depositMessage}</p><p>Thank you for banking with us.</p>`;
+      await sendEmail(user.Email, subject, text, htmlContent);
+
       res.status(200).json({
         message: "Deposit successful",
         newSavingsAmount: safeAmount,
@@ -174,6 +188,20 @@ const withdrawInterest = async (req, res) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    // Send notification and email for interest withdrawal
+    const withdrawalMessage = `You have successfully withdrawn $${withdrawnAmount.toFixed(
+      2
+    )} interest from your savings account.`;
+    await Notification.create({
+      userId,
+      type: "success",
+      message: withdrawalMessage,
+    });
+    const subject = "Savings Interest Withdrawal Successful";
+    const text = withdrawalMessage;
+    const htmlContent = `<p>Dear ${user.Name},</p><p>${withdrawalMessage}</p><p>Thank you for banking with us.</p>`;
+    await sendEmail(user.Email, subject, text, htmlContent);
 
     res.status(200).json({
       message: `Successfully withdrew $${withdrawnAmount.toFixed(2)} interest.`,
@@ -355,6 +383,18 @@ const cancelSavings = async (req, res) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    // Send notification and email for savings cancellation
+    const cancelMessage = `Your savings plan has been canceled. The principal amount of $${principalAmount} has been refunded to your account.`;
+    await Notification.create({
+      userId,
+      type: "info",
+      message: cancelMessage,
+    });
+    const subject = "Savings Plan Canceled";
+    const text = cancelMessage;
+    const htmlContent = `<p>Dear ${user.Name},</p><p>${cancelMessage}</p><p>Thank you for banking with us.</p>`;
+    await sendEmail(user.Email, subject, text, htmlContent);
 
     return res.status(200).json({
       message:

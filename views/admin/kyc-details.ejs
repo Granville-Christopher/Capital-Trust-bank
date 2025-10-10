@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - KYC Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank"
+    />
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <%- include('partials/header') %> <%- include('partials/sidebar') %>
+
+    <main class="ml-0 lg:ml-64 mt-20 p-6">
+      <h1 class="text-2xl font-bold text-gray-800 mb-6">KYC Details</h1>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- User Info -->
+          <div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+              User Information
+            </h2>
+            <p><strong>Name:</strong> <%= kyc.userId.Name %></p>
+            <p><strong>Email:</strong> <%= kyc.userId.Email %></p>
+            <p>
+              <strong>Account Number:</strong> <%= kyc.userId.AccountNumber %>
+            </p>
+          </div>
+
+          <!-- KYC Info -->
+          <div>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+              KYC Information
+            </h2>
+            <p><strong>Country:</strong> <%= kyc.country %></p>
+            <p><strong>Nationality:</strong> <%= kyc.nationality %></p>
+            <p><strong>Address:</strong> <%= kyc.residentialAddress %></p>
+            <p><strong>Occupation:</strong> <%= kyc.occupation %></p>
+            <p><strong>Account Category:</strong> <%= kyc.accountCategory %></p>
+            <p>
+              <strong>Current Status:</strong> <%= kyc.verified ? 'Verified' :
+              'Pending' %>
+            </p>
+            <p>
+              <strong>Submitted:</strong> <%= new
+              Date(kyc.createdAt).toLocaleDateString() %>
+            </p>
+          </div>
+        </div>
+
+        <!-- Documents Section (if any) -->
+        <% if (kyc.documents && kyc.documents.length > 0) { %>
+        <div class="mt-6 pt-6 border-t">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            Uploaded Documents
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <% kyc.documents.forEach(doc => { %>
+            <div class="border rounded-lg p-4">
+              <p><strong><%= doc.type %>:</strong></p>
+              <a
+                href="<%= doc.path %>"
+                target="_blank"
+                class="text-blue-600 hover:underline"
+                >View Document</a
+              >
+            </div>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- Actions -->
+        <div class="mt-6 pt-6 border-t">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Actions</h3>
+          <div class="flex gap-4">
+            <button
+              onclick="approveKYC('<%= kyc._id %>')"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+              Approve KYC
+            </button>
+            <button
+              onclick="declineKYC('<%= kyc._id %>')"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Decline KYC
+            </button>
+            <a
+              href="/admin/kyc"
+              class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              >Back to List</a
+            >
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %> <%- include('partials/toastalerts') %>
+
+    <script>
+      async function approveKYC(kycId) {
+        if (!confirm("Are you sure you want to approve this KYC?")) return;
+        try {
+          const response = await fetch(`/admin/kyc/${kycId}/approve`, {
+            method: "POST",
+          });
+          const result = await response.json();
+          if (response.ok) {
+            showToast("success", result.message);
+            setTimeout(() => (window.location.href = "/admin/kyc"), 1500);
+          } else {
+            showToast("error", result.error || "Approval failed");
+          }
+        } catch (err) {
+          showToast("error", "Server error");
+        }
+      }
+
+      async function declineKYC(kycId) {
+        if (!confirm("Are you sure you want to decline this KYC?")) return;
+        try {
+          const response = await fetch(`/admin/kyc/${kycId}/decline`, {
+            method: "POST",
+          });
+          const result = await response.json();
+          if (response.ok) {
+            showToast("success", result.message);
+            setTimeout(() => (window.location.href = "/admin/kyc"), 1500);
+          } else {
+            showToast("error", result.error || "Decline failed");
+          }
+        } catch (err) {
+          showToast("error", "Server error");
+        }
+      }
+    </script>
+  </body>
+</html>

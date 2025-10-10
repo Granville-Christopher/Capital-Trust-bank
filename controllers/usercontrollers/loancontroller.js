@@ -4,6 +4,8 @@ const Loan = require("../../models/usermodels/loans");
 const LoanHistory = require("../../models/usermodels/loanhistory");
 const Transactions = require("../../models/usermodels/transactionhistory");
 const User = require("../../models/usermodels/userSignup");
+const Notification = require("../../models/usermodels/notifications");
+const sendEmail = require("../../config/loanremindermailer");
 
 const CREDIT_SCORE_BASE = [
   { min: 300, max: 500, base: 0 },
@@ -291,6 +293,18 @@ const requestLoan = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
+    // Send notification and email for loan approval
+    const approvalMessage = `Your loan of $${amount} has been approved and credited to your account.`;
+    await Notification.create({
+      userId,
+      type: "success",
+      message: approvalMessage,
+    });
+    const subject = "Loan Approved";
+    const text = approvalMessage;
+    const htmlContent = `<p>Dear ${user.Name},</p><p>${approvalMessage}</p><p>Thank you for banking with us.</p>`;
+    await sendEmail(user.Email, subject, text, htmlContent);
+
     return res.status(200).json({
       message: "Loan approved and credited to your account.",
       loan: loan[0],
@@ -442,6 +456,18 @@ const repayLoan = async (req, res) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    // Send notification and email for loan repayment
+    const repaymentMessage = `Your loan repayment of $${amount} has been processed successfully.`;
+    await Notification.create({
+      userId,
+      type: "success",
+      message: repaymentMessage,
+    });
+    const subject = "Loan Repayment Successful";
+    const text = repaymentMessage;
+    const htmlContent = `<p>Dear ${user.Name},</p><p>${repaymentMessage}</p><p>Thank you for banking with us.</p>`;
+    await sendEmail(user.Email, subject, text, htmlContent);
 
     return res.status(200).json({
       message:

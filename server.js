@@ -1,7 +1,7 @@
 require("dotenv").config();
-require('./jobs/cronjobs');
-require('./jobs/cronjobs');
-require('./jobs/loancronjob');
+require("./jobs/cronjobs");
+require("./jobs/cronjobs");
+require("./jobs/loancronjob");
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -13,6 +13,7 @@ const indexRoute = require("./routes/indexroute/index");
 const basicRoute = require("./routes/userroutes/authroute");
 const userRoute = require("./routes/userroutes/basicroutes");
 const postRoutes = require("./routes/userroutes/userpostroutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const db = require("./db/databaseconnection");
 
@@ -70,6 +71,7 @@ app.use("/", indexRoute);
 app.use("/user/secure/ctb/", postRoutes);
 app.use("/secure/ctb/", basicRoute);
 app.use("/udp/", userRoute);
+app.use("/admin", adminRoutes);
 
 app.use((req, res) => {
   res.status(404).render("404", { url: req.originalUrl });
