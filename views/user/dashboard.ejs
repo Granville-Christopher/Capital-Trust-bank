@@ -133,13 +133,13 @@
 
     <div class="bg-white rounded-xl shadow p-3 h-[180px]">
   <div class="flex justify-between items-center mb-4">
-    <h3 class="text-lg font-semibold text-gray-800">Recent Transactions</h3>
+    <h3 class="text-sm font-semibold text-gray-800">Recent Transactions</h3>
     <div class="text-sm">
-      <a href="transactionhistory" class="text-blue-400 hover:underline">View Transaction History</a>
+      <a href="transactionhistory" class="text-blue-400 hover:underline text-xs">View Transaction History</a>
     </div>
   </div>
 
-  <ul class="space-y-3 text-sm">
+  <ul class="space-y-3 text-xs">
     <% if (recentTransactions && recentTransactions.length > 0) { %>
       <% recentTransactions.forEach(function(transaction) { 
            // original description
