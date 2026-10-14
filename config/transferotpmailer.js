@@ -1,23 +1,9 @@
 require("dotenv").config();
-
-const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
+const { sendTransactionalEmail, getEmailFromName } = require("./loanremindermailer");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+console.log("✅ Multi-Tier OTP Mailer Initialized (Primary Inbox Delivery)");
 
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("Nodemailer connection error:", error);
-  } else {
-    console.log("Nodemailer is ready to send emails");
-  }
-});
 const generateOtp = () => {
   return otpGenerator.generate(6, {
     upperCaseAlphabets: false,
@@ -26,35 +12,58 @@ const generateOtp = () => {
   });
 };
 
-const sendOtpEmail = async (email, otp) => {
-  const mailOptions = {
-    from: `"Capital Trust Bank" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "Your One-Time Password (OTP) for Transfer Confirmation",
-    html: `
-            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h2 style="color: #4CAF50;">Transfer OTP Verification</h2>
-                <p>Dear User,</p>
-                <p>You have initiated a transfer. To complete your transaction, please use the following One-Time Password (OTP):</p>
-                <h1 style="background-color: #f2f2f2; padding: 15px; text-align: center; border-radius: 5px; letter-spacing: 5px;">
-                    <strong>${otp}</strong>
-                </h1>
-                <p>This OTP is valid for <strong>5 minutes</strong>. Please do not share this code with anyone.</p>
-                <p>If you did not initiate this transfer, please contact support immediately.</p>
-                <p>Thank you,</p>
-                <p>Your Banking Team</p>
-            </div>
-        `,
-  };
+const sendOtpEmail = async (email, otp, userName = "") => {
+  const brandName = getEmailFromName();
+  const nameGreeting = userName ? `Hi ${userName},` : "Hi,";
+  const subject = `${otp} is your ${brandName} authorization code`;
+  const plainText = `${brandName}\n\n${nameGreeting}\n\nUse this code to authorize your transfer:\n\n${otp}\n\nThis code expires in 5 minutes.\nIf you did not make this request, you can safely ignore this email.\n\n${brandName} Team`;
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${subject}</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 24px; background-color: #f6f8fa; color: #24292f;">
+  <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border: 1px solid #d0d7de; border-radius: 8px; padding: 28px;">
+    <div style="font-size: 18px; font-weight: 700; color: #1f2328; margin-bottom: 16px;">
+      ${brandName}
+    </div>
+    <p style="font-size: 14px; line-height: 1.5; margin: 0 0 12px 0; color: #24292f;">
+      ${nameGreeting}
+    </p>
+    <p style="font-size: 14px; line-height: 1.5; margin: 0 0 18px 0; color: #24292f;">
+      Use this code to authorize your transfer:
+    </p>
+    <div style="text-align: center; margin: 20px 0;">
+      <span style="font-family: monospace; font-size: 30px; font-weight: 700; letter-spacing: 5px; color: #0969da; background: #f6f8fa; border: 1px solid #d0d7de; padding: 10px 22px; border-radius: 6px; display: inline-block;">
+        ${otp}
+      </span>
+    </div>
+    <p style="font-size: 13px; line-height: 1.5; margin: 0 0 10px 0; color: #57606a;">
+      This code expires in 5 minutes.
+    </p>
+    <hr style="border: none; border-top: 1px solid #d0d7de; margin: 20px 0 14px 0;">
+    <p style="font-size: 12px; line-height: 1.4; color: #57606a; margin: 0;">
+      If you did not request this, no action is needed.
+    </p>
+  </div>
+</body>
+</html>
+  `;
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("OTP Email sent: %s", info.messageId);
-    console.log("OTP Email sent to ", email);
-    return { success: true, messageId: info.messageId };
-  } catch (error) {
-    console.error("Error sending OTP email:", error);
-    return { success: false, error: error.message };
+    const result = await sendTransactionalEmail({
+      to: email,
+      subject: subject,
+      html: htmlContent,
+      text: plainText,
+    });
+    return { success: true, messageId: result.id || result.provider };
+  } catch (err) {
+    console.error("❌ Failed to send OTP email:", err);
+    return { success: false, error: err.message };
   }
 };
 

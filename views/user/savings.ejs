@@ -7,86 +7,76 @@
     <title>Capital Trust Bank - Savings</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
-    <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
-    <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
-    <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         const currencyCode = "<%= currencyCode %>";
     </script>
-
 </head>
 
-<body class="bg-gradient-to-b relative from-blue-100 to-gray-100 min-h-screen pt-16 pb-24 px-6 space-y-4">
-    <div class="fixed top-0 left-0 right-0 bg-blue-100 w-full z-30 px-3 pt-4 flex justify-between items-center">
-        <a href="finance"
-            class="inline-block mb-4 px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-            &larr; Back to Finance
-        </a>
-
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">My Savings</h1>
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+    <div class="fixed top-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-b border-gray-100 flex items-center px-4 py-3 z-30 shadow-sm">
+        <button onclick="history.back()" class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100 mr-2">
+            <i class="fa-solid fa-arrow-left text-gray-700 text-sm"></i>
+        </button>
+        <h2 class="text-sm font-bold text-gray-800">My Savings</h2>
     </div>
-    <div class="max-w-md mx-auto">
-        <section id="savingsSection">
-            <div class="bg-white rounded-xl shadow px-6 mb-4 relative" id="savingsCard">
-                <p class="text-lg font-semibold mb-2">Savings Balance</p>
-                <p class="text-3xl font-bold text-blue-600 mb-4" id="savingsBalance">no savings yet</p>
 
-                <div class="flex justify-between text-sm text-gray-600 mb-4">
-                    <span id="todayInterest"></span>
-                    <span id="totalInterest"></span>
-                </div>
-
-                <div class="flex gap-4 mt-4">
-                    <button id="withdrawInterestBtn"
-                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-medium w-1/2">
-                        Withdraw Interest
-                    </button>
-
-                    <button id="compoundInterestBtn"
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-medium w-1/2">
-                        Compound Interest
-                    </button>
-                </div>
-                <div class="flex gap-4 mt-4">
-                    <button id="cancelSavingsBtn"
-                        class="mt-4 w-full py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">
+    <div class="pt-16 px-4 space-y-4">
+        <div class="max-w-md mx-auto">
+            <section id="savingsSection">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                    <p class="text-sm font-bold text-gray-800 mb-1.5">Savings Balance</p>
+                    <p class="text-2xl font-bold text-indigo-600 mb-3" id="savingsBalance">no savings yet</p>
+                    <div class="flex justify-between text-xs text-gray-600 mb-4">
+                        <span id="todayInterest"></span>
+                        <span id="totalInterest"></span>
+                    </div>
+                    <div class="flex gap-2.5">
+                        <button id="withdrawInterestBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-semibold flex-1 transition shadow-md text-xs">
+                            Withdraw Interest
+                        </button>
+                        <button id="compoundInterestBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-semibold flex-1 transition shadow-md text-xs">
+                            Compound Interest
+                        </button>
+                    </div>
+                    <button id="cancelSavingsBtn" class="mt-3 w-full py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition shadow-md text-sm">
                         Cancel Savings
                     </button>
                 </div>
-            </div>
-        </section>
-    </div>
-
-    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
-
-            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="mt-1">Home</span>
-            </a>
-
-            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-chart-line text-lg"></i>
-                <span class="mt-1">Finance</span>
-            </a>
-
-            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-credit-card text-lg"></i>
-                <span class="mt-1">Cards</span>
-            </a>
-
-            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="mt-1">Me</span>
-            </a>
-
+            </section>
         </div>
     </div>
 
-    <script src="/js/auth/savings.js"></script>
+    <div class="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-t border-gray-100 z-50">
+        <div class="flex justify-around items-center px-4 py-2.5">
+            <a href="dashboard" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-house text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
+            </a>
+            <a href="finance" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
+            </a>
+            <a href="cards" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
+            </a>
+            <a href="profile" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
+            </a>
+        </div>
+    </div>
 </body>
 
 </html>

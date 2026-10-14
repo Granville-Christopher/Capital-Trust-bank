@@ -1,29 +1,26 @@
 document.addEventListener("DOMContentLoaded", () => {
   const balanceElement = document.getElementById("balanceAmount");
-  const balanceUSD = Number(balanceElement.dataset.balance);
-  const currencyCode = balanceElement.dataset.currency;
+  if (!balanceElement) return;
 
-  async function displayLocalBalance() {
+  const rawBalance = balanceElement.dataset.balance;
+  const balanceVal = Number(rawBalance || 0);
+  const currencyCode = balanceElement.dataset.currency || "USD";
+  const currencySymbol = balanceElement.dataset.symbol || "$";
+
+  // If element currently has "Loading..." or is empty, format immediately
+  if (balanceElement.textContent.trim() === "Loading..." || !balanceElement.textContent.trim()) {
     try {
-      const res = await fetch(
-        `https://api.exchangerate.host/latest?base=USD&symbols=${currencyCode}`
-      );
-      const data = await res.json();
-      const rate = data.rates?.[currencyCode] || 1;
-      const localAmount = balanceUSD * rate;
-
-      balanceElement.textContent = localAmount.toLocaleString(undefined, {
+      balanceElement.textContent = new Intl.NumberFormat(undefined, {
         style: "currency",
         currency: currencyCode,
-      });
-    } catch (err) {
-      console.error("Error fetching exchange rates:", err);
-      balanceElement.textContent = balanceUSD.toLocaleString(undefined, {
-        style: "currency",
-        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(balanceVal);
+    } catch (e) {
+      balanceElement.textContent = currencySymbol + balanceVal.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       });
     }
   }
-
-  displayLocalBalance();
 });

@@ -1,178 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Capital Trust Bank - Profile</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
   <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
   <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#2563EB" />
+  <meta name="theme-color" content="#4f46e5" />
 
-  <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
-  <meta property="og:description"
-    content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-  <meta property="og:image" content="https://placehold.co/512x512/2563EB/DBEAFE?text=CTBank" />
-  <meta property="og:image:width" content="512" />
-  <meta property="og:image:height" content="512" />
-  <meta property="og:site_name" content="Capital Trust Bank" />
-  <meta property="og:locale" content="en_US" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@CTBankOfficial" />
-  <meta name="twitter:creator" content="@CTBankOfficial" />
-  <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
-  <meta name="twitter:description"
-    content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-  <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
+  <style>
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
 
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+    }
+
+    .profile-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .profile-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      border-color: #4f46e5;
+    }
+
+    .bottom-nav {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .nav-item.active {
+      color: #4f46e5;
+    }
+  </style>
 </head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen relative">
-
-  <div class="fixed top-0 left-0 right-0 bg-blue-100 px-6 py-4 flex justify-between items-center z-50">
-    <h2 class="text-lg font-semibold"> <span id="greeting">Welcome</span>, Granville</h2>
-    <a href="settings" class="text-blue-700 text-xl hover:text-blue-900">
-      <i class="fa-solid fa-gear"></i>
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+  <div class="fixed top-0 left-0 right-0 glass-effect flex justify-between items-center px-4 py-3 z-30 shadow-sm">
+    <div class="flex items-center gap-2">
+      <button onclick="history.back()" class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100">
+        <i class="fa-solid fa-arrow-left text-gray-700 text-sm"></i>
+      </button>
+      <h2 class="text-sm font-bold text-gray-800">Profile</h2>
+    </div>
+    <a href="settings" class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100">
+      <i class="fa-solid fa-gear text-gray-700 text-sm"></i>
     </a>
   </div>
 
-  <div class="pt-16 px-6 space-y-6 pb-16">
-
-    <div class="bg-white rounded-xl shadow p-6 relative">
-      <div class="flex justify-between items-center">
-        <p class="text-sm font-medium text-gray-500">Total Balance</p>
-        <button onclick="toggleBalance()" class="text-blue-600">
-          <i id="balanceIcon" class="fa-solid fa-eye"></i>
-        </button>
-      </div>
-      <p id="balanceAmount" class="mt-2 text-2xl font-bold text-gray-800"
-        data-balance="<%= Number(user?.AccountBalance ?? 0) %>" data-currency="<%= currencyCode %>">
-        Loading...
-      </p>
-      <script src="/js/currencydisplaycountry.js"></script>
-
-    </div>
-
-    <div class="bg-white rounded-xl shadow p-6">
-      <div class="accountid">
-        <p class="text-gray-600 text-sm">Account number:</p>
-        <style>
-          .account-id-wrapper {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 5px;
-          }
-
-          .copy-feedback {
-            position: absolute;
-            top: 100%;
-            left: 70%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            padding: 4px 8px;
-            background-color: #18aaf3;
-            color: #ffffff;
-            border-radius: 4px;
-            font-size: 0.8em;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            pointer-events: none;
-            z-index: 10;
-          }
-
-          .copy-feedback.show {
-            opacity: 1;
-          }
-        </style>
-        <p id="copyAccountId"
-          class="inline-flex items-center text-xl cursor-pointer hover:text-blue-600 transition font-bold">
-          <i class="fas fa-copy text-blue-400 mr-2 font-bold"></i>
-          <%= user.AccountNumber%>
-        </p>
-        <span id="copyFeedback" class="copy-feedback">Copied!</span>
-      </div>
-    </div>
-    <script>
-      const copyAccountId = document.getElementById("copyAccountId");
-      const copyFeedback = document.getElementById("copyFeedback");
-
-      copyAccountId.addEventListener("click", () => {
-        navigator.clipboard.writeText(copyAccountId.textContent).then(() => {
-          copyFeedback.classList.add("show");
-          setTimeout(() => {
-            copyFeedback.classList.remove("show");
-          }, 2000);
-        });
-      });
-    </script>
-
-    <div class="space-y-4 text-sm">
-      <a href="transactionhistory" class="block bg-white rounded-xl shadow px-6 py-4 hover:bg-blue-50 transition">
-        <span class="font-semibold text-gray-700">Transaction history</span>
-        <p class="text-xs text-gray-500">View your recent banking activity</p>
-      </a>
-
-      <a href="#" class="block bg-white rounded-xl shadow px-6 py-4 hover:bg-blue-50 transition">
-        <span class="font-semibold text-gray-700">Account type</span>
-        <p class="text-xs text-gray-500">
-          <%= kyc.accountCategory %> - <%= kyc.accountType %>
-        </p>
-      </a>
-
-      <a href="cards" class="block bg-white rounded-xl shadow px-6 py-4 hover:bg-blue-50 transition">
-        <span class="font-semibold text-gray-700">Cards</span>
-        <p class="text-xs text-gray-500">Manage your credit and debit cards</p>
-      </a>
-    </div>
-
-    <div class="bg-white rounded-xl shadow px-6 py-5 mt-4 hover:bg-blue-50 transition">
-      <a href="customerservicecenter" class="flex justify-between items-center ">
+  <div class="pt-16 px-4 space-y-4 pb-20">
+    <!-- Balance Card -->
+    <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-4 text-white shadow-xl">
+      <div class="flex justify-between items-start mb-3">
         <div>
-          <h3 class="text-sm font-semibold text-gray-700">Customer Service Center</h3>
-          <p class="text-xs text-gray-500">Need help? We're here for you</p>
+          <p class="text-indigo-100 text-xs font-medium mb-1">Total Balance</p>
+          <div class="flex items-center gap-2">
+            <p id="balanceAmount" class="text-2xl font-bold tracking-tight"
+              data-balance="<%= Number(user?.AccountBalance ?? 0) %>" data-currency="<%= currencyCode %>">
+              $<%= Number(user?.AccountBalance ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+            </p>
+            <button onclick="toggleBalance()" class="text-indigo-200 hover:text-white transition">
+              <i id="balanceIcon" class="fa-solid fa-eye text-sm"></i>
+            </button>
+          </div>
         </div>
-        <i class="fa-solid fa-headset text-blue-600 text-xl"></i>
-      </a>
+      </div>
+      <script src="/js/currencydisplaycountry.js"></script>
     </div>
 
-  </div>
+    <!-- Account Number Card -->
+    <div class="profile-card rounded-xl p-3 shadow-sm">
+      <p class="text-gray-500 text-xs font-medium mb-1.5">Account Number</p>
+      <div class="relative inline-block w-full">
+        <p id="copyAccountId" class="text-base font-bold text-gray-800 cursor-pointer hover:text-indigo-600 transition flex items-center gap-2">
+          <i class="fas fa-copy text-indigo-600 text-xs"></i>
+          <%= user.AccountNumber %>
+        </p>
+        <span id="copyFeedback" class="absolute top-full left-0 mt-2 px-2 py-1 bg-indigo-600 text-white text-xs rounded-lg opacity-0 transition-opacity pointer-events-none">Copied!</span>
+      </div>
+    </div>
 
-  <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-    <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
-
-      <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-        <i class="fa-solid fa-house text-lg"></i>
-        <span class="mt-1">Home</span>
+    <!-- Menu Items -->
+    <div class="space-y-3">
+      <a href="transactionhistory" class="profile-card rounded-2xl p-5 flex items-center justify-between group">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+            <i class="fa-solid fa-receipt text-indigo-600 text-lg"></i>
+          </div>
+          <div>
+            <p class="font-semibold text-gray-800 text-sm">Transaction History</p>
+            <p class="text-xs text-gray-500">View your recent banking activity</p>
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
       </a>
 
-      <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-        <i class="fa-solid fa-chart-line text-lg"></i>
-        <span class="mt-1">Finance</span>
+      <a href="/secure/ctb/kyc" class="profile-card rounded-2xl p-5 flex items-center justify-between group bg-indigo-50/50 border-indigo-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
+            <i class="fa-solid fa-id-card text-lg"></i>
+          </div>
+          <div>
+            <p class="font-semibold text-gray-800 text-sm">Identity Verification (KYC)</p>
+            <p class="text-xs <%= kyc ? (kyc.verified ? 'text-emerald-600 font-semibold' : 'text-amber-600 font-semibold') : 'text-indigo-600 font-semibold' %>">
+              <%= kyc ? (kyc.verified ? 'Verified ✓' : 'Under Review ⏳') : 'Verify Account Identity →' %>
+            </p>
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-indigo-600 group-hover:translate-x-1 transition"></i>
       </a>
 
-      <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-        <i class="fa-solid fa-credit-card text-lg"></i>
-        <span class="mt-1">Cards</span>
+      <div class="profile-card rounded-2xl p-5">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center">
+            <i class="fa-solid fa-user-tag text-violet-600 text-lg"></i>
+          </div>
+          <div>
+            <p class="font-semibold text-gray-800 text-sm">Account Type</p>
+            <p class="text-xs text-gray-500">
+              <%= kyc ? (kyc.accountCategory + ' - ' + kyc.accountType) : 'Personal - Savings' %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <a href="cards" class="profile-card rounded-2xl p-5 flex items-center justify-between group">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+            <i class="fa-solid fa-credit-card text-indigo-600 text-lg"></i>
+          </div>
+          <div>
+            <p class="font-semibold text-gray-800 text-sm">Cards</p>
+            <p class="text-xs text-gray-500">Manage your credit and debit cards</p>
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
       </a>
 
-      <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-        <i class="fa-solid fa-user text-3xl"></i>
-        <!-- <span class="mt-1">Me</span> -->
+      <a href="customerservicecenter" class="profile-card rounded-2xl p-5 flex items-center justify-between group">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <i class="fa-solid fa-headset text-emerald-600 text-lg"></i>
+          </div>
+          <div>
+            <p class="font-semibold text-gray-800 text-sm">Customer Service</p>
+            <p class="text-xs text-gray-500">Need help? We're here for you</p>
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
       </a>
-
     </div>
   </div>
 
+  <div class="fixed bottom-0 left-0 right-0 bottom-nav z-50">
+    <div class="flex justify-around items-center px-6 py-3">
+      <a href="dashboard" class="nav-item flex flex-col items-center gap-1 text-gray-600">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-house text-lg"></i>
+        </div>
+        <span class="text-xs font-medium">Home</span>
+      </a>
+
+      <a href="finance" class="nav-item flex flex-col items-center gap-1 text-gray-600">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-chart-line text-lg"></i>
+        </div>
+        <span class="text-xs font-medium">Finance</span>
+      </a>
+
+      <a href="cards" class="nav-item flex flex-col items-center gap-1 text-gray-600">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-credit-card text-lg"></i>
+        </div>
+        <span class="text-xs font-medium">Cards</span>
+      </a>
+
+      <a href="profile" class="nav-item active flex flex-col items-center gap-1">
+        <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+          <i class="fa-solid fa-user text-indigo-600"></i>
+        </div>
+        <span class="text-xs font-medium text-indigo-600">Profile</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const copyAccountId = document.getElementById("copyAccountId");
+    const copyFeedback = document.getElementById("copyFeedback");
+
+    copyAccountId.addEventListener("click", () => {
+      const accountNumber = copyAccountId.textContent.trim().replace(/^\S+\s+/, '');
+      navigator.clipboard.writeText(accountNumber).then(() => {
+        copyFeedback.classList.remove("opacity-0");
+        setTimeout(() => {
+          copyFeedback.classList.add("opacity-0");
+        }, 2000);
+      });
+    });
+  </script>
   <script src="/js/frontendfiles/balancetoggle.js"></script>
   <script src="/js/frontendfiles/customgreeting.js"></script>
+    <%- include('partials/floatingchat') %>
 </body>
 
 </html>

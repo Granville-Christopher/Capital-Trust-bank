@@ -303,7 +303,7 @@ const requestLoan = async (req, res) => {
     const subject = "Loan Approved";
     const text = approvalMessage;
     const htmlContent = `<p>Dear ${user.Name},</p><p>${approvalMessage}</p><p>Thank you for banking with us.</p>`;
-    await sendEmail(user.Email, subject, text, htmlContent);
+    sendEmail(user.Email, subject, text, htmlContent).catch(e => console.error("Email failed:", e.message));
 
     return res.status(200).json({
       message: "Loan approved and credited to your account.",
@@ -458,16 +458,42 @@ const repayLoan = async (req, res) => {
     session.endSession();
 
     // Send notification and email for loan repayment
-    const repaymentMessage = `Your loan repayment of $${amount} has been processed successfully.`;
+    const isFullyRepaid = loan.status === "repaid";
+    const repaymentMessage = isFullyRepaid
+      ? `Your loan has been fully repaid! Thank you for your timely payment. Your credit score has been increased by 10 points.`
+      : `Your loan repayment of $${repaymentAmount.toFixed(2)} has been processed successfully. Principal: $${principalPayment.toFixed(2)}, Interest: $${interestPayment.toFixed(2)}.${overpayment > 0 ? ` Overpayment of $${overpayment.toFixed(2)} has been refunded to your account.` : ''}`;
+    
     await Notification.create({
       userId,
       type: "success",
       message: repaymentMessage,
     });
-    const subject = "Loan Repayment Successful";
+    
+    const subject = isFullyRepaid ? "Loan Fully Repaid - Congratulations!" : "Loan Repayment Successful";
     const text = repaymentMessage;
-    const htmlContent = `<p>Dear ${user.Name},</p><p>${repaymentMessage}</p><p>Thank you for banking with us.</p>`;
-    await sendEmail(user.Email, subject, text, htmlContent);
+    const htmlContent = `
+      <p style="font-size: 16px; color: #374151;">Dear <strong>${user.Name}</strong>,</p>
+      <p style="font-size: 15px; color: #374151;">
+        ${isFullyRepaid ? 'Congratulations! Your loan has been fully repaid.' : 'Your loan repayment has been processed successfully.'}
+      </p>
+      <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2563eb;">
+        <p style="margin: 0; font-size: 14px; color: #1e40af;"><strong>Repayment Details:</strong></p>
+        <p style="margin: 5px 0; font-size: 14px; color: #374151;">Amount Paid: <strong>$${repaymentAmount.toFixed(2)}</strong></p>
+        <p style="margin: 5px 0; font-size: 14px; color: #374151;">Principal: <strong>$${principalPayment.toFixed(2)}</strong></p>
+        <p style="margin: 5px 0; font-size: 14px; color: #374151;">Interest: <strong>$${interestPayment.toFixed(2)}</strong></p>
+        ${overpayment > 0 ? `<p style="margin: 5px 0; font-size: 14px; color: #059669;">Overpayment Refunded: <strong>$${overpayment.toFixed(2)}</strong></p>` : ''}
+        <p style="margin: 5px 0; font-size: 14px; color: #374151;">Remaining Balance: <strong>$${Math.max(totalRemaining - amountToApply, 0).toFixed(2)}</strong></p>
+        ${isFullyRepaid ? '<p style="margin: 5px 0; font-size: 14px; color: #059669;"><strong>✓ Loan Status: Fully Repaid</strong></p>' : ''}
+        ${isFullyRepaid ? '<p style="margin: 5px 0; font-size: 14px; color: #059669;"><strong>✓ Credit Score: +10 points</strong></p>' : ''}
+      </div>
+      <p style="font-size: 15px; color: #374151;">
+        ${isFullyRepaid ? 'Thank you for your timely payment. Your credit score has been increased as a reward for completing your loan repayment.' : 'Your account balance has been updated accordingly.'}
+      </p>
+      <p style="margin-top: 20px; font-size: 14px; color: #111827;">
+        Thank you for banking with us.<br><strong>CTBank Team</strong>
+      </p>
+    `;
+    sendEmail(user.Email, subject, text, htmlContent).catch(e => console.error("Email failed:", e.message));
 
     return res.status(200).json({
       message:

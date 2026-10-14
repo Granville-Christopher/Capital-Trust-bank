@@ -1,17 +1,13 @@
-const form = document.getElementById("internationaltransfer");
-const internationaltransferBtn = document.getElementById(
-  "internationaltransfer-btn"
-);
-const internationaltransferText = document.getElementById(
-  "internationaltransfer-text"
-);
+const form = document.getElementById("transferform");
+const transferBtn = document.getElementById("transfer-btn");
+const transferText = document.getElementById("transfer-text");
 const spinner = document.getElementById("spinner");
 
 form.addEventListener("submit", async function (event) {
   event.preventDefault();
 
-  internationaltransferBtn.disabled = true;
-  internationaltransferText.textContent = "Processing";
+  transferBtn.disabled = true;
+  transferText.textContent = "Processing";
   spinner.classList.remove("hidden");
 
   try {
@@ -33,13 +29,13 @@ form.addEventListener("submit", async function (event) {
       !data.Iban
     ) {
       showToast("All fields are required");
-      internationaltransferText.textContent = "Initiate transfer";
+      transferText.textContent = "Initiate transfer";
       spinner.classList.add("hidden");
-      internationaltransferBtn.disabled = false;
+      transferBtn.disabled = false;
       return;
     }
 
-    const response = await fetch("/user/secure/ctb/internationaltransfer", {
+    const response = await fetch("/user/secure/ctb/transfer", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -51,16 +47,23 @@ form.addEventListener("submit", async function (event) {
     if (contentType && contentType.includes("application/json")) {
       const data = await response.json();
       if (!response.ok) {
+        const blockMessage = data.block
+          ? `${data.block.reasonTitle || "Withdrawal Restriction Active"}: ${
+              data.block.reasonMessage || data.error
+            } ${data.block.unlockInstruction || ""}`
+          : null;
+
         const errorMsg =
+          blockMessage ||
           data.errors?.map((err) => err.msg).join("\n") ||
           data.error ||
           data.message ||
           "Transfer failed.";
         showToast(errorMsg);
 
-        internationaltransferText.textContent = "Initiate transfer";
+        transferText.textContent = "Initiate transfer";
         spinner.classList.add("hidden");
-        internationaltransferBtn.disabled = false;
+        transferBtn.disabled = false;
         return;
       }
 
@@ -71,22 +74,22 @@ form.addEventListener("submit", async function (event) {
       } else {
         window.location.href = "/udp/confirmtransfer";
       }
-      internationaltransferText.textContent = "Initiate transfer";
+      transferText.textContent = "Initiate transfer";
       spinner.classList.add("hidden");
-      internationaltransferBtn.disabled = false;
+      transferBtn.disabled = false;
     } else {
       const text = await response.text();
       console.error("Non-JSON response:", text);
       showToast("Server error: non-JSON response");
-      internationaltransferText.textContent = "Initiate transfer";
+      transferText.textContent = "Initiate transfer";
       spinner.classList.add("hidden");
-      internationaltransferBtn.disabled = false;
+      transferBtn.disabled = false;
     }
   } catch (error) {
     console.error("Fetch error:", error);
     showToast("Network error. Please try again later.");
-    internationaltransferText.textContent = "Initiate transfer";
+    transferText.textContent = "Initiate transfer";
     spinner.classList.add("hidden");
-    internationaltransferBtn.disabled = false;
+    transferBtn.disabled = false;
   }
 });

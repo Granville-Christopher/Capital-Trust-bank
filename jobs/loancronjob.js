@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Loan = require("../models/usermodels/loans");
 const LoanHistory = require("../models/usermodels/loanhistory");
 const User = require("../models/usermodels/userSignup");
-const sendEmail = require("../config/loanremindermailer");
+const { sendEmail } = require("../config/loanremindermailer");
 
 cron.schedule("0 0 * * *", async () => {
   console.log("⏰ [CRON] Running daily loan reminder & default check...");
@@ -44,7 +44,7 @@ cron.schedule("0 0 * * *", async () => {
           Please make arrangements to repay by <strong>${loan.dueDate.toDateString()}</strong> to avoid penalties and credit score impact.
         </p>
         <p style="margin-top: 20px; font-size: 14px; color: #111827;">
-          Thank you,<br><strong>CTBank Loans Team</strong>
+          Thank you,<br><strong>CTBank Team</strong>
         </p>
       `;
 
@@ -117,7 +117,7 @@ cron.schedule("0 0 * * *", async () => {
           ).toFixed(2)}</strong>
         </p>
         <p style="margin-top: 20px; font-size: 14px; color: #111827;">
-          Thank you,<br><strong>CTBank Loans Team</strong>
+          Thank you,<br><strong>CTBank Team</strong>
         </p>
       `;
 

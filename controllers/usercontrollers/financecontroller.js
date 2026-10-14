@@ -111,7 +111,7 @@ const depositToSavings = [
       const subject = "Savings Deposit Successful";
       const text = depositMessage;
       const htmlContent = `<p>Dear ${user.Name},</p><p>${depositMessage}</p><p>Thank you for banking with us.</p>`;
-      await sendEmail(user.Email, subject, text, htmlContent);
+      sendEmail(user.Email, subject, text, htmlContent).catch(e => console.error("Email failed:", e.message));
 
       res.status(200).json({
         message: "Deposit successful",
@@ -201,7 +201,7 @@ const withdrawInterest = async (req, res) => {
     const subject = "Savings Interest Withdrawal Successful";
     const text = withdrawalMessage;
     const htmlContent = `<p>Dear ${user.Name},</p><p>${withdrawalMessage}</p><p>Thank you for banking with us.</p>`;
-    await sendEmail(user.Email, subject, text, htmlContent);
+    sendEmail(user.Email, subject, text, htmlContent).catch(e => console.error("Email failed:", e.message));
 
     res.status(200).json({
       message: `Successfully withdrew $${withdrawnAmount.toFixed(2)} interest.`,
@@ -394,7 +394,7 @@ const cancelSavings = async (req, res) => {
     const subject = "Savings Plan Canceled";
     const text = cancelMessage;
     const htmlContent = `<p>Dear ${user.Name},</p><p>${cancelMessage}</p><p>Thank you for banking with us.</p>`;
-    await sendEmail(user.Email, subject, text, htmlContent);
+    sendEmail(user.Email, subject, text, htmlContent).catch(e => console.error("Email failed:", e.message));
 
     return res.status(200).json({
       message:

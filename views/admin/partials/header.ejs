@@ -1,16 +1,15 @@
-<div
-  class="fixed top-0 left-0 right-0 bg-blue-100 flex justify-between items-center px-4 py-4 z-20"
->
-  <a href="/admin/dashboard" class="flex justify-start gap-2 items-center">
-    <span class="text-blue-50 bg-blue-600 rounded-full px-2 py-1">
-      <i class="fa-solid fa-user-shield"></i>
-    </span>
-    <h2 class="text-lg font-semibold text-gray-800">
-      Admin,
-      <span class="text-lg font-semibold"> <%= admin?.name || 'Admin' %> </span>
-    </h2>
+<div class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-b border-gray-200 flex justify-between items-center px-6 py-4 z-20 shadow-sm">
+  <a href="/admin/dashboard" class="flex justify-start gap-3 items-center">
+    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-lg">
+      <i class="fa-solid fa-user-shield text-white text-sm"></i>
+    </div>
+    <div>
+      <p class="text-xs text-gray-500 font-medium">Admin Panel</p>
+      <h2 class="text-base font-bold text-gray-900"><%= admin?.name || 'Admin' %></h2>
+    </div>
   </a>
-  <a href="/admin/logout" class="text-blue-600 hover:text-blue-800">
-    <i class="fa fa-sign-out text-2xl"></i>
+  <a href="/admin/logout" class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition text-gray-700 font-medium text-sm">
+    <i class="fa fa-sign-out text-sm"></i>
+    <span class="hidden md:inline">Logout</span>
   </a>
 </div>

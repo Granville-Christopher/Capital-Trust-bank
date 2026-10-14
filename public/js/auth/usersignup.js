@@ -43,7 +43,7 @@ form.addEventListener("submit", async function (event) {
       }
 
       form.reset();
-      window.location.href = "/secure/ctb/kyc";
+      window.location.href = "/udp/dashboard";
       signupText.textContent = "Sign Up";
       spinner.classList.add("hidden");
       signupBtn.disabled = false;

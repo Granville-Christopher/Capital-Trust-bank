@@ -25,6 +25,11 @@ const transactionHistorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    bankName: {
+      type: String,
+      required: false,
+      default: "",
+    },
     transferId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "localTransfer",
@@ -50,7 +55,15 @@ const transactionHistorySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "successful", "failed"],
+      enum: [
+        "pending",
+        "successful",
+        "completed",
+        "on hold",
+        "on-hold",
+        "reversed",
+        "failed",
+      ],
       default: "pending",
       required: true,
     },

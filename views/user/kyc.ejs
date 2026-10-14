@@ -1,269 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Capital Trust Bank - KYC verification</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
     <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
     <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
-
-    <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta property="og:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-    <meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:site_name" content="Capital Trust Bank" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@CTBankOfficial" />
-    <meta name="twitter:creator" content="@CTBankOfficial" />
-    <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta name="twitter:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-
-
+    <meta name="theme-color" content="#4f46e5" />
 </head>
 
 <%- include('partials/toastalerts')%>
 
-    <body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen flex flex-col relative">
-        <div class="bg-blue-600 text-white py-6 px-4 flex flex-col items-center">
-            <div class="text-2xl font-semibold flex items-center space-x-2">
-                <i class="fa-solid fa-building-columns text-white"></i>
-                <span>Capital Trust Bank</span>
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen flex flex-col relative">
+    <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-5 px-4 flex flex-col items-center shadow-lg">
+        <div class="text-xl font-bold flex items-center space-x-2">
+            <i class="fa-solid fa-building-columns text-white text-lg"></i>
+            <span>Capital Trust Bank</span>
+        </div>
+        <p class="mt-2 text-xs text-indigo-100">Please fill out your KYC details to verify your account.</p>
+        <a href="index" class="mt-2 text-xs underline hover:text-white transition">← Back to Home</a>
+    </div>
+
+    <div class="flex-grow flex items-center justify-center px-4 py-6">
+        <form id="kycForm" class="bg-white rounded-xl shadow-xl p-6 w-full max-w-xl space-y-4" enctype="multipart/form-data">
+            <h2 class="text-xl font-bold text-indigo-700 text-center mb-1">KYC Verification Form</h2>
+            <p class="text-xs text-gray-500 text-center mb-4">Complete your account verification</p>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Country</label>
+                <select id="countrySelect" name="country"
+                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm"></select>
             </div>
-            <p class="mt-2 text-sm">Please fill out your KYC details to verify your account.</p>
-            <a href="index" class="mt-2 text-xs underline hover:text-gray-200">← Back to Home</a>
-        </div>
 
-        <div class="flex-grow flex items-center justify-center px-4 py-8">
-            <form id="kycForm" class="rounded-xl p-8 w-full max-w-xl space-y-6" enctype="multipart/form-data">
-                <h2 class="text-xl font-bold text-blue-600 text-center">KYC Verification Form</h2>
-
-                <div>
-                    <label class="block text-sm mb-1">Country</label>
-                    <select id="countrySelect" name="country"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"></select>
-                </div>
-
-                <div>
-                    <label class="block text-sm mb-1">Nationality</label>
-                    <select id="nationalitySelect" name="nationality"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"></select>
-                </div>
-
-                <div>
-                    <label class="block text-sm mb-1">Residential Address</label>
-                    <input type="text" name="residentialAddress" placeholder="Enter your address"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                </div>
-
-                <div>
-                    <label class="block text-sm mb-1">Occupation</label>
-                    <input type="text" name="occupation" placeholder="Enter your occupation"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                </div>
-
-                <div>
-                    <label class="block text-sm mb-1">Account Category</label>
-                    <select id="accountCategory" name="accountCategory" onchange="updateAccountTypes()"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400">
-                        <option value="">-- Select Category --</option>
-                        <option value="personal">Personal Account</option>
-                        <option value="retirement">Retirement Account</option>
-                        <option value="business">Business Account</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm mb-1">Account Type</label>
-                    <select id="accountType" name="accountType"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400">
-                        <option value="">-- Select Type --</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm mb-1">Date of Birth</label>
-                    <input type="date" name="dateOfBirth"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400" />
-                </div>
-
-                <div>
-                    <label class="block text-sm mb-1">ID Type</label>
-                    <select name="idType"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400">
-                        <option value="">-- Select ID Type --</option>
-                        <option value="idcard">ID Card</option>
-                        <option value="driverlicense">Driver's License</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm mb-1">Upload ID - Front</label>
-                    <input type="file" name="idFront" class="w-full px-4 py-2 border border-blue-500 rounded-full" />
-                </div>
-                <div>
-                    <label class="block text-sm mb-1">Upload ID - Back</label>
-                    <input type="file" name="idBack" class="w-full px-4 py-2 border border-blue-500 rounded-full" />
-                </div>
-
-                <div>
-                    <label class="block text-sm mb-1">Phone Number</label>
-                    <input type="tel" name="phoneNumber" placeholder="Enter phone number"
-                        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400" />
-                </div>
-
-                <div class="flex items-center space-x-2">
-                    <input type="checkbox" id="agree" name="agree"
-                        class="border-blue-500 text-blue-600 focus:ring-blue-400 rounded" />
-                    <label for="agree" class="text-sm text-gray-700">I confirm the above information is true and
-                        accurate.</label>
-                </div>
-
-                <button type="submit"
-                    class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-200">
-                    Submit KYC
-                </button>
-            </form>
-        </div>
-
-        <div id="kycSuccessModal" class="modal"
-            style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center;">
-            <div
-                style="background:white; padding:20px; border-radius:10px; width:400px; text-align:center; font-family:sans-serif;">
-                <h2 style="color:green;">✅ KYC Submitted!</h2>
-                <p>Your KYC has been submitted successfully and is now under review.</p>
-                <p>This process may take <strong>up to 24 hours</strong>.
-                    If you do not receive an email within 24 hours, please contact our support team.</p>
-                <p style="margin-top:10px; color:gray;">Redirecting you to login in <span
-                        id="redirectCountdown">25</span> seconds...</p>
-                <button onclick="window.location.href='/secure/ctb/login'"
-                    style="margin-top:15px; padding:10px 20px; background:green; color:white; border:none; border-radius:5px; cursor:pointer;">Go
-                    to Login Now</button>
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Nationality</label>
+                <select id="nationalitySelect" name="nationality"
+                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm"></select>
             </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Residential Address</label>
+                <input type="text" name="residentialAddress" placeholder="Enter your address"
+                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Occupation</label>
+                <input type="text" name="occupation" placeholder="Enter your occupation"
+                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Account Category</label>
+                <select id="accountCategory" name="accountCategory" onchange="updateAccountTypes()"
+                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm">
+                    <option value="">-- Select Category --</option>
+                    <option value="personal">Personal Account</option>
+                    <option value="joint">Joint Account</option>
+                    <option value="escrow">Escrow Account</option>
+                    <option value="retirement">Retirement Account</option>
+                    <option value="business">Business Account</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Account Type</label>
+                <select id="accountType" name="accountType"
+                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm">
+                    <option value="">-- Select Type --</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Date of Birth</label>
+                <input type="date" name="dateOfBirth"
+                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">ID Type</label>
+                <select name="idType"
+                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm">
+                    <option value="">-- Select ID Type --</option>
+                    <option value="idcard">ID Card</option>
+                    <option value="driverlicense">Driver's License</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1.5">Upload ID - Front</label>
+                <input type="file" name="idFront" accept="image/*"
+                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm" />
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Upload ID - Back</label>
+                <input type="file" name="idBack" accept="image/*"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+                <input type="tel" name="phoneNumber" placeholder="Enter phone number"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <input type="checkbox" id="agree" name="agree"
+                    class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                <label for="agree" class="text-sm text-gray-700">I confirm the above information is true and accurate.</label>
+            </div>
+
+            <button type="submit"
+                class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-lg">
+                Submit KYC
+            </button>
+        </form>
+    </div>
+
+    <div id="kycSuccessModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md text-center relative">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-check text-emerald-600 text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">KYC Submitted!</h2>
+            <p class="text-gray-600 mb-2">Your KYC has been submitted successfully and is now under review.</p>
+            <p class="text-sm text-gray-500 mb-4">This process may take <strong>up to 24 hours</strong>. If you do not receive an email within 24 hours, please contact our support team.</p>
+            <p class="text-sm text-gray-500 mb-6">Redirecting you to login in <span id="redirectCountdown" class="font-bold text-indigo-600">25</span> seconds...</p>
+            <button onclick="window.location.href='/secure/ctb/login'"
+                class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-lg">
+                Go to Login Now
+            </button>
         </div>
-        <script>
-            function updateAccountTypes() {
-                const category = document.getElementById('accountCategory').value;
-                const typeSelect = document.getElementById('accountType');
-                typeSelect.innerHTML = '';
+    </div>
+    <script>
+        function updateAccountTypes() {
+            const category = document.getElementById('accountCategory').value;
+            const typeSelect = document.getElementById('accountType');
+            typeSelect.innerHTML = '';
 
-                const types = {
-                    personal: ['Checking Account', 'Savings Account', 'Fixed Deposit'],
-                    retirement: ['Brokerage Account', 'Individual Retirement Account (IRA)', '401(k) Account'],
-                    business: ['Business Checking Account', 'Merchant Account', 'Business Savings Account']
-                };
+            const types = {
+                personal: ['Checking Account', 'Savings Account', 'Fixed Deposit'],
+                joint: ['Joint Checking Account', 'Joint Savings Account', 'Joint Investment Account'],
+                escrow: ['Escrow Deposit Account', 'Real Estate Escrow', 'Commercial Escrow Account'],
+                retirement: ['Brokerage Account', 'Individual Retirement Account (IRA)', '401(k) Account'],
+                business: ['Business Checking Account', 'Merchant Account', 'Business Savings Account', 'Commercial Escrow Account']
+            };
 
-                if (types[category]) {
-                    types[category].forEach(type => {
-                        const option = document.createElement('option');
-                        option.value = type.toLowerCase().replace(/ /g, '-');
-                        option.textContent = type;
-                        typeSelect.appendChild(option);
-                    });
-                } else {
-                    const placeholder = document.createElement('option');
-                    placeholder.textContent = '-- Select Type --';
-                    typeSelect.appendChild(placeholder);
-                }
+            if (types[category]) {
+                types[category].forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type.toLowerCase().replace(/ /g, '-');
+                    option.textContent = type;
+                    typeSelect.appendChild(option);
+                });
+            } else {
+                const placeholder = document.createElement('option');
+                placeholder.textContent = '-- Select Type --';
+                typeSelect.appendChild(placeholder);
             }
+        }
 
-            document.getElementById("kycForm").addEventListener("submit", async (e) => {
-                e.preventDefault();
+        document.getElementById("kycForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-                const idFrontFile = document.querySelector('input[name="idFront"]').files[0];
-                const idBackFile = document.querySelector('input[name="idBack"]').files[0];
-                const country = document.querySelector('select[name="country"]').value.trim();
-                const nationality = document.querySelector('select[name="nationality"]').value.trim();
-                const residentialAddress = document.querySelector('input[name="residentialAddress"]').value.trim();
-                const occupation = document.querySelector('input[name="occupation"]').value.trim();
-                const accountCategory = document.querySelector('select[name="accountCategory"]').value.trim();
-                const accountType = document.querySelector('select[name="accountType"]').value.trim();
-                const dateOfBirth = document.querySelector('input[name="dateOfBirth"]').value.trim();
-                const idType = document.querySelector('select[name="idType"]').value.trim();
-                const phoneNumber = document.querySelector('input[name="phoneNumber"]').value.trim();
-                const agree = document.querySelector('input[name="agree"]').checked;
+            const idFrontFile = document.querySelector('input[name="idFront"]').files[0];
+            const idBackFile = document.querySelector('input[name="idBack"]').files[0];
+            const country = document.querySelector('select[name="country"]').value.trim();
+            const nationality = document.querySelector('select[name="nationality"]').value.trim();
+            const residentialAddress = document.querySelector('input[name="residentialAddress"]').value.trim();
+            const occupation = document.querySelector('input[name="occupation"]').value.trim();
+            const accountCategory = document.querySelector('select[name="accountCategory"]').value.trim();
+            const accountType = document.querySelector('select[name="accountType"]').value.trim();
+            const dateOfBirth = document.querySelector('input[name="dateOfBirth"]').value.trim();
+            const idType = document.querySelector('select[name="idType"]').value.trim();
+            const phoneNumber = document.querySelector('input[name="phoneNumber"]').value.trim();
+            const agree = document.querySelector('input[name="agree"]').checked;
 
-                if (!idFrontFile) return alert("Please upload the front of your ID.");
-                if (!idBackFile) return alert("Please upload the back of your ID.");
-                if (!country) return alert("Please select your country.");
-                if (!nationality) return alert("Please select your nationality.");
-                if (!residentialAddress) return alert("Please enter your residential address.");
-                if (!occupation) return alert("Please enter your occupation.");
-                if (!accountCategory) return alert("Please select your account category.");
-                if (!accountType) return alert("Please select your account type.");
-                if (!dateOfBirth) return alert("Please enter your date of birth.");
-                if (!idType) return alert("Please select your ID type.");
-                if (!phoneNumber) return alert("Please enter your phone number.");
-                if (!agree) return alert("You must agree to the terms before submitting.");
+            if (!idFrontFile) return alert("Please upload the front of your ID.");
+            if (!idBackFile) return alert("Please upload the back of your ID.");
+            if (!country) return alert("Please select your country.");
+            if (!nationality) return alert("Please select your nationality.");
+            if (!residentialAddress) return alert("Please enter your residential address.");
+            if (!occupation) return alert("Please enter your occupation.");
+            if (!accountCategory) return alert("Please select your account category.");
+            if (!accountType) return alert("Please select your account type.");
+            if (!dateOfBirth) return alert("Please enter your date of birth.");
+            if (!idType) return alert("Please select your ID type.");
+            if (!phoneNumber) return alert("Please enter your phone number.");
+            if (!agree) return alert("You must agree to the terms before submitting.");
 
-                const formData = new FormData();
-                formData.append("idFront", idFrontFile);
-                formData.append("idBack", idBackFile);
-                formData.append("country", country);
-                formData.append("nationality", nationality);
-                formData.append("residentialAddress", residentialAddress);
-                formData.append("occupation", occupation);
-                formData.append("accountCategory", accountCategory);
-                formData.append("accountType", accountType);
-                formData.append("dateOfBirth", dateOfBirth);
-                formData.append("idType", idType);
-                formData.append("phoneNumber", phoneNumber);
-                formData.append("agree", agree ? "true" : "false");
+            const formData = new FormData();
+            formData.append("idFront", idFrontFile);
+            formData.append("idBack", idBackFile);
+            formData.append("country", country);
+            formData.append("nationality", nationality);
+            formData.append("residentialAddress", residentialAddress);
+            formData.append("occupation", occupation);
+            formData.append("accountCategory", accountCategory);
+            formData.append("accountType", accountType);
+            formData.append("dateOfBirth", dateOfBirth);
+            formData.append("idType", idType);
+            formData.append("phoneNumber", phoneNumber);
+            formData.append("agree", agree ? "true" : "false");
 
+            try {
+                const response = await fetch("/user/secure/ctb/submit-kyc", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const text = await response.text();
+                let result;
                 try {
-                    const response = await fetch("/user/secure/ctb/submit-kyc", {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    const text = await response.text();
-                    let result;
-                    try {
-                        result = JSON.parse(text);
-                    } catch {
-                        throw new Error("Server did not return valid JSON:\n" + text);
-                    }
-
-                    if (response.ok) {
-                        const modal = document.getElementById("kycSuccessModal");
-                        modal.style.display = "flex";
-
-                        let countdown = 25;
-                        const countdownEl = document.getElementById("redirectCountdown");
-                        const timer = setInterval(() => {
-                            countdown--;
-                            countdownEl.textContent = countdown;
-                            if (countdown <= 0) {
-                                clearInterval(timer);
-                                window.location.href = "/secure/ctb/login";
-                            }
-                        }, 1000);
-                    } else {
-                        alert("Error: " + result.message);
-                    }
-                } catch (error) {
-                    console.error("KYC Submission Error:", error);
-                    alert("Something went wrong. Please try again.");
+                    result = JSON.parse(text);
+                } catch {
+                    throw new Error("Server did not return valid JSON:\n" + text);
                 }
-            });
-        </script>
 
-        <script src="/js/frontendfiles/countries.js"></script>
+                if (response.ok) {
+                    const modal = document.getElementById("kycSuccessModal");
+                    modal.classList.remove("hidden");
 
-    </body>
+                    let countdown = 25;
+                    const countdownEl = document.getElementById("redirectCountdown");
+                    const timer = setInterval(() => {
+                        countdown--;
+                        countdownEl.textContent = countdown;
+                        if (countdown <= 0) {
+                            clearInterval(timer);
+                            window.location.href = "/secure/ctb/login";
+                        }
+                    }, 1000);
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (error) {
+                console.error("KYC Submission Error:", error);
+                alert("Something went wrong. Please try again.");
+            }
+        });
+    </script>
+
+    <script src="/js/frontendfiles/countries.js"></script>
+</body>
 
 </html>

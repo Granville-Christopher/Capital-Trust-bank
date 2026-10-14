@@ -16,13 +16,16 @@
       href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank"
     />
   </head>
-  <body class="bg-gray-100 min-h-screen">
+  <body class="bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50 min-h-screen">
     <%- include('partials/header') %> <%- include('partials/sidebar') %>
 
     <main class="ml-0 lg:ml-64 mt-20 p-6">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">KYC Details</h1>
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">KYC Details</h1>
+        <p class="text-sm text-gray-600">Detailed view of user KYC information and documents.</p>
+      </div>
 
-      <div class="bg-white rounded-xl shadow p-6">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- User Info -->
           <div>
@@ -57,27 +60,68 @@
           </div>
         </div>
 
-        <!-- Documents Section (if any) -->
-        <% if (kyc.documents && kyc.documents.length > 0) { %>
+        <!-- Documents Section -->
         <div class="mt-6 pt-6 border-t">
           <h3 class="text-lg font-semibold text-gray-800 mb-4">
-            Uploaded Documents
+            Uploaded Verification Documents
           </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <% kyc.documents.forEach(doc => { %>
-            <div class="border rounded-lg p-4">
-              <p><strong><%= doc.type %>:</strong></p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- ID Front -->
+            <% if (kyc.idFront) { %>
+            <div class="border rounded-xl p-4 bg-gray-50 flex flex-col items-center">
+              <p class="font-semibold text-gray-700 mb-3 w-full text-left">
+                <i class="fa-solid fa-id-card mr-1 text-indigo-600"></i> ID Front / Document Front
+              </p>
+              <div class="w-full h-64 overflow-hidden rounded-lg border border-gray-200 bg-white flex items-center justify-center mb-3">
+                <img 
+                  src="<%= kyc.idFront %>" 
+                  alt="ID Front" 
+                  class="max-h-full max-w-full object-contain cursor-pointer hover:scale-105 transition duration-300"
+                  onclick="window.open('<%= kyc.idFront %>', '_blank')"
+                />
+              </div>
               <a
-                href="<%= doc.path %>"
+                href="<%= kyc.idFront %>"
                 target="_blank"
-                class="text-blue-600 hover:underline"
-                >View Document</a
+                class="px-4 py-2 bg-indigo-50 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-100 transition text-sm flex items-center gap-1.5"
               >
+                <i class="fa-solid fa-up-right-from-square"></i> Open in New Tab
+              </a>
             </div>
-            <% }) %>
+            <% } %>
+
+            <!-- ID Back -->
+            <% if (kyc.idBack) { %>
+            <div class="border rounded-xl p-4 bg-gray-50 flex flex-col items-center">
+              <p class="font-semibold text-gray-700 mb-3 w-full text-left">
+                <i class="fa-solid fa-id-card mr-1 text-indigo-600"></i> ID Back / Document Back
+              </p>
+              <div class="w-full h-64 overflow-hidden rounded-lg border border-gray-200 bg-white flex items-center justify-center mb-3">
+                <img 
+                  src="<%= kyc.idBack %>" 
+                  alt="ID Back" 
+                  class="max-h-full max-w-full object-contain cursor-pointer hover:scale-105 transition duration-300"
+                  onclick="window.open('<%= kyc.idBack %>', '_blank')"
+                />
+              </div>
+              <a
+                href="<%= kyc.idBack %>"
+                target="_blank"
+                class="px-4 py-2 bg-indigo-50 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-100 transition text-sm flex items-center gap-1.5"
+              >
+                <i class="fa-solid fa-up-right-from-square"></i> Open in New Tab
+              </a>
+            </div>
+            <% } %>
+
+            <% if (!kyc.idFront && !kyc.idBack) { %>
+            <div class="col-span-2 text-center py-6 bg-amber-50 border border-amber-100 text-amber-800 rounded-xl">
+              <i class="fa-solid fa-triangle-exclamation text-lg mb-1"></i>
+              <p class="font-semibold text-sm">No identification documents uploaded for this KYC request.</p>
+            </div>
+            <% } %>
           </div>
         </div>
-        <% } %>
 
         <!-- Actions -->
         <div class="mt-6 pt-6 border-t">
@@ -105,43 +149,59 @@
       </div>
     </main>
 
-    <%- include('partials/footer') %> <%- include('partials/toastalerts') %>
+    <%- include('partials/footer') %> <%- include('partials/toastalerts') %> <%- include('partials/confirmation-modal') %>
 
     <script>
       async function approveKYC(kycId) {
-        if (!confirm("Are you sure you want to approve this KYC?")) return;
-        try {
-          const response = await fetch(`/admin/kyc/${kycId}/approve`, {
-            method: "POST",
-          });
-          const result = await response.json();
-          if (response.ok) {
-            showToast("success", result.message);
-            setTimeout(() => (window.location.href = "/admin/kyc"), 1500);
-          } else {
-            showToast("error", result.error || "Approval failed");
-          }
-        } catch (err) {
-          showToast("error", "Server error");
-        }
+        showConfirmation(
+          'Approve KYC',
+          'Are you sure you want to approve this KYC verification? The user will be verified.',
+          async () => {
+            try {
+              const response = await fetch(`/admin/kyc/${kycId}/approve`, {
+                method: "POST",
+              });
+              const result = await response.json();
+              if (response.ok) {
+                showSuccess('Success', result.message, () => {
+                  setTimeout(() => (window.location.href = "/admin/kyc"), 1000);
+                });
+              } else {
+                showError('Error', result.error || "Approval failed");
+              }
+            } catch (err) {
+              showError('Error', "Server error. Please try again.");
+            }
+          },
+          'Approve',
+          'Cancel'
+        );
       }
 
       async function declineKYC(kycId) {
-        if (!confirm("Are you sure you want to decline this KYC?")) return;
-        try {
-          const response = await fetch(`/admin/kyc/${kycId}/decline`, {
-            method: "POST",
-          });
-          const result = await response.json();
-          if (response.ok) {
-            showToast("success", result.message);
-            setTimeout(() => (window.location.href = "/admin/kyc"), 1500);
-          } else {
-            showToast("error", result.error || "Decline failed");
-          }
-        } catch (err) {
-          showToast("error", "Server error");
-        }
+        showConfirmation(
+          'Decline KYC',
+          'Are you sure you want to decline this KYC verification? This action cannot be undone.',
+          async () => {
+            try {
+              const response = await fetch(`/admin/kyc/${kycId}/decline`, {
+                method: "POST",
+              });
+              const result = await response.json();
+              if (response.ok) {
+                showSuccess('Success', result.message, () => {
+                  setTimeout(() => (window.location.href = "/admin/kyc"), 1000);
+                });
+              } else {
+                showError('Error', result.error || "Decline failed");
+              }
+            } catch (err) {
+              showError('Error', "Server error. Please try again.");
+            }
+          },
+          'Decline',
+          'Cancel'
+        );
       }
     </script>
   </body>

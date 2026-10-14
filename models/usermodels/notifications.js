@@ -13,6 +13,9 @@ const notificationSchema = new mongoose.Schema(
       enum: [
         "transfer_credit",
         "transfer_debit",
+        "deposit_request",
+        "deposit_approved",
+        "deposit_declined",
         "system_alert",
         "info",
         "warning",
@@ -21,9 +24,22 @@ const notificationSchema = new mongoose.Schema(
       default: "info",
       required: true,
     },
+    title: {
+      type: String,
+      default: "",
+    },
     message: {
       type: String,
       required: true,
+    },
+    statusType: {
+      type: String,
+      enum: ["successful", "completed", "on_hold", "reversed", "pending", null],
+      default: null,
+    },
+    popupDismissed: {
+      type: Boolean,
+      default: false,
     },
     read: {
       type: Boolean,

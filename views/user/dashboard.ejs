@@ -7,235 +7,613 @@
     <title>Capital Trust Bank - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
     <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
     <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
+    <meta name="theme-color" content="#4f46e5" />
 
-    <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta property="og:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-    <meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:site_name" content="Capital Trust Bank" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@CTBankOfficial" />
-    <meta name="twitter:creator" content="@CTBankOfficial" />
-    <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta name="twitter:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
+    <style>
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+        }
+
+        .premium-card {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 50%, #3730a3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        .card-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.08;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.15) 10px, rgba(255,255,255,0.15) 20px);
+        }
+
+        .action-btn {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(79, 70, 229, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.15);
+            border-color: #4f46e5;
+        }
+
+        .service-card {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            border-color: #4f46e5;
+        }
+
+        .service-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .transaction-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .transaction-item:hover {
+            background: rgba(79, 70, 229, 0.04);
+            border-left-color: #4f46e5;
+            transform: translateX(4px);
+        }
+
+        .bottom-nav {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #4f46e5;
+        }
+
+        .nav-item.active i {
+            transform: scale(1.15);
+        }
+
+        .copy-feedback {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            padding: 5px 10px;
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            color: #ffffff;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+
+        .copy-feedback.show {
+            opacity: 1;
+        }
+    </style>
 </head>
 
-<body class="bg-gradient-to-b relative from-blue-100 to-gray-100 min-h-screen pt-16 pb-24 px-6 space-y-4">
-
-    <div class="fixed top-0 left-0 right-0 bg-blue-100 flex justify-between items-center px-4 py-4 z-20 ">
-        <a href="profile" class="flex justify-start gap-2 items-center">
-            <span class="text-blue-50 bg-blue-600 rounded-full px-2 py-1"><i class="fa-solid fa-user"></i></span>
-            <h2 class="text-lg font-semibold text-gray-800">
-                <span id="greeting"></span>,
-                <span class="text-lg font-semibold">
-                    <%= user.Name.split(' ')[0] %>
-                </span>
-            </h2>
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+    <!-- Premium Header -->
+    <div class="fixed top-0 left-0 right-0 glass-effect flex justify-between items-center px-4 py-3 z-30 shadow-sm">
+        <a href="profile" class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-md">
+                <span class="text-white font-semibold text-xs"><%= (user && user.Name) ? user.Name.charAt(0).toUpperCase() : 'U' %></span>
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 font-medium" id="greeting">Good Morning</p>
+                <h2 class="text-sm font-bold text-gray-800">
+                    <%= (user && user.Name) ? user.Name.split(' ')[0] : 'User' %>
+                </h2>
+            </div>
         </a>
-        <a href="notifications"><i class="fa fa-bell text-blue-600 text-2xl"></i></a>
+        <a href="notifications" class="relative">
+            <div class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100">
+                <i class="fa fa-bell text-gray-700 text-sm"></i>
+            </div>
+            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+        </a>
     </div>
 
-    <div class="bg-black text-white rounded-xl p-6 relative shadow-lg h-[180px]">
-        <div class="absolute top-4 right-6 text-right">
-            <%- kyc.country %>
-        </div>
+    <div class="pt-16 px-4 space-y-4">
+        <% const txLock = (user && user.transactionLock) || {}; %>
+        <% const withdrawalsBlocked = !!txLock.isBlocked; %>
+        <% const accountTierKey = ((user && user.accountTier) || 'tier1').toLowerCase(); %>
+        <% const accountTierLabel = accountTierKey === 'tier3' ? 'Tier 3' : accountTierKey === 'tier2' ? 'Tier 2' : 'Tier 1'; %>
 
-        <div class="absolute top-4 left-6">
-            <p class="text-xs text-gray-400">Available Balance <button onclick="toggleBalance()"
-                    class="text-blue-400 ml-2 text-sm">
-                    <i id="balanceIcon" class="fa-solid fa-eye"></i>
-                </button></p>
-            <div class="flex items-center space-x-2 mt-1">
-                <p id="balanceAmount" class="text-2xl font-bold" 
-                    data-balance="<%= Number(user?.AccountBalance ?? 0) %>" 
-                    data-currency="<%= currencyCode %>">
-                    Loading...
-                </p>
+        <% 
+            let accountStatus = 'Active';
+            if (user && user.loginBlocked) {
+                accountStatus = 'Blocked';
+            } else if (withdrawalsBlocked) {
+                accountStatus = 'On Hold';
+            } else if (user && (user.status === 'inactive' || user.isActive === false)) {
+                accountStatus = 'Inactive';
+            } else if (user && user.status === 'blocked') {
+                accountStatus = 'Blocked';
+            } else if (user && user.status === 'on hold') {
+                accountStatus = 'On Hold';
+            } else if (user && user.status) {
+                accountStatus = user.status.charAt(0).toUpperCase() + user.status.slice(1);
+            }
+        %>
 
+        <!-- Premium Balance Card -->
+        <div class="premium-card rounded-3xl p-6 text-white relative shadow-2xl overflow-hidden">
+            <div class="card-pattern"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-start mb-5">
+                    <div class="">
+                        <div class="flex items-center gap-2 mb-1">
+                            <p class="text-indigo-100 text-xs font-medium">Available Balance</p>
+                            <span class="px-2 py-0.5 text-[10px] rounded-full bg-white/20 border border-white/25 font-semibold text-white">
+                                <%= accountTierLabel %>
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <p id="balanceAmount" class="text-2xl font-bold tracking-tight" 
+                                data-balance="<%= Number(user?.AccountBalance ?? 0) %>" 
+                                data-currency="<%= currencyCode %>"
+                                data-symbol="<%= typeof currencySymbol !== 'undefined' ? currencySymbol : '$' %>">
+                                <%= typeof formattedBalance !== 'undefined' ? formattedBalance : ((typeof currencySymbol !== 'undefined' ? currencySymbol : '$') + Number(user?.AccountBalance ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) %>
+                            </p>
+                            <button onclick="toggleBalance()" class="text-indigo-200 hover:text-white transition">
+                                <i id="balanceIcon" class="fa-solid fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Top Right Account Status -->
+                    <div class="text-right">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold backdrop-blur-md shadow-sm border <%= accountStatus === 'Active' ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400/30' : (accountStatus === 'On Hold' ? 'bg-amber-500/20 text-amber-200 border-amber-400/30' : (accountStatus === 'Inactive' ? 'bg-slate-500/25 text-slate-200 border-slate-400/30' : 'bg-red-500/20 text-red-200 border-red-400/30')) %>">
+                            <span class="w-1.5 h-1.5 rounded-full <%= accountStatus === 'Active' ? 'bg-emerald-400 animate-pulse' : (accountStatus === 'On Hold' ? 'bg-amber-400' : (accountStatus === 'Inactive' ? 'bg-slate-400' : 'bg-red-400')) %>"></span>
+                            <%= accountStatus %>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-end mt-6">
+                    <div>
+                        <p class="text-indigo-100 text-xs font-medium mb-1">Account Number</p>
+                        <div class="relative inline-block">
+                            <p id="copyAccountId" class="text-sm font-bold cursor-pointer hover:text-indigo-200 transition flex items-center gap-1.5">
+                                <i class="fas fa-copy text-xs"></i>
+                                <%= user ? user.AccountNumber : '' %>
+                            </p>
+                            <span id="copyFeedback" class="copy-feedback">Copied!</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-indigo-100 text-xs font-medium mb-1"><%= kyc?.accountCategory || 'Standard' %></p>
+                        <p class="text-white text-xs font-semibold"><%= kyc?.accountType || 'Savings' %></p>
+                        <% if (kyc?.country) { %>
+                        <p class="text-indigo-100 text-xs font-medium mt-0.5"><%- kyc.country %></p>
+                        <% } %>
+                    </div>
+                </div>
             </div>
             <script src="/js/currencydisplaycountry.js"></script>
         </div>
-        <div class="flex">
-            <div class="accountid bottom-4 absolute">
-                <p class="text-gray-400 text-xs">Account number:</p>
-                <style>
-                    .account-id-wrapper {
-                        position: relative;
-                        display: inline-block;
-                        margin-bottom: 5px;
-                    }
 
-                    .copy-feedback {
-                        position: absolute;
-                        top: 100%;
-                        left: 70%;
-                        transform: translateX(-50%);
-                        white-space: nowrap;
-                        padding: 4px 8px;
-                        background-color: #18aaf3;
-                        color: #ffffff;
-                        border-radius: 4px;
-                        font-size: 0.8em;
-                        opacity: 0;
-                        transition: opacity 0.3s ease-in-out;
-                        pointer-events: none;
-                        z-index: 10;
-                    }
+        <!-- Quick Actions -->
+        <div>
+            <h3 class="text-xs font-bold text-gray-700 mb-2 px-1">Quick Actions</h3>
+            <div class="grid grid-cols-3 gap-2">
+                <a href="deposit" class="action-btn rounded-xl p-2.5 flex flex-col items-center justify-center gap-1 relative z-10">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-600 to-violet-700 flex items-center justify-center shadow-md">
+                        <i class="fa-solid fa-wallet text-white text-xs"></i>
+                    </div>
+                    <span class="font-semibold text-gray-800 text-[11px]">Top Up</span>
+                </a>
 
-                    .copy-feedback.show {
-                        opacity: 1;
-                    }
-                </style>
-                <p id="copyAccountId"
-                    class="inline-flex items-center text-lg cursor-pointer hover:text-blue-600 transition">
-                    <i class="fas fa-copy text-blue-400 mr-2"></i>
-                    <%= user.AccountNumber%>
+                <a href="<%= withdrawalsBlocked ? '#' : 'transfer' %>"
+                   id="withdrawQuickAction"
+                   class="js-lock-action action-btn rounded-xl p-2.5 flex flex-col items-center justify-center gap-1 relative z-10 <%= withdrawalsBlocked ? 'border-red-200 bg-red-50/40' : '' %>"
+                   data-blocked="<%= withdrawalsBlocked ? 'true' : 'false' %>"
+                   data-lock-action="withdraw">
+                    <div class="w-9 h-9 rounded-lg <%= withdrawalsBlocked ? 'bg-gradient-to-br from-red-500 to-red-600' : 'bg-gradient-to-br from-rose-600 to-rose-700' %> flex items-center justify-center shadow-md">
+                        <i class="fa-solid <%= withdrawalsBlocked ? 'fa-lock' : 'fa-money-bill-wave' %> text-white text-xs"></i>
+                    </div>
+                    <span class="font-semibold <%= withdrawalsBlocked ? 'text-red-700' : 'text-gray-800' %> text-[11px]">Withdraw</span>
+                </a>
+
+                <a href="<%= withdrawalsBlocked ? '#' : 'transfer' %>"
+                   id="transferQuickAction"
+                   class="js-lock-action action-btn rounded-xl p-2.5 flex flex-col items-center justify-center gap-1 relative z-10 <%= withdrawalsBlocked ? 'border-red-200 bg-red-50/40' : '' %>"
+                   data-blocked="<%= withdrawalsBlocked ? 'true' : 'false' %>"
+                   data-lock-action="transfer">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-md">
+                        <i class="fa-solid fa-paper-plane text-white text-xs"></i>
+                    </div>
+                    <span class="font-semibold <%= withdrawalsBlocked ? 'text-red-700' : 'text-gray-800' %> text-[11px]">Transfer</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-sm font-bold text-gray-800">Recent Transactions</h3>
+                <a href="transactionhistory" class="text-indigo-600 hover:text-indigo-700 text-xs font-semibold">View All</a>
+            </div>
+
+            <div class="space-y-2">
+                <% if (recentTransactions && recentTransactions.length > 0) { %>
+                    <% recentTransactions.forEach(function(transaction) { 
+                        var desc = (transaction.description || '').toString();
+                        var isTransfer = /Transfer\s+(to|from)/i.test(desc);
+                        var cleaned = desc.replace(/\s*\([^)]*\)/g, '').trim();
+                        var displayDesc = isTransfer ? cleaned : desc;
+                    %>
+                    <div class="transaction-item rounded-lg p-2.5">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
+                                    <% if (transaction.type === 'credit') { %>
+                                        bg-emerald-100 text-emerald-600
+                                    <% } else { %>
+                                        bg-red-100 text-red-600
+                                    <% } %>">
+                                    <i class="fa-solid <% if (transaction.type === 'credit') { %>fa-arrow-down<% } else { %>fa-arrow-up<% } %> text-xs"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-semibold text-gray-800 text-xs truncate"><%= displayDesc %></p>
+                                    <p class="text-xs text-gray-500">
+                                        <%= new Date(transaction.createdAt || transaction.transactionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right flex-shrink-0 ml-2">
+                                <p class="font-bold text-xs
+                                    <% if (transaction.type === 'debit') { %>
+                                        text-red-600
+                                    <% } else if (transaction.type === 'credit') { %>
+                                        text-emerald-600
+                                    <% } else { %>
+                                        text-gray-800
+                                    <% } %>">
+                                    <% if (transaction.type === 'debit') { %>-<% } else if (transaction.type === 'credit') { %>+<% } %>
+                                    <%= new Intl.NumberFormat(undefined, { style: 'currency', currency: currencyCode || 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(transaction.amount) %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="text-center py-6">
+                        <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-2">
+                            <i class="fa-solid fa-receipt text-gray-400 text-base"></i>
+                        </div>
+                        <p class="text-gray-500 text-xs font-medium">No recent transactions</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Services Grid -->
+        <div>
+            <h3 class="text-xs font-bold text-gray-700 mb-2 px-1">Services</h3>
+            <div class="grid grid-cols-2 gap-2.5">
+                <a href="creditcard" class="service-card rounded-xl p-3 flex flex-col items-center gap-2">
+                    <div class="service-icon">
+                        <i class="fa-solid fa-credit-card text-white text-base"></i>
+                    </div>
+                    <span class="font-semibold text-gray-800 text-xs">Credit Card</span>
+                </a>
+
+                <a href="debitcard" class="service-card rounded-xl p-3 flex flex-col items-center gap-2">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);">
+                        <i class="fa-solid fa-credit-card-alt text-white text-base"></i>
+                    </div>
+                    <span class="font-semibold text-gray-800 text-xs">Debit Card</span>
+                </a>
+
+                <a href="finance" class="service-card rounded-xl p-3 flex flex-col items-center gap-2">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);">
+                        <i class="fa-solid fa-hand-holding-dollar text-white text-base"></i>
+                    </div>
+                    <span class="font-semibold text-gray-800 text-xs">Loans</span>
+                </a>
+
+                <a href="finance" class="service-card rounded-xl p-3 flex flex-col items-center gap-2">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);">
+                        <i class="fa-solid fa-piggy-bank text-white text-base"></i>
+                    </div>
+                    <span class="font-semibold text-gray-800 text-xs">Savings</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <% if (withdrawalsBlocked) { %>
+    <div id="accountLockModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 p-4 items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div class="p-6 text-center">
+                <div class="w-14 h-14 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-3">
+                    <i class="fa-solid fa-lock text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2"><%= txLock.reasonTitle || 'Withdrawal Restriction Active' %></h3>
+                <p class="text-sm text-gray-600 mb-3"><%= txLock.reasonMessage || 'Withdrawals are temporarily restricted on your account.' %></p>
+                <p class="text-sm text-gray-700 mb-5">
+                    To unlock withdrawals, deposit at least
+                    <strong><%= new Intl.NumberFormat(undefined, { style: 'currency', currency: currencyCode || 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(txLock.unlockDepositAmount || 0)) %></strong>.
+                    This deposit remains your money and stays available in your account.
                 </p>
-                <span id="copyFeedback" class="copy-feedback">Copied!</span>
-            </div>
-            <div class="absolute bottom-4 right-6 text-sm text-gray-300 text-right">
-                <p class="text-sm font-semibold"><%= kyc.accountCategory %></p>
-                <p class="text-xs text-gray-300"><%= kyc.accountType %></p>
+                <div class="grid grid-cols-2 gap-2">
+                    <a href="deposit" class="px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition text-sm">
+                        Top Up Now
+                    </a>
+                    <button id="closeLockModal" class="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition text-sm">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+    <% } %>
 
-    <div class="grid grid-cols-2 gap-4">
-        <a href="internationaltransfer"
-            class="bg-white rounded-xl px-auto py-3 flex justify-start pl-2 items-center shadow hover:shadow-md hover:bg-blue-50 transition">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-globe text-blue-600 text-lg"></i>
-                <h3 class="font-semibold text-gray-800 text-xs md:text-md">International Transfer</h3>
+    <!-- KYC Verification Prompt Modal -->
+    <% if (!kyc || !kyc.verified) { %>
+    <div id="kycNoticeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center border border-gray-100 transform transition-all">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-100 to-indigo-200 text-indigo-600 flex items-center justify-center mx-auto mb-4 shadow-inner">
+                <i class="fa-solid fa-id-card text-2xl"></i>
             </div>
-        </a>
-
-        <a href="localtransfer"
-            class="bg-white rounded-xl flex justify-start pl-2 items-center px-auto shadow hover:shadow-md hover:bg-blue-50 transition">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-location-dot text-blue-600 text-lg"></i>
-                <h3 class="font-semibold text-gray-800 text-xs md:text-md">Local Transfer</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Verify Your Account</h3>
+            <p class="text-sm text-gray-600 mb-6 leading-relaxed">
+                Welcome to Capital Trust Bank! To ensure full access to all banking services, please complete your identity verification. You can access the KYC link anytime in <strong class="text-indigo-600">Settings</strong>.
+            </p>
+            <div class="space-y-2">
+                <a href="settings" class="block w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl font-semibold shadow-lg shadow-indigo-200 hover:from-indigo-700 hover:to-indigo-800 transition text-sm text-center">
+                    Go to Settings & Verify KYC
+                </a>
+                <button id="closeKycNoticeModal" class="block w-full py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition text-xs">
+                    Remind Me Later
+                </button>
             </div>
-        </a>
+        </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const kycNoticeModal = document.getElementById("kycNoticeModal");
+            const closeKycNoticeModal = document.getElementById("closeKycNoticeModal");
+            const urlParams = new URLSearchParams(window.location.search);
+            const isNewAccount = urlParams.get("newAccount") === "true";
 
-    <div class="bg-white rounded-xl shadow p-3 h-[180px]">
-  <div class="flex justify-between items-center mb-4">
-    <h3 class="text-sm font-semibold text-gray-800">Recent Transactions</h3>
-    <div class="text-sm">
-      <a href="transactionhistory" class="text-blue-400 hover:underline text-xs">View Transaction History</a>
+            if (isNewAccount || !sessionStorage.getItem("kycModalDismissed")) {
+                setTimeout(() => {
+                    kycNoticeModal?.classList.remove("hidden");
+                    kycNoticeModal?.classList.add("flex");
+                }, 400);
+            }
+
+            closeKycNoticeModal?.addEventListener("click", () => {
+                kycNoticeModal?.classList.add("hidden");
+                kycNoticeModal?.classList.remove("flex");
+                sessionStorage.setItem("kycModalDismissed", "true");
+            });
+
+            kycNoticeModal?.addEventListener("click", (e) => {
+                if (e.target === kycNoticeModal) {
+                    kycNoticeModal?.classList.add("hidden");
+                    kycNoticeModal?.classList.remove("flex");
+                    sessionStorage.setItem("kycModalDismissed", "true");
+                }
+            });
+        });
+    </script>
+    <% } %>
+
+    <% if (typeof statusPopup !== 'undefined' && statusPopup) { %>
+    <!-- Transfer Status Notification Modal -->
+    <div id="statusPopupModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-auto text-center border border-gray-100">
+            <% if (statusPopup.statusType === 'successful' || statusPopup.statusType === 'completed') { %>
+                <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i class="fa-solid fa-circle-check text-emerald-600 text-3xl"></i>
+                </div>
+                <span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full mb-2">Transfer Successful</span>
+                <h3 class="text-base font-bold text-gray-900 mb-1"><%= statusPopup.title || 'Transfer Completed' %></h3>
+            <% } else if (statusPopup.statusType === 'on_hold') { %>
+                <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i class="fa-solid fa-circle-pause text-amber-600 text-3xl"></i>
+                </div>
+                <span class="inline-block px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full mb-2">Transfer On Hold</span>
+                <h3 class="text-base font-bold text-gray-900 mb-1"><%= statusPopup.title || 'Transfer On Hold' %></h3>
+            <% } else if (statusPopup.statusType === 'reversed') { %>
+                <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i class="fa-solid fa-arrow-rotate-left text-indigo-600 text-3xl"></i>
+                </div>
+                <span class="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-full mb-2">Transfer Reversed & Refunded</span>
+                <h3 class="text-base font-bold text-gray-900 mb-1"><%= statusPopup.title || 'Transfer Reversed' %></h3>
+            <% } else { %>
+                <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i class="fa-solid fa-bell text-blue-600 text-3xl"></i>
+                </div>
+                <span class="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full mb-2">Transfer Update</span>
+                <h3 class="text-base font-bold text-gray-900 mb-1"><%= statusPopup.title || 'Transfer Update' %></h3>
+            <% } %>
+
+            <p class="text-xs text-gray-600 my-3 leading-relaxed">
+                <%= statusPopup.message %>
+            </p>
+
+            <button id="dismissStatusPopupBtn" class="w-full mt-2 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold rounded-xl text-xs hover:from-indigo-700 hover:to-indigo-800 transition shadow-md">
+                Acknowledge
+            </button>
+        </div>
     </div>
-  </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const statusModal = document.getElementById("statusPopupModal");
+            const dismissBtn = document.getElementById("dismissStatusPopupBtn");
 
-  <ul class="space-y-3 text-xs">
-    <% if (recentTransactions && recentTransactions.length > 0) { %>
-      <% recentTransactions.forEach(function(transaction) { 
-           // original description
-           var desc = (transaction.description || '').toString();
+            async function dismissStatusModal() {
+                try {
+                    await fetch("/user/secure/ctb/dismiss-status-popup/<%= statusPopup._id %>", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include"
+                    });
+                } catch (err) {
+                    console.error("Error dismissing popup:", err);
+                } finally {
+                    statusModal?.classList.add("hidden");
+                }
+            }
 
-           // detect transfers like "Transfer to" or "Transfer from"
-           var isTransfer = /Transfer\s+(to|from)/i.test(desc);
+            dismissBtn?.addEventListener("click", dismissStatusModal);
+        });
+    </script>
+    <% } %>
 
-           // remove any parentheses and their contents
-           var cleaned = desc.replace(/\s*\([^)]*\)/g, '').trim();
-
-           // show cleaned only for transfers; otherwise show original
-           var displayDesc = isTransfer ? cleaned : desc;
-      %>
-        <li class="flex justify-between border-b pb-2">
-          <span><%= displayDesc %></span>
-
-          <span class="font-semibold
-                       <% if (transaction.type === 'debit') { %>
-                        text-red-600
-                        <% } else if (transaction.type==='credit' ) { %>
-                            text-green-600
-                            <% } else { %>
-                                text-gray-800
-                                <% } %>">
-                                    <% if (transaction.type==='debit' ) { %>-<% } %>
-                                            <%= new Intl.NumberFormat(undefined, { style: 'currency' , currency:
-                                                currencyCode || 'USD' , minimumFractionDigits: 2, maximumFractionDigits:
-                                                2 }).format(transaction.amount) %>
-                </span>
-                </li>
-                <% }); %>
-                    <% } else { %>
-                        <li class="text-gray-500 text-center">No recent transactions.</li>
-                        <% } %>
-                            </ul>
-    </div>
-
-
-    <div class="grid grid-cols-2 gap-4">
-        <a href="creditcard" class="bg-white rounded-xl p-6 shadow hover:shadow-md hover:bg-blue-50 transition">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-credit-card text-blue-600 text-lg"></i>
-                <h3 class="font-semibold text-gray-800">Credit Card</h3>
-            </div>
-        </a>
-
-        <a href="debitcard" class="bg-white rounded-xl p-6 shadow hover:shadow-md hover:bg-blue-50 transition">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-credit-card-alt text-blue-600 text-lg"></i>
-                <h3 class="font-semibold text-gray-800">Debit Card</h3>
-            </div>
-        </a>
-
-        <a href="finance" class="bg-white rounded-xl p-6 shadow hover:shadow-md hover:bg-blue-50 transition">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-hand-holding-dollar text-blue-600 text-lg"></i>
-                <h3 class="font-semibold text-gray-800"> Loans </h3>
-            </div>
-        </a>
-
-        <a href="finance" class="bg-white rounded-xl p-6 shadow hover:shadow-md hover:bg-blue-50 transition">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-piggy-bank text-blue-600 text-lg"></i>
-                <h3 class="font-semibold text-gray-800">Savings</h3>
-            </div>
-        </a>
-    </div>
-
-    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
-
-            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-house text-3xl"></i>
-                <!-- <span class="mt-1">Home</span> -->
+    <!-- Premium Bottom Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 bottom-nav z-50">
+        <div class="flex justify-around items-center px-4 py-2.5">
+            <a href="dashboard" class="nav-item active flex flex-col items-center gap-0.5">
+                <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
+                    <i class="fa-solid fa-house text-indigo-600 text-sm"></i>
+                </div>
+                <span class="text-xs font-medium text-indigo-600">Home</span>
             </a>
 
-            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-chart-line text-lg"></i>
-                <span class="mt-1">Finance</span>
+            <a href="finance" class="nav-item flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
             </a>
 
-            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-credit-card text-lg"></i>
-                <span class="mt-1">Cards</span>
+            <a href="cards" class="nav-item flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
             </a>
 
-            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="mt-1">Me</span>
+            <a href="profile" class="nav-item flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
             </a>
         </div>
     </div>
+
     <script src="/js/frontendfiles/balancetoggle.js"></script>
     <script src="/js/frontendfiles/customgreeting.js"></script>
     <script src="/js/frontendfiles/copyaccountid.js"></script>
+    <% if (withdrawalsBlocked) { %>
+    <script>
+        const lockModal = document.getElementById("accountLockModal");
+        const closeLockModal = document.getElementById("closeLockModal");
+        const lockActions = document.querySelectorAll(".js-lock-action");
+
+        function openLockModal(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            lockModal.classList.remove("hidden");
+            lockModal.classList.add("flex");
+        }
+
+        function hideLockModal() {
+            lockModal.classList.add("hidden");
+            lockModal.classList.remove("flex");
+        }
+
+        setTimeout(openLockModal, 300);
+        closeLockModal?.addEventListener("click", hideLockModal);
+        lockModal?.addEventListener("click", (event) => {
+            if (event.target === lockModal) {
+                hideLockModal();
+            }
+        });
+
+        lockActions.forEach((action) => {
+            action.addEventListener("click", openLockModal);
+        });
+    </script>
+    <% } %>
+    <%- include('partials/floatingchat') %>
 </body>
 
 </html>

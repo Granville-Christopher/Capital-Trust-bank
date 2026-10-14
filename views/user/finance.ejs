@@ -1,280 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Capital Trust Bank - Finance</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
   <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
   <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#2563EB" />
+  <meta name="theme-color" content="#4f46e5" />
 
-  <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
-  <meta property="og:description"
-    content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-  <meta property="og:image" content="https://placehold.co/512x512/2563EB/DBEAFE?text=CTBank" />
-  <meta property="og:image:width" content="512" />
-  <meta property="og:image:height" content="512" />
-  <meta property="og:site_name" content="Capital Trust Bank" />
-  <meta property="og:locale" content="en_US" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@CTBankOfficial" />
-  <meta name="twitter:creator" content="@CTBankOfficial" />
-  <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
-  <meta name="twitter:description"
-    content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-  <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
+  <style>
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
 
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+    }
 
+    .finance-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .finance-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .tab-button {
+      transition: all 0.3s ease;
+    }
+
+    .tab-button.active {
+      color: #4f46e5;
+      border-bottom-color: #4f46e5;
+    }
+
+    .bottom-nav {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .nav-item.active {
+      color: #4f46e5;
+    }
+  </style>
 </head>
 
-<body class="bg-gradient-to-b relative from-blue-100 to-gray-100 min-h-screen pt-16 pb-24 px-6 space-y-8">
-  <div class="text-left fixed top-0 left-0 right-0 w-full bg-blue-100 px-2 py-4">
-    <p class="text-sm text-gray-600">Total Balance</p>
-    <p id="balanceAmount" class=" text-lg font-bold text-blue-600"
-      data-balance="<%= Number(user?.AccountBalance ?? 0) %>" data-currency="<%= currencyCode %>">
-      Loading...
-    </p>
-    <script src="/js/currencydisplaycountry.js"></script>
-  </div>
-
-  <div class="creditScore-container" style="max-width: 350px; margin: auto; text-align: center; margin-top: -70px; ">
-    <canvas id="creditScoreGauge" width="300" height=""></canvas>
-
-    <h3 class="text-xl font-bold " style="margin-top: -100px">
-      Credit Score: <span id="creditscore-value"></span>
-    </h3>
-
-    <div id="creditScoreLegend" class="text-center items-center text-sm"></div>
-  </div>
-
-
-  <div class="flex justify-between max-w-md mx-auto mb-6">
-    <button id="savingsBtn"
-      class="flex items-center space-x-2 text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">
-      <i class="fa-solid fa-piggy-bank text-xl"></i>
-      <span>Savings</span>
-    </button>
-    <button id="loansBtn"
-      class="flex items-center space-x-2 text-gray-500 font-semibold border-b-2 border-transparent pb-1 hover:text-blue-600">
-      <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
-      <span>Loans</span>
-    </button>
-  </div>
-
-  <section id="savingsSection" class="max-w-md mx-auto">
-    <div class="bg-white rounded-xl shadow p-6 mb-4 relative" id="savingsCard">
-      <div class="topsection flex justify-between items-center">
-        <p class="text-lg font-semibold mb-2">Savings Balance</p>
-        <p class="text-lg font-semibold mb-2 text-blue-400"><a href="financehistory">savings history</a></p>
-      </div>
-      <p class="text-3xl font-bold text-blue-600 mb-4" id="savingsBalance" data-currency="<%= currencyCode %>">
-        no savings yet
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+  <div class="fixed top-0 left-0 right-0 glass-effect flex items-center justify-between px-4 py-3 z-30 shadow-sm">
+    <div class="flex items-center gap-2">
+      <button onclick="history.back()" class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100">
+        <i class="fa-solid fa-arrow-left text-gray-700 text-sm"></i>
+      </button>
+      <h2 class="text-sm font-bold text-gray-800">Finance</h2>
+    </div>
+    <div class="text-right">
+      <p class="text-xs text-gray-500 font-medium">Total Balance</p>
+      <p id="balanceAmount" class="text-sm font-bold text-indigo-600" data-balance="<%= Number(user?.AccountBalance ?? 0) %>" data-currency="<%= currencyCode %>">
+        $<%= Number(user?.AccountBalance ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
       </p>
+      <script src="/js/currencydisplaycountry.js"></script>
+    </div>
+  </div>
 
-      <div class="flex justify-between text-sm text-gray-600 mb-4">
-        <span id="todayInterest"></span>
-        <span id="totalInterest"></span>
-      </div>
-
-
-      <div class="flex gap-4 mt-4">
-        <button id="withdrawInterestBtn"
-          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-medium w-1/2">
-          Withdraw Interest
-        </button>
-
-        <button id="compoundInterestBtn"
-          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-medium w-1/2">
-          Compound Interest
-        </button>
-      </div>
-      <div class="flex gap-4 mt-4">
-        <a href="savings"
-          class=" text-center bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-xl font-medium w-full">
-          <button id="compoundInterestBtn" class="">
-            View all savings
-          </button>
-        </a>
-      </div>
+  <div class="pt-16 px-4 space-y-4">
+    <!-- Credit Score -->
+    <div class="creditScore-container bg-white rounded-xl shadow-sm border border-gray-100 p-4 text-center">
+      <canvas id="creditScoreGauge" width="300" height=""></canvas>
+      <h3 class="text-base font-bold text-gray-800 mt-3">
+        Credit Score: <span id="creditscore-value" class="text-indigo-600"></span>
+      </h3>
+      <div id="creditScoreLegend" class="text-center items-center text-xs text-gray-500 mt-1.5"></div>
     </div>
 
-    <button id="openSavingsFormBtn"
-      class="SavingsScrollToBottom w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition mb-4">
-      Add to Savings
-    </button>
-    <form id="savingsForm" class="bg-white rounded-xl shadow p-6 max-w-md mx-auto hidden">
-      <label for="saveAmount" class="block text-sm font-semibold mb-2">Choose amount to save</label>
-      <input type="number" id="saveAmount" name="saveAmount" placeholder="Enter amount"
-        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4" />
-      <label for="savingsTerm" class="block text-sm font-semibold mb-2">Select Savings Term</label>
-      <select id="savingsTerm" name="savingsTerm"
-        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4">
-        <option value="7">7 days</option>
-        <option value="14">14 days</option>
-        <option value="30">1 month</option>
-        <option value="90">3 months</option>
-        <option value="120">4 months</option>
-        <option value="150">5 months</option>
-        <option value="180">6 months</option>
-        <option value="210">7 months</option>
-        <option value="240">8 months</option>
-        <option value="270">9 months</option>
-        <option value="300">10 months</option>
-        <option value="330">11 months</option>
-        <option value="365">12 months</option>
-      </select>
-      <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-        Save
+    <!-- Tabs -->
+    <div class="flex justify-between max-w-md mx-auto bg-white rounded-xl p-1.5 shadow-sm border border-gray-100">
+      <button id="savingsBtn" class="tab-button active flex items-center justify-center space-x-1.5 text-indigo-600 font-semibold border-b-2 border-indigo-600 pb-1.5 flex-1 text-sm">
+        <i class="fa-solid fa-piggy-bank text-sm"></i>
+        <span>Savings</span>
       </button>
-    </form>
-  </section>
+      <button id="loansBtn" class="tab-button flex items-center justify-center space-x-1.5 text-gray-500 font-semibold border-b-2 border-transparent pb-1.5 flex-1 hover:text-indigo-600 text-sm">
+        <i class="fa-solid fa-hand-holding-dollar text-sm"></i>
+        <span>Loans</span>
+      </button>
+    </div>
 
-  <section id="loansSection" class="max-w-md mx-auto hidden">
-    <div class="bg-white rounded-xl shadow p-4 mb-4 relative">
-      <div class="qlcredit bg-gray-100 rounded p-2">
-        <div class="flex justify-between items-center">
-          <p class="text-lg font-semibold mb-2">Qualified loan credit</p>
-          <p class="text-lg font-semibold mb-2 text-blue-400"><a href="financehistory">loan history</a></p>
+    <!-- Savings Section -->
+    <section id="savingsSection" class="max-w-md mx-auto space-y-4">
+      <div class="finance-card rounded-2xl p-6">
+        <div class="flex justify-between items-center mb-4">
+          <p class="text-base font-bold text-gray-800">Savings Balance</p>
+          <a href="financehistory" class="text-indigo-600 hover:text-indigo-700 text-sm font-semibold">View History</a>
         </div>
-        <p class="text-3xl mb-2 font-bold text-green-600" id="qualifiedCredit" data-currency="<%= currencyCode %>">$0
+        <p class="text-3xl font-bold text-indigo-600 mb-4" id="savingsBalance" data-currency="<%= currencyCode %>">
+          no savings yet
         </p>
-      </div>
-
-      <div class="p-2">
-        <p class="text-lg font-semibold mb-2">Outstanding Loan</p>
-        <p class="text-3xl font-bold text-red-600 mb-2" id="outstandingLoan" data-currency="<%= currencyCode %>">$0</p>
-      </div>
-
-      <div class="p-2">
-        <p class="text-lg font-semibold mb-2">Available Credit</p>
-        <p class="text-3xl font-bold text-blue-600 mb-2" id="availableCredit" data-currency="<%= currencyCode %>">$0</p>
-      </div>
-
-      <div class="flex justify-between text-sm text-gray-600">
-        <span></span>
-        <span id="ddate" class="text-red-600"></span>
-      </div>
-
-      <div class="loanBtns flex justify-between items-center gap-2 mt-3">
-        <button id="openLoanFormBtn"
-          class="LoanScrollToBottom w-full py-2 bg-blue-600 text-gray-100 rounded-full hover:bg-blue-700 transition">
-          Request for Loan
-        </button>
-        <a href="loans" class="w-full bg-blue-600 hover:bg-blue-700 flex py-2 rounded-full">
-          <button class="text-gray-100 text-center mx-auto text-base ">
-            View loans
+        <div class="flex justify-between text-sm text-gray-600 mb-5">
+          <span id="todayInterest"></span>
+          <span id="totalInterest"></span>
+        </div>
+        <div class="flex gap-3">
+          <button id="withdrawInterestBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-xl font-semibold flex-1 transition shadow-md">
+            Withdraw Interest
           </button>
+          <button id="compoundInterestBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-xl font-semibold flex-1 transition shadow-md">
+            Compound Interest
+          </button>
+        </div>
+        <a href="savings" class="block mt-3 text-center bg-amber-500 hover:bg-amber-600 text-white px-4 py-3 rounded-xl font-semibold transition shadow-md">
+          View All Savings
         </a>
       </div>
-    </div>
 
-    <form id="loanForm" class="bg-white rounded-xl shadow p-6 max-w-md mx-auto hidden">
-      <label for="loanAmount" class="block text-sm font-semibold mb-2">Loan Amount</label>
-      <input type="number" id="loanAmount" name="loanAmount" placeholder="Enter loan amount"
-        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4" />
-
-      <label for="loanReason" class="block text-sm font-semibold mb-2">Reason for Loan</label>
-      <select id="loanReason" name="loanReason"
-        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4">
-        <option value="" disabled selected>Select a reason</option>
-        <option value="medical">Medical Bills</option>
-        <option value="rent">Rent</option>
-        <option value="education">Education</option>
-        <option value="business">Business</option>
-        <option value="other">Other</option>
-      </select>
-
-      <label for="loanTerm" class="block text-sm font-semibold mb-2">Loan Term</label>
-      <select id="loanTerm" name="loanTerm"
-        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4">
-        <option value="7">7 days</option>
-        <option value="14">14 days</option>
-        <option value="30">1 month</option>
-        <option value="90">3 months</option>
-        <option value="180">6 months</option>
-        <option value="365">12 months</option>
-      </select>
-
-      <label for="guarantor" class="block text-sm font-semibold mb-2">Guarantor Name </label>
-      <input type="text" id="guarantor" name="guarantor" placeholder="Enter guarantor name"
-        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4" />
-
-      <label for="guarantorContact" class="block text-sm font-semibold mb-2">Guarantor Contact (Phone or Email)</label>
-      <input type="text" id="guarantorContact" name="guarantorContact"
-        placeholder="Enter guarantor phone number (inc . country code) or email"
-        class="w-full px-4 py-2 border border-blue-500 rounded-full outline-none focus:ring-2 focus:ring-blue-400 mb-4" />
-
-      <div class="flex items-center mb-4">
-        <input type="checkbox" id="loanAgreement" name="loanAgreement" class="mr-2">
-        <label for="loanAgreement" class="text-sm text-blue-500">I agree to the loan <a href="loantc">terms and
-            conditions</a>.</label>
-      </div>
-
-      <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-        Submit Loan Request
+      <button id="openSavingsFormBtn" class="SavingsScrollToBottom w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-lg">
+        <i class="fa-solid fa-plus mr-2"></i>Add to Savings
       </button>
-    </form>
 
-  </section>
+      <form id="savingsForm" class="finance-card rounded-2xl p-6 hidden">
+        <label for="saveAmount" class="block text-sm font-semibold text-gray-700 mb-2">Choose amount to save</label>
+        <input type="number" id="saveAmount" name="saveAmount" placeholder="Enter amount"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition mb-4" />
+        <label for="savingsTerm" class="block text-sm font-semibold text-gray-700 mb-2">Select Savings Term</label>
+        <select id="savingsTerm" name="savingsTerm"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition mb-5">
+          <option value="7">7 days</option>
+          <option value="14">14 days</option>
+          <option value="30">1 month</option>
+          <option value="90">3 months</option>
+          <option value="120">4 months</option>
+          <option value="150">5 months</option>
+          <option value="180">6 months</option>
+          <option value="210">7 months</option>
+          <option value="240">8 months</option>
+          <option value="270">9 months</option>
+          <option value="300">10 months</option>
+          <option value="330">11 months</option>
+          <option value="365">12 months</option>
+        </select>
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-lg">
+          Save
+        </button>
+      </form>
+    </section>
 
-  <div id="loanProcessingModal"
-    class="fixed inset-0 bg-black top-0 bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative">
-      <div id="loanSpinner" class="mb-4">
-        <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
-        <h3 class="text-lg font-semibold text-gray-800">Loan processing...</h3>
-        <p class="text-sm text-gray-500">Please wait...</p>
+    <!-- Loans Section -->
+    <section id="loansSection" class="max-w-md mx-auto space-y-4 hidden">
+      <div class="finance-card rounded-2xl p-6">
+        <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-5 text-white mb-4 shadow-lg">
+          <div class="flex justify-between items-center mb-2">
+            <p class="text-base font-semibold">Qualified Loan Credit</p>
+            <a href="financehistory" class="text-emerald-100 hover:text-white text-sm font-semibold">Loan History</a>
+          </div>
+          <p class="text-3xl font-bold" id="qualifiedCredit" data-currency="<%= currencyCode %>">$0</p>
+        </div>
+
+        <div class="space-y-4 mb-5">
+          <div>
+            <p class="text-sm font-semibold text-gray-600 mb-1">Outstanding Loan</p>
+            <p class="text-2xl font-bold text-red-600" id="outstandingLoan" data-currency="<%= currencyCode %>">$0</p>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-600 mb-1">Available Credit</p>
+            <p class="text-2xl font-bold text-indigo-600" id="availableCredit" data-currency="<%= currencyCode %>">$0</p>
+          </div>
+          <div class="text-right">
+            <span id="ddate" class="text-xs text-red-600 font-medium"></span>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button id="openLoanFormBtn" class="LoanScrollToBottom flex-1 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-lg">
+            Request Loan
+          </button>
+          <a href="loans" class="flex-1 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-center font-semibold transition shadow-lg flex items-center justify-center">
+            View Loans
+          </a>
+        </div>
       </div>
-      <div id="loanSuccess" class="mb-4 hidden">
-        <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
-        <h3 class="mt-2 text-xl font-semibold text-gray-800">Loan Request Successful</h3>
-        <p class="text-sm text-gray-500">Your loan request has been approved.</p>
+
+      <form id="loanForm" class="finance-card rounded-2xl p-6 hidden">
+        <label for="loanAmount" class="block text-sm font-semibold text-gray-700 mb-2">Loan Amount</label>
+        <input type="number" id="loanAmount" name="loanAmount" placeholder="Enter loan amount"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition mb-4" />
+
+        <label for="loanReason" class="block text-sm font-semibold text-gray-700 mb-2">Reason for Loan</label>
+        <select id="loanReason" name="loanReason"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition mb-4">
+          <option value="" disabled selected>Select a reason</option>
+          <option value="medical">Medical Bills</option>
+          <option value="rent">Rent</option>
+          <option value="education">Education</option>
+          <option value="business">Business</option>
+          <option value="other">Other</option>
+        </select>
+
+        <label for="loanTerm" class="block text-sm font-semibold text-gray-700 mb-2">Loan Term</label>
+        <select id="loanTerm" name="loanTerm"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition mb-4">
+          <option value="7">7 days</option>
+          <option value="14">14 days</option>
+          <option value="30">1 month</option>
+          <option value="90">3 months</option>
+          <option value="180">6 months</option>
+          <option value="365">12 months</option>
+        </select>
+
+        <label for="guarantor" class="block text-sm font-semibold text-gray-700 mb-2">Guarantor Name</label>
+        <input type="text" id="guarantor" name="guarantor" placeholder="Enter guarantor name"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition mb-4" />
+
+        <label for="guarantorContact" class="block text-sm font-semibold text-gray-700 mb-2">Guarantor Contact</label>
+        <input type="text" id="guarantorContact" name="guarantorContact" placeholder="Phone or Email"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition mb-4" />
+
+        <div class="flex items-center mb-5">
+          <input type="checkbox" id="loanAgreement" name="loanAgreement" class="mr-2 w-4 h-4 text-teal-600 rounded focus:ring-teal-500">
+          <label for="loanAgreement" class="text-sm text-gray-700">I agree to the loan <a href="loantc" class="text-teal-600 hover:text-teal-700 font-semibold">terms and conditions</a>.</label>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-lg">
+          Submit Loan Request
+        </button>
+      </form>
+    </section>
+
+    <!-- Loan Processing Modal -->
+    <div id="loanProcessingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+      <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative">
+        <button id="closeLoanModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+        <div id="loanSpinner" class="mb-4">
+          <i class="fa-solid fa-spinner fa-spin text-teal-600 text-5xl mb-4"></i>
+          <h3 class="text-lg font-bold text-gray-800">Loan processing...</h3>
+          <p class="text-sm text-gray-500 mt-2">Please wait...</p>
+        </div>
+        <div id="loanSuccess" class="mb-4 hidden">
+          <i class="fa-solid fa-circle-check text-emerald-500 text-5xl mb-4"></i>
+          <h3 class="text-xl font-bold text-gray-800">Loan Request Successful</h3>
+          <p class="text-sm text-gray-500 mt-2">Your loan request has been approved.</p>
+        </div>
+        <div id="loanFailure" class="mb-4 hidden">
+          <i class="fa-solid fa-circle-xmark text-red-500 text-5xl mb-4"></i>
+          <h3 class="text-xl font-bold text-gray-800">Loan Request Failed</h3>
+          <p class="text-sm text-gray-500 mt-2">Something went wrong. Please try again.</p>
+        </div>
+        <button id="closeLoanModalBtn2" class="mt-6 w-full py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition font-semibold shadow-lg">
+          Close
+        </button>
       </div>
-      <div id="loanFailure" class="mb-4 hidden">
-        <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
-        <h3 class="mt-2 text-xl font-semibold text-gray-800">Loan Request Failed</h3>
-        <p class="text-sm text-gray-500">Something went wrong. Please try again.</p>
-      </div>
-      <button id="closeLoanModalBtn"
-        class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-        Close
-      </button>
     </div>
   </div>
-  <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-    <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
 
-      <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-        <i class="fa-solid fa-house text-lg"></i>
-        <span class="mt-1">Home</span>
+  <div class="fixed bottom-0 left-0 right-0 bottom-nav z-50">
+    <div class="flex justify-around items-center px-6 py-3">
+      <a href="dashboard" class="flex flex-col items-center gap-1 text-gray-600">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-house text-lg"></i>
+        </div>
+        <span class="text-xs font-medium">Home</span>
       </a>
-
-      <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-        <i class="fa-solid fa-chart-line text-3xl"></i>
-        <!-- <span class="mt-1">Finance</span> -->
+      <a href="finance" class="nav-item active flex flex-col items-center gap-1">
+        <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
+          <i class="fa-solid fa-chart-line text-teal-600"></i>
+        </div>
+        <span class="text-xs font-medium text-teal-600">Finance</span>
       </a>
-
-      <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-        <i class="fa-solid fa-credit-card text-lg"></i>
-        <span class="mt-1">Cards</span>
+      <a href="cards" class="flex flex-col items-center gap-1 text-gray-600">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-credit-card text-lg"></i>
+        </div>
+        <span class="text-xs font-medium">Cards</span>
       </a>
-
-      <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-        <i class="fa-solid fa-user text-lg"></i>
-        <span class="mt-1">Me</span>
+      <a href="profile" class="flex flex-col items-center gap-1 text-gray-600">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-user text-lg"></i>
+        </div>
+        <span class="text-xs font-medium">Profile</span>
       </a>
-
     </div>
   </div>
+
   <script>
     let savingsscroll = document.getElementsByClassName("SavingsScrollToBottom")[0];
     if (savingsscroll) {
@@ -299,14 +322,13 @@
         }, 50);
       });
     }
-
   </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script> -->
   <script src="/js/frontendfiles/creditscore.js"></script>
   <script src="/js/frontendfiles/finance.js"></script>
   <script src="/js/auth/financesavings.js"></script>
   <script src="/js/auth/loans.js"></script>
+    <%- include('partials/floatingchat') %>
 </body>
 
 </html>

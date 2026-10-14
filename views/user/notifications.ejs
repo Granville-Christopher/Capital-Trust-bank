@@ -4,102 +4,193 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Capital Trust Bank - Notifications</title>
+    <title>Notifications</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
-    <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
-    <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
-    <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
+    <meta name="theme-color" content="#4f46e5" />
+
+    <style>
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+        }
+
+        .notification-card {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            border-color: #4f46e5;
+        }
+
+        .notification-card.unread {
+            border-left: 4px solid #4f46e5;
+            background: rgba(79, 70, 229, 0.02);
+        }
+
+        .bottom-nav {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
 </head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen py-6 px-2 space-y-6 relative">
-
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 flex items-center">
-            <i class="fa-solid fa-bell text-blue-600 mr-2"></i>
-            Notifications
-        </h2>
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+    <div class="fixed top-0 left-0 right-0 glass-effect flex items-center px-4 py-3 z-30 shadow-sm">
+        <button onclick="history.back()" class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100 mr-2">
+            <i class="fa-solid fa-arrow-left text-gray-700 text-sm"></i>
+        </button>
+        <h2 class="text-sm font-bold text-gray-800">Notifications</h2>
     </div>
 
-    <div class="overflow-y-auto h-[600px] ">
-        <ul class="space-y-4">
-            <% if (notifications && notifications.length> 0) { %>
-                <% notifications.forEach(function(notification) { %>
-                    <li class="bg-white rounded-xl shadow p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-semibold text-gray-800">
-                                <% let notificationTitle='Notification' ; if (notification.type) {
-                                    notificationTitle=notification.type.replace(/_/g, ' ' ).toUpperCase(); } %>
-                                    <%= notificationTitle %>
-                            </h3>
-                            <span class="text-xs text-gray-500">
-                                <% // Manual date formatting for robustness %>
-                                    <% const date=new Date(notification.createdAt); const
-                                        day=String(date.getDate()).padStart(2, '0' ); const monthNames=["Jan", "Feb"
-                                        , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct" , "Nov" , "Dec"
-                                        ]; const month=monthNames[date.getMonth()]; const year=date.getFullYear(); let
-                                        hours=date.getHours(); const minutes=String(date.getMinutes()).padStart(2, '0'
-                                        ); const ampm=hours>= 12 ? 'PM' : 'AM';
-                                        hours = hours % 12;
-                                        hours = hours ? String(hours) : '12'; // The hour '0' (midnight) should be '12'
-                                        hours = hours.padStart(2, '0'); // Add leading zero if needed
+    <div class="pt-16 px-4 space-y-2.5">
+        <% if (notifications && notifications.length > 0) { %>
+            <% notifications.forEach(function(notification) { 
+                let notificationTitle = notification.title || '';
+                if (!notificationTitle && notification.type) {
+                    notificationTitle = notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                }
+                if (!notificationTitle) notificationTitle = 'Notification';
+                
+                const sType = (notification.statusType || '').toLowerCase();
+                const nType = (notification.type || '').toLowerCase();
+                
+                let iconClass = 'fa-solid fa-bell text-indigo-600';
+                let iconBg = 'bg-indigo-100';
+                let badgeText = '';
+                let badgeClass = '';
 
-                                        // Format for example: 27-Jul-2025 11:59 PM
-                                        const formattedDate = `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
-                                        %>
-                                        <%= formattedDate %>
-                            </span>
-                        </div>
-                        <p class="text-gray-700 text-sm">
-                            <%= notification.message || '' %>
-                        </p>
-                        <% if (!notification.read) { %>
-                            <a href="transactionhistory#localSection">
-                                <div class="mt-2 text-right">
-                                    <span
-                                        class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">View</span>
+                if (sType === 'successful' || sType === 'completed' || nType === 'success') {
+                    iconClass = 'fa-solid fa-circle-check text-emerald-600';
+                    iconBg = 'bg-emerald-100';
+                    badgeText = 'Completed';
+                    badgeClass = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+                } else if (sType === 'on_hold' || sType === 'on hold' || nType === 'warning') {
+                    iconClass = 'fa-solid fa-circle-pause text-amber-600';
+                    iconBg = 'bg-amber-100';
+                    badgeText = 'On Hold';
+                    badgeClass = 'bg-amber-50 text-amber-700 border border-amber-200';
+                } else if (sType === 'reversed') {
+                    iconClass = 'fa-solid fa-arrow-rotate-left text-indigo-600';
+                    iconBg = 'bg-indigo-100';
+                    badgeText = 'Reversed & Refunded';
+                    badgeClass = 'bg-indigo-50 text-indigo-700 border border-indigo-200';
+                } else if (sType === 'pending' || nType === 'transfer_debit') {
+                    iconClass = 'fa-solid fa-clock text-amber-600';
+                    iconBg = 'bg-amber-100';
+                    badgeText = 'Pending';
+                    badgeClass = 'bg-amber-50 text-amber-700 border border-amber-200';
+                } else if (nType === 'transfer_credit') {
+                    iconClass = 'fa-solid fa-arrow-down text-emerald-600';
+                    iconBg = 'bg-emerald-100';
+                    badgeText = 'Credit';
+                    badgeClass = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+                } else if (sType === 'failed' || nType === 'danger') {
+                    iconClass = 'fa-solid fa-circle-xmark text-red-600';
+                    iconBg = 'bg-red-100';
+                    badgeText = 'Failed';
+                    badgeClass = 'bg-red-50 text-red-700 border border-red-200';
+                }
+
+                const date = new Date(notification.createdAt);
+                const day = String(date.getDate()).padStart(2, '0');
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const month = monthNames[date.getMonth()];
+                const year = date.getFullYear();
+                let hours = date.getHours();
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? String(hours).padStart(2, '0') : '12';
+                const formattedDate = `${day} ${month} ${year} ${hours}:${minutes} ${ampm}`;
+            %>
+                <div class="notification-card <%= !notification.read ? 'unread' : '' %> rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-start justify-between gap-3 mb-1.5">
+                        <div class="flex items-start gap-3 flex-1 min-w-0">
+                            <div class="w-10 h-10 rounded-xl <%= iconBg %> flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i class="<%= iconClass %> text-base"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap mb-1">
+                                    <h3 class="font-bold text-gray-800 text-sm"><%= notificationTitle %></h3>
+                                    <% if (badgeText) { %>
+                                        <span class="inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full <%= badgeClass %>">
+                                            <%= badgeText %>
+                                        </span>
+                                    <% } %>
                                 </div>
-                            </a>
-                            <% } %>
-                    </li>
-                    <% }); %>
-                        <% } else { %>
-                            <li class="text-center text-gray-500 p-4">
-                                No notifications available.
-                            </li>
-                            <% } %>
-        </ul>
+                                <p class="text-gray-700 text-xs leading-relaxed"><%= notification.message || '' %></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                        <span class="text-[11px] text-gray-500 font-medium"><%= formattedDate %></span>
+                        <% if (notification.relatedReferenceId) { %>
+                            <span class="text-[11px] text-gray-500 font-mono">Ref: <%= notification.relatedReferenceId %></span>
+                        <% } %>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-bell-slash text-gray-400 text-2xl"></i>
+                </div>
+                <p class="text-gray-600 font-medium mb-1">No notifications available</p>
+                <p class="text-sm text-gray-500">You're all caught up!</p>
+            </div>
+        <% } %>
     </div>
 
-    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
-
-            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="mt-1">Home</span>
+    <!-- Bottom Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 bottom-nav z-50">
+        <div class="flex justify-around items-center px-4 py-2.5">
+            <a href="dashboard" class="nav-item flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-house text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
             </a>
 
-            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-chart-line text-lg"></i>
-                <span class="mt-1">Finance</span>
+            <a href="finance" class="nav-item flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
             </a>
 
-            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-credit-card text-lg"></i>
-                <span class="mt-1">Cards</span>
+            <a href="cards" class="nav-item flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
             </a>
 
-            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="mt-1">Me</span>
+            <a href="profile" class="nav-item flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
             </a>
-
         </div>
     </div>
-
 </body>
 
 </html>

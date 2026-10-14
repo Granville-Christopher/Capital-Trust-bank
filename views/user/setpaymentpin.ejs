@@ -1,245 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Capital Trust Bank - Set payment pin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
     <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
     <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
-
-    <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta property="og:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-    <meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:site_name" content="Capital Trust Bank" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@CTBankOfficial" />
-    <meta name="twitter:creator" content="@CTBankOfficial" />
-    <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta name="twitter:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-
-
+    <meta name="theme-color" content="#4f46e5" />
 </head>
 <%- include('partials/toastalerts')%>
 
-    <body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 flex flex-col justify-center items-center">
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-24">
+    <div class="fixed top-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-b border-gray-100 flex items-center px-5 py-4 z-30 shadow-sm">
+        <button onclick="history.back()" class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100 mr-3">
+            <i class="fa-solid fa-arrow-left text-gray-700"></i>
+        </button>
+        <h2 class="text-lg font-bold text-gray-800">Set Payment PIN</h2>
+    </div>
 
-        <div class="bg-white rounded-xl shadow p-6 max-w-sm w-full text-center">
+    <div class="pt-20 px-5 flex flex-col justify-center items-center min-h-[calc(100vh-80px)]">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-sm w-full text-center">
             <div class="setpaymentpindsection">
                 <% if (hasPin) { %>
-                    <h2 class="text-xl font-semibold text-gray-800 mb-6">Payment PIN Already Set</h2>
-                    <p class="mb-4">You have already set your payment PIN successfully.</p>
-                    <p>
+                    <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-check-circle text-amber-600 text-2xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Payment PIN Already Set</h2>
+                    <p class="text-gray-600 mb-4">You have already set your payment PIN successfully.</p>
+                    <p class="text-sm text-gray-500 mb-6">
                         Want to change your PIN? Please go to
-                        <a href="changepaymentpin" class="text-blue-600 underline">Change Payment
-                            PIN</a>.
+                        <a href="changepaymentpin" class="text-indigo-600 hover:text-indigo-700 font-semibold underline">Change Payment PIN</a>.
                     </p>
-                    <p>
-                        <a href="dashboard"> back to dashboard</a>
-                    </p>
-                    <% } else { %>
-                        <h2 class="text-xl font-semibold text-gray-800 mb-6"> Set payment pin</h2>
-                        <form id="setPinForm" class="space-y-4">
-                            <div class="relative">
-                                <input type="password" id="Pin" placeholder="New PIN" maxlength="4"
-                                    class="w-full py-3 px-4 rounded-full border-2 border-blue-600 text-center text-lg outline-none" />
-                                <i class="fa fa-eye absolute right-4 top-3 cursor-pointer text-gray-500"
-                                    onclick="togglePassword('Pin', this)"></i>
+                    <a href="dashboard" class="inline-block px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition font-semibold shadow-lg">
+                        Back to Dashboard
+                    </a>
+                <% } else { %>
+                    <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-shield-halved text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Set Payment PIN</h2>
+                    <form id="setPinForm" class="space-y-4">
+                        <div class="relative">
+                            <input type="password" id="Pin" placeholder="New PIN" maxlength="4"
+                                class="w-full py-3 px-4 rounded-xl border-2 border-gray-200 text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                            <i class="fa fa-eye absolute right-4 top-3.5 cursor-pointer text-gray-500 hover:text-indigo-600"
+                                onclick="togglePassword('Pin', this)"></i>
+                        </div>
+                        <div class="relative">
+                            <input type="password" id="confirmPin" placeholder="Confirm New PIN" maxlength="4"
+                                class="w-full py-3 px-4 rounded-xl border-2 border-gray-200 text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                            <i class="fa fa-eye absolute right-4 top-3.5 cursor-pointer text-gray-500 hover:text-indigo-600"
+                                onclick="togglePassword('confirmPin', this)"></i>
+                        </div>
+
+                        <button type="submit" id="confirmPin-btn"
+                            class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl font-semibold hover:from-indigo-700 hover:to-indigo-800 transition shadow-lg flex items-center justify-center">
+                            <span id="confirmPin-text">Set PIN</span>
+                            <svg id="spinner" class="animate-spin h-5 w-5 ml-2 hidden text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            </svg>
+                        </button>
+                    </form>
+                <% } %>
+
+                <div id="generatingPinModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+                    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
+                        <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-5xl mb-4"></i>
+                        <h3 class="text-lg font-bold text-gray-800">Setting Payment PIN...</h3>
+                        <p class="text-sm text-gray-500 mt-2">Please wait while we update your payment PIN.</p>
+                    </div>
+                </div>
+                <div id="pinsetModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+                    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative">
+                        <div id="successIcon" class="mb-4">
+                            <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+                                <i class="fa-solid fa-circle-check text-emerald-600 text-3xl"></i>
                             </div>
-                            <div class="relative">
-                                <input type="password" id="confirmPin" placeholder="Confirm New PIN" maxlength="4"
-                                    class="w-full py-3 px-4 rounded-full border-2 border-blue-600 text-center text-lg outline-none" />
-                                <i class="fa fa-eye absolute right-4 top-3 cursor-pointer text-gray-500"
-                                    onclick="togglePassword('confirmPin', this)"></i>
+                            <h3 class="text-xl font-bold text-gray-800">Payment PIN Set Successfully</h3>
+                            <p class="text-sm text-gray-500 mt-2">Your payment PIN has been Set.</p>
+                        </div>
+
+                        <div id="failureIcon" class="mb-4 hidden">
+                            <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                                <i class="fa-solid fa-circle-xmark text-red-600 text-3xl"></i>
                             </div>
+                            <h3 class="text-xl font-bold text-gray-800">Failed to Set Payment PIN</h3>
+                            <p id="failureMessage" class="text-sm text-gray-500 mt-2">Something went wrong. Please try again.</p>
+                        </div>
 
-                            <button type="submit" id="confirmPin-btn"
-                                class="w-full py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition duration-200 flex items-center justify-center">
-                                <span id="confirmPin-text"> Set PIN</span>
-                                <svg id="spinner" class="animate-spin h-5 w-5 ml-2 hidden text-white"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4">
-                                    </circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                                </svg>
-                            </button>
-                        </form>
-                        <% } %>
-
-                            <div id="generatingPinModal"
-                                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-                                <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
-                                    <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
-                                    <h3 class="text-lg font-semibold">Setting Payment PIN...</h3>
-                                    <p class="text-sm text-gray-500">Please wait while we update your payment PIN.</p>
-                                </div>
-                            </div>
-                            <div id="pinsetModal"
-                                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-                                <div
-                                    class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
-
-                                    <div id="successIcon" class="mb-4">
-                                        <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
-                                        <h3 class="mt-2 text-xl font-semibold text-gray-800">Payment PIN Set
-                                            Successfully</h3>
-                                        <p class="text-sm text-gray-500">Your payment PIN has been Set.</p>
-                                    </div>
-
-                                    <div id="failureIcon" class="mb-4 hidden">
-                                        <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
-                                        <h3 class="mt-2 text-xl font-semibold text-gray-800">Failed to Set Payment PIN
-                                        </h3>
-                                        <p id="failureMessage" class="text-sm text-gray-500">Something went wrong.
-                                            Please try again.</p>
-                                    </div>
-
-                                    <button onclick="closeSetPinModal()"
-                                        class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-                                        Close
-                                    </button>
-                                </div>
-                            </div>
+                        <button onclick="closeSetPinModal()"
+                            class="mt-6 w-full py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition font-semibold shadow-lg">
+                            Close
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <script src="/js/auth/setpaymentpin.js"></script>
-        <script>
-            // function togglePassword(inputId, icon) {
-            //     const input = document.getElementById(inputId);
-            //     if (input.type === "password") {
-            //         input.type = "text";
-            //         icon.classList.remove("fa-eye");
-            //         icon.classList.add("fa-eye-slash");
-            //     } else {
-            //         input.type = "password";
-            //         icon.classList.remove("fa-eye-slash");
-            //         icon.classList.add("fa-eye");
-            //     }
-            // }
+    <div class="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-t border-gray-100 z-50">
+        <div class="flex justify-around items-center px-6 py-3">
+            <a href="/udp/dashboard" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-house text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
+            </a>
+            <a href="/udp/finance" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
+            </a>
+            <a href="/udp/cards" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
+            </a>
+            <a href="/udp/profile" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-user text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
+            </a>
+        </div>
+    </div>
 
-            // const generatingPinModal = document.getElementById("generatingPinModal");
-            // const pinsetModal = document.getElementById("pinsetModal");
-            // const successsetIcon = document.getElementById("successIcon");
-            // const failuresetIcon = document.getElementById("failureIcon");
-
-            // function closeSetPinModal() {
-            //     pinsetModal.classList.add("hidden");
-            // }
-            // window.closeSetPinModal = closeSetPinModal;
-
-            // const setPinForm = document.getElementById('setPinForm');
-            // const Pin = document.getElementById('Pin');
-            // const ConfirmPin = document.getElementById('confirmPin');
-            // const confirmPinbtn = document.getElementById("confirmPin-btn");
-            // const confirmPintext = document.getElementById("confirmPin-text");
-            // const spinner = document.getElementById("spinner");
-
-            // setPinForm.addEventListener('submit', async function (event) {
-            //     event.preventDefault();
-
-            //     generatingPinModal.classList.remove("hidden");
-
-            //     confirmPinbtn.disabled = true;
-            //     confirmPintext.textContent = "Processing";
-            //     spinner.classList.remove("hidden");
-
-            //     try {
-            //         const data = {
-            //             Pin: Pin.value,
-            //             ConfirmPin: ConfirmPin.value,
-            //         };
-
-            //         if (ConfirmPin.value !== Pin.value) {
-            //             generatingPinModal.classList.add("hidden");
-            //             showToast("Pin does not match");
-            //             confirmPinbtn.disabled = false;
-            //             confirmPintext.textContent = "Set pin";
-            //             spinner.classList.add("hidden");
-            //             return;
-            //         }
-
-            //         const response = await fetch("/user/secure/ctb/setpaymentpin", {
-            //             method: "POST",
-            //             headers: { "Content-Type": "application/json" },
-            //             body: JSON.stringify(data),
-            //         });
-
-            //         const contentType = response.headers.get("content-type");
-
-            //         if (contentType && contentType.includes("application/json")) {
-            //             const responseData = await response.json();
-            //             if (!response.ok) {
-            //                 generatingPinModal.classList.add("hidden");
-            //                 successsetIcon.classList.add("hidden");
-            //                 failuresetIcon.classList.remove("hidden");
-            //                 pinsetModal.classList.remove("hidden");
-
-            //                 const failureMessageElem = document.getElementById("failureMessage");
-            //                 if (failureMessageElem) {
-            //                     failureMessageElem.textContent = responseData.error || responseData.message || "Failed to set payment PIN.";
-            //                 }
-
-            //                 confirmPinbtn.disabled = false;
-            //                 confirmPintext.textContent = "Set pin";
-            //                 spinner.classList.add("hidden");
-            //                 return;
-            //             }
-
-            //             generatingPinModal.classList.add("hidden");
-            //             successsetIcon.classList.remove("hidden");
-            //             failuresetIcon.classList.add("hidden");
-            //             pinsetModal.classList.remove("hidden");
-
-            //             const failureMessageElem = document.getElementById("failureMessage");
-            //             if (failureMessageElem) {
-            //                 failureMessageElem.textContent = "";
-            //             }
-
-            //             setPinForm.reset();
-            //             setTimeout(() => {
-            //                 window.location.href = `/udp/dashboard`;
-            //             }, 2000);
-
-            //             confirmPinbtn.disabled = false;
-            //             confirmPintext.textContent = "Set pin";
-            //             spinner.classList.add("hidden");
-            //         } else {
-            //             const text = await response.text();
-            //             console.error("Non-JSON response:", text);
-            //             generatingPinModal.classList.add("hidden");
-            //             showToast("Server error: non-JSON response");
-            //             confirmPinbtn.disabled = false;
-            //             confirmPintext.textContent = "Set pin";
-            //             spinner.classList.add("hidden");
-            //         }
-            //     } catch (err) {
-            //         console.error("Error setting pin:", err);
-            //         generatingPinModal.classList.add("hidden");
-            //         showToast("Network error. Please try again later.");
-            //         confirmPinbtn.disabled = false;
-            //         confirmPintext.textContent = "Set pin";
-            //         spinner.classList.add("hidden");
-            //     }
-            // });
-        </script>
-    </body>
+    <script src="/js/auth/setpaymentpin.js"></script>
+</body>
 
 </html>

@@ -1,20 +1,26 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const Notification = require("../../models/usermodels/notifications");
 
 const {
   registerUser,
   loginUser,
+  verifyLoginOtp,
+  resendLoginOtp,
   changeLoginPassword,
 } = require("../../controllers/usercontrollers/authController");
 const {
   internationalTransfer,
+  localTransfer,
   setTransactionPin,
   changeTransactionPin,
   verifyTransfer,
   verifyLocalTransfer,
-  localTransfer,
 } = require("../../controllers/usercontrollers/transfercontroller");
+const {
+  submitDepositRequest,
+} = require("../../controllers/usercontrollers/depositcontroller");
 const lookupAccount = require("../../controllers/usercontrollers/lookupaccount");
 const {
   depositToSavings,
@@ -76,13 +82,16 @@ router.get("/creditcard-details", fetchCreditCard);
 
 router.post("/signup", registerUser);
 router.post("/login", loginUser);
+router.post("/verify-login-otp", verifyLoginOtp);
+router.post("/resend-login-otp", resendLoginOtp);
 router.post("/changeaccountpassword", changeLoginPassword);
-router.post("/internationaltransfer", internationalTransfer);
+router.post("/transfer", internationalTransfer);
+router.post("/localtransfer", localTransfer);
 router.post("/setpaymentpin", setTransactionPin);
 router.post("/changepaymentpin", changeTransactionPin);
 router.post("/confirmtransfer", verifyTransfer);
-router.post("/localtransfer", localTransfer);
 router.post("/confirmlocaltransfer", verifyLocalTransfer);
+router.post("/submit-deposit", submitDepositRequest);
 router.post("/savings", depositToSavings);
 
 router.post("/:id/withdraw-interest", withdrawInterest);
@@ -106,5 +115,23 @@ router.delete("/terminate-debit-card", terminateCard);
 
 router.post("/freeze-credit-card", freezeCreditCard);
 router.delete("/terminate-credit-card", terminateCreditCard);
+
+router.post("/dismiss-status-popup/:notificationId", async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const { notificationId } = req.params;
+    await Notification.findOneAndUpdate(
+      { _id: notificationId, userId },
+      { $set: { popupDismissed: true, read: true } }
+    );
+    return res.json({ success: true });
+  } catch (err) {
+    console.error("Error dismissing status popup:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
 
 module.exports = router;

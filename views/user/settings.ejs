@@ -1,153 +1,449 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Capital Trust Bank - Settings</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
     <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
     <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
+    <meta name="theme-color" content="#4f46e5" />
 
-    <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta property="og:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-    <meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:site_name" content="Capital Trust Bank" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@CTBankOfficial" />
-    <meta name="twitter:creator" content="@CTBankOfficial" />
-    <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta name="twitter:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
+    <style>
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
 
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+        }
 
+        .settings-card {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .settings-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            border-color: #4f46e5;
+        }
+
+        .bottom-nav {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
 </head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 text-gray-800 space-y-6 relative">
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+    <% const accountTierKey = (user.accountTier || 'tier1').toLowerCase(); %>
+    <% const tierConfigMap = {
+        tier1: { label: 'Tier 1', perTransactionLimit: 5000, dailyLimit: 20000, isUnlimited: false },
+        tier2: { label: 'Tier 2', perTransactionLimit: 25000, dailyLimit: 100000, isUnlimited: false },
+        tier3: { label: 'Tier 3', perTransactionLimit: null, dailyLimit: null, isUnlimited: true },
+      }; %>
+    <% const currentTier = tierConfigMap[accountTierKey] || tierConfigMap.tier1; %>
 
-    <div class="flex items-center fixed bg-blue-100 p-4 top-0 left-0 right-0 w-full">
-        <button onclick="history.back()" class="text-blue-700 hover:text-blue-900 text-lg">
-            <i class="fa-solid fa-arrow-left"></i>
+    <div class="fixed top-0 left-0 right-0 glass-effect flex items-center px-4 py-3 z-30 shadow-sm">
+        <button onclick="history.back()" class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100 mr-2">
+            <i class="fa-solid fa-arrow-left text-gray-700 text-sm"></i>
         </button>
-        <h2 class="ml-3 text-xl font-semibold">Settings</h2>
+        <h2 class="text-sm font-bold text-gray-800">Settings</h2>
     </div>
 
-    <div class="space-y-4 mt-32">
-        <div class="max-w-md mx-auto bg-blue-50 shadow-md rounded-lg p-4 ">
-
-            <h2 class="text-xl font-bold text-gray-800 mb-2"><%- user.Name %></h2>
-
-            <p class="text-gray-600">
-                KYC Status:
-                <span class="font-semibold <%= kyc?.verified ? 'text-green-600' : 'text-red-600' %>">
-                    <%= kyc?.verified ? "Verified" : "Not Verified" %>
-                </span>
-            </p>
+    <div class="pt-16 px-4 space-y-4">
+        <!-- Profile Card -->
+        <div class="settings-card rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-md">
+                        <span class="text-white font-bold text-base"><%= user.Name.charAt(0).toUpperCase() %></span>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-gray-800"><%- user.Name %></h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="px-2 py-0.5 rounded-lg text-xs font-semibold <%= kyc?.verified ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' %>">
+                                <%= kyc?.verified ? "✓ Verified" : "Not Verified" %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <button onclick="toggleKycDetails()"
-                class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none">
-                Profile Details
+                class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-md text-sm">
+                View Profile Details
             </button>
 
-            <div id="kycDetails" class="hidden mt-4 bg-white rounded p-3 space-y-3 border-t pt-4">
-                <p><strong>Email:</strong> <%- user.Email %></p>
-                <p>
-                    <strong>Date of Birth:</strong>
-                    <%- ( kyc?.dateOfBirth ? new Date(kyc.dateOfBirth).toLocaleDateString('en-US', { year: 'numeric' ,
-                        month: 'long' , day: 'numeric' , timeZone: 'UTC' }) : "N/A" ) %>
-                </p>
-                <p><strong>Nationality:</strong> <%- kyc?.nationality || "N/A" %></p>
-
-                <p><strong>Address:</strong> <%- kyc?.residentialAddress || "N/A" %></p>
-                <p><strong>Phone:</strong> <%- kyc?.phoneNumber || "N/A" %></p>
-
-                <p><strong>Account Category:</strong> <%- kyc?.accountCategory || "N/A" %></p>
-                <p><strong>Account Type:</strong> <%- kyc?.accountType || "N/A" %></p>
+            <div id="kycDetails" class="hidden mt-5 pt-5 border-t border-gray-200 space-y-3">
+                <div class="text-sm">
+                    <div>
+                        <p class="text-gray-500 font-medium mb-1">Email</p>
+                        <p class="text-gray-800 font-semibold"><%- user.Email %></p>
+                    </div>
+                </div>
+                <div class="text-sm">
+                    <div>
+                        <p class="text-gray-500 font-medium mb-1">Date of Birth</p>
+                        <p class="text-gray-800 font-semibold">
+                            <%- ( kyc?.dateOfBirth ? new Date(kyc.dateOfBirth).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }) : "N/A" ) %>
+                        </p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-500 font-medium mb-1">Nationality</p>
+                        <p class="text-gray-800 font-semibold"><%- kyc?.nationality || "N/A" %></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 font-medium mb-1">Phone</p>
+                        <p class="text-gray-800 font-semibold"><%- kyc?.phoneNumber || "N/A" %></p>
+                    </div>
+                </div>
+                <div class="pt-3 border-t border-gray-200">
+                    <p class="text-gray-500 font-medium mb-1">Address</p>
+                    <p class="text-gray-800 font-semibold"><%- kyc?.residentialAddress || "N/A" %></p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-200">
+                    <div>
+                        <p class="text-gray-500 font-medium mb-1">Account Category</p>
+                        <p class="text-gray-800 font-semibold"><%- kyc?.accountCategory || "N/A" %></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 font-medium mb-1">Account Type</p>
+                        <p class="text-gray-800 font-semibold"><%- kyc?.accountType || "N/A" %></p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <script>
-            function toggleKycDetails() {
-                document.getElementById("kycDetails").classList.toggle("hidden");
-            }
-        </script>
+        <!-- Account Tier & Limits -->
+        <div class="settings-card rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-800">Account Tier & Transaction Limits</h3>
+                    <p class="text-xs text-gray-500 mt-1">Your current transfer allowance</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-100 text-indigo-700">
+                    <%= currentTier.label %>
+                </span>
+            </div>
 
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Security Management</h3>
+            <% if (currentTier.isUnlimited) { %>
+                <p class="text-sm font-semibold text-emerald-700">Tier 3: Unlimited per-transaction and daily transfer limits.</p>
+            <% } else { %>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
+                        <p class="text-xs text-gray-500 mb-1">Per-Transaction Limit</p>
+                        <p class="text-sm font-bold text-gray-800">$<%= Number(currentTier.perTransactionLimit || 0).toLocaleString() %></p>
+                    </div>
+                    <div class="p-3 rounded-lg bg-gray-50 border border-gray-200">
+                        <p class="text-xs text-gray-500 mb-1">Daily Transfer Limit</p>
+                        <p class="text-sm font-bold text-gray-800">$<%= Number(currentTier.dailyLimit || 0).toLocaleString() %></p>
+                    </div>
+                </div>
+            <% } %>
+        </div>
 
-        <a href="/secure/ctb/changeaccountpassword"
-            class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Change Account Password</a>
-        <a href="/secure/ctb/resetpassword" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Forgot
-            Account Password</a>
-        <a href="/secure/ctb/setpaymentpin" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Set
-            Payment PIN</a>
-        <a href="/secure/ctb/changepaymentpin"
-            class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Change Payment PIN</a>
-        <a href="/secure/ctb/forgotpaymentpin"
-            class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Forgot Payment PIN</a>
-        <a href="/secure/ctb/setcreditcardpin" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Set
-            Credit Card PIN</a>
-        <a href="/secure/ctb/managecreditcardpin"
-            class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Manage Credit Card PIN</a>
-        <a href="/secure/ctb/setdebitcardpin" class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Set
-            Debit Card PIN</a>
-        <a href="/secure/ctb/managedebitcardpin"
-            class="block text-sm hover:bg-blue-50 px-4 py-2 rounded transition">Manage Debit Card PIN</a>
-    </div>
+        <!-- Security Management -->
+        <div>
+            <h3 class="text-sm font-bold text-gray-700 mb-3 px-1">Security Management</h3>
+            <div class="space-y-2">
+                <a href="/secure/ctb/changeaccountpassword" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                            <i class="fa-solid fa-key text-indigo-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Change Account Password</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
 
-    <div class="bg-white rounded-xl shadow p-6 ">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Account Options</h3>
-        <a href="#" class="block text-sm text-red-600 hover:bg-red-50 px-4 py-2 rounded transition">Close Account</a>
-        <div class="border-t mb-8 mt-8">
-            <button onclick="logout()"
-                class="w-full py-3 bg-red-600 text-white rounded-full font-medium hover:bg-red-700 transition">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Log Out
-            </button>
+                <a href="/secure/ctb/resetpassword" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
+                            <i class="fa-solid fa-lock text-violet-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Forgot Account Password</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/setpaymentpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                            <i class="fa-solid fa-shield-halved text-indigo-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Set Payment PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/changepaymentpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                            <i class="fa-solid fa-pen text-purple-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Change Payment PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/forgotpaymentpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                            <i class="fa-solid fa-question-circle text-amber-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Forgot Payment PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/setcreditcardpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                            <i class="fa-solid fa-credit-card text-blue-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Set Credit Card PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/managecreditcardpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center">
+                            <i class="fa-solid fa-credit-card text-sky-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Manage Credit Card PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/setdebitcardpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                            <i class="fa-solid fa-credit-card-alt text-emerald-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Set Debit Card PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/managedebitcardpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                            <i class="fa-solid fa-credit-card-alt text-indigo-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Manage Debit Card PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Account Options -->
+        <div class="settings-card rounded-2xl p-5 shadow-sm">
+            <h3 class="text-sm font-bold text-gray-700 mb-3">Account Options</h3>
+            <a href="#" class="block text-sm text-red-600 hover:text-red-700 font-semibold py-2">Close Account</a>
+            <div class="border-t border-gray-200 mt-4 pt-4">
+                <button onclick="logout()"
+                    class="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-semibold hover:from-red-700 hover:to-red-800 transition shadow-lg">
+                    <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Log Out
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
-
-            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="mt-1">Home</span>
+    <div class="fixed bottom-0 left-0 right-0 bottom-nav z-50">
+        <div class="flex justify-around items-center px-6 py-3">
+            <a href="dashboard" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-house text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
             </a>
-
-            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-chart-line text-lg"></i>
-                <span class="mt-1">Finance</span>
+            <a href="finance" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
             </a>
-
-            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-credit-card text-lg"></i>
-                <span class="mt-1">Cards</span>
+            <a href="cards" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
             </a>
+            <a href="profile" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-user text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
+            </a>
+        </div>
+    </div>
 
-            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="mt-1">Me</span>
+            <h3 class="text-sm font-bold text-gray-700 mb-3 px-1">Security Management</h3>
+            <div class="space-y-2">
+                <a href="/secure/ctb/changeaccountpassword" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                            <i class="fa-solid fa-key text-indigo-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Change Account Password</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/resetpassword" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
+                            <i class="fa-solid fa-lock text-violet-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Forgot Account Password</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/setpaymentpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                            <i class="fa-solid fa-shield-halved text-indigo-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Set Payment PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/changepaymentpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                            <i class="fa-solid fa-pen text-purple-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Change Payment PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/forgotpaymentpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                            <i class="fa-solid fa-question-circle text-amber-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Forgot Payment PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/setcreditcardpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                            <i class="fa-solid fa-credit-card text-blue-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Set Credit Card PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/managecreditcardpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center">
+                            <i class="fa-solid fa-credit-card text-sky-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Manage Credit Card PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/setdebitcardpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                            <i class="fa-solid fa-credit-card-alt text-emerald-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Set Debit Card PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+
+                <a href="/secure/ctb/managedebitcardpin" class="settings-card rounded-2xl p-4 flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                            <i class="fa-solid fa-credit-card-alt text-indigo-600"></i>
+                        </div>
+                        <span class="font-semibold text-gray-800 text-sm">Manage Debit Card PIN</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Account Options -->
+        <div class="settings-card rounded-2xl p-5 shadow-sm">
+            <h3 class="text-sm font-bold text-gray-700 mb-3">Account Options</h3>
+            <a href="#" class="block text-sm text-red-600 hover:text-red-700 font-semibold py-2">Close Account</a>
+            <div class="border-t border-gray-200 mt-4 pt-4">
+                <button onclick="logout()"
+                    class="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-semibold hover:from-red-700 hover:to-red-800 transition shadow-lg">
+                    <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Log Out
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bottom-nav z-50">
+        <div class="flex justify-around items-center px-6 py-3">
+            <a href="dashboard" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-house text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
+            </a>
+            <a href="finance" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
+            </a>
+            <a href="cards" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
+            </a>
+            <a href="profile" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-user text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
             </a>
         </div>
     </div>
 
     <script>
-        function logout() {
+        function toggleKycDetails() {
+            document.getElementById("kycDetails").classList.toggle("hidden");
+        }
 
-            alert("You have been logged out.");
-            window.location.href = "login";
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                window.location.href = "/secure/ctb/logout";
+            }
         }
     </script>
 </body>

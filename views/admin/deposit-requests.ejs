@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - Deposit Requests</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50 min-h-screen">
+    <%- include('partials/header') %> <%- include('partials/sidebar') %>
+
+    <main class="ml-0 lg:ml-64 mt-20 p-6">
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Deposit Requests</h1>
+        <p class="text-sm text-gray-600">Review and manage cryptocurrency deposit requests from users.</p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+        <div class="overflow-x-auto">
+          <table class="min-w-full table-auto">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">User</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Amount</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Cryptocurrency</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Network</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Transaction Hash</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Payment proof</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
+                <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% depositRequests.forEach(request => { %>
+              <tr class="border-t">
+                <td class="px-4 py-2 text-sm text-gray-900">
+                  <div>
+                    <div class="font-medium"><%= request.userId?.Name || 'N/A' %></div>
+                    <div class="text-xs text-gray-500"><%= request.userId?.Email || 'N/A' %></div>
+                    <div class="text-xs text-gray-500">Acc: <%= request.userId?.AccountNumber || 'N/A' %></div>
+                  </div>
+                </td>
+                <td class="px-4 py-2 text-sm text-gray-900"><%= request.amount %></td>
+                <td class="px-4 py-2 text-sm text-gray-900"><%= request.cryptocurrency %></td>
+                <td class="px-4 py-2 text-sm text-gray-900"><%= request.network %></td>
+                <td class="px-4 py-2 text-sm text-gray-900">
+                  <% if (request.transactionHash) { %>
+                    <code class="text-xs break-all max-w-xs block"><%= request.transactionHash %></code>
+                  <% } else { %>
+                    <span class="text-gray-400">N/A</span>
+                  <% } %>
+                </td>
+                <td class="px-4 py-2 text-sm text-gray-900">
+                  <% if (request.paymentProof) { %>
+                    <a href="<%= request.paymentProof %>" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline text-xs font-medium">View image</a>
+                    <div class="mt-1 max-w-[120px]">
+                      <img src="<%= request.paymentProof %>" alt="Payment proof" class="rounded border border-gray-200 max-h-24 object-contain bg-gray-50" loading="lazy" />
+                    </div>
+                  <% } else { %>
+                    <span class="text-gray-400 text-xs">None</span>
+                  <% } %>
+                </td>
+                <td class="px-4 py-2 text-sm">
+                  <% if (request.status === 'pending') { %>
+                    <span class="px-2 py-1 rounded bg-yellow-100 text-yellow-800">Pending</span>
+                  <% } else if (request.status === 'approved') { %>
+                    <span class="px-2 py-1 rounded bg-green-100 text-green-800">Approved</span>
+                  <% } else { %>
+                    <span class="px-2 py-1 rounded bg-red-100 text-red-800">Declined</span>
+                  <% } %>
+                </td>
+                <td class="px-4 py-2 text-sm text-gray-900">
+                  <%= new Date(request.createdAt).toLocaleDateString() %>
+                </td>
+                <td class="px-4 py-2 text-sm">
+                  <% if (request.status === 'pending') { %>
+                    <button
+                      onclick='approveDeposit("<%= request._id %>")'
+                      class="text-green-600 hover:text-green-800 mr-2"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      onclick='declineDeposit("<%= request._id %>")'
+                      class="text-red-600 hover:text-red-800"
+                    >
+                      Decline
+                    </button>
+                  <% } else { %>
+                    <span class="text-gray-400">Processed</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Decline Modal -->
+      <div id="declineModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+          <div class="p-6">
+            <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-red-100">
+              <i class="fa-solid fa-triangle-exclamation text-red-600 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900 text-center mb-2">Decline Deposit Request</h2>
+            <form id="declineForm">
+              <input type="hidden" name="requestId" id="declineRequestId" />
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Reason (Optional)</label>
+                <textarea name="adminNotes" id="declineNotes" rows="3"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                  placeholder="Enter reason for declining..."></textarea>
+              </div>
+              <div class="flex gap-3">
+                <button
+                  type="button"
+                  onclick="document.getElementById('declineModal').classList.add('hidden')"
+                  class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition"
+                >
+                  Cancel
+                </button>
+                <button type="submit" class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition shadow-md">
+                  Decline
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %> <%- include('partials/toastalerts') %> <%- include('partials/confirmation-modal') %>
+
+    <script>
+      function approveDeposit(requestId) {
+        showConfirmation(
+          'Approve Deposit Request',
+          'Are you sure you want to approve this deposit request? The user\'s account will be credited.',
+          () => {
+            fetch(`/admin/deposit-requests/${requestId}/approve`, { method: 'POST' })
+              .then(res => res.json())
+              .then(data => {
+                if (data.message) {
+                  showSuccess('Success', data.message, () => {
+                    setTimeout(() => location.reload(), 1000);
+                  });
+                } else {
+                  showError('Error', data.error || 'Failed to approve deposit');
+                }
+              })
+              .catch(err => {
+                console.error(err);
+                showError('Error', 'Server error. Please try again.');
+              });
+          },
+          'Approve',
+          'Cancel'
+        );
+      }
+
+      function declineDeposit(requestId) {
+        document.getElementById('declineRequestId').value = requestId;
+        document.getElementById('declineModal').classList.remove('hidden');
+      }
+
+      document.getElementById('declineForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const requestId = formData.get('requestId');
+        const adminNotes = formData.get('adminNotes');
+
+        try {
+          const response = await fetch(`/admin/deposit-requests/${requestId}/decline`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminNotes }),
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            showSuccess('Success', result.message, () => {
+              document.getElementById('declineModal').classList.add('hidden');
+              setTimeout(() => location.reload(), 1000);
+            });
+          } else {
+            showError('Error', result.error || 'Failed to decline deposit');
+          }
+        } catch (err) {
+          console.error(err);
+          showError('Error', 'Server error. Please try again.');
+        }
+      });
+    </script>
+  </body>
+</html>
+

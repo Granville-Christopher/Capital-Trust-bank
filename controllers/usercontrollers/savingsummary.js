@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 const Savings = require("../../models/usermodels/savings");
 const User = require("../../models/usermodels/userSignup");
-const SavingsHistory = require("../../models/usermodels/savingshistory")
+const SavingsHistory = require("../../models/usermodels/savingshistory");
+const Notification = require("../../models/usermodels/notifications");
+const sendEmail = require("../../config/loanremindermailer");
 
 const DAILY_INTEREST_RATE = 0.1 / 365;
 
@@ -104,6 +106,40 @@ const compoundAllSavings = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
+    // Get user for email
+    const user = await User.findById(userId);
+    if (user && totalInterestToCompound > 0) {
+      // Create notification
+      const compoundMessage = `You have successfully compounded $${totalInterestToCompound.toFixed(2)} interest into your savings account.`;
+      await Notification.create({
+        userId,
+        type: "success",
+        message: compoundMessage,
+      });
+
+      // Send email
+      const subject = "Savings Interest Compounded";
+      const text = compoundMessage;
+      const htmlContent = `
+        <p style="font-size: 16px; color: #374151;">Dear <strong>${user.Name}</strong>,</p>
+        <p style="font-size: 15px; color: #374151;">
+          Your interest has been successfully compounded into your savings account.
+        </p>
+        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2563eb;">
+          <p style="margin: 0; font-size: 14px; color: #1e40af;"><strong>Compounding Details:</strong></p>
+          <p style="margin: 5px 0; font-size: 14px; color: #374151;">Interest Compounded: <strong>$${totalInterestToCompound.toFixed(2)}</strong></p>
+          <p style="margin: 5px 0; font-size: 14px; color: #374151;">Savings Plans Updated: <strong>${compoundedLogs.length}</strong></p>
+        </div>
+        <p style="font-size: 15px; color: #374151;">
+          The compounded interest has been added to your savings principal, which will help your savings grow faster through compound interest.
+        </p>
+        <p style="margin-top: 20px; font-size: 14px; color: #111827;">
+          Thank you for banking with us.<br><strong>CTBank Team</strong>
+        </p>
+      `;
+      sendEmail(user.Email, subject, text, htmlContent).catch(e => console.error("Email failed:", e.message));
+    }
+
     res.status(200).json({
       message: `Successfully compounded $${totalInterestToCompound.toFixed(
         2
@@ -177,6 +213,36 @@ const withdrawAllSavings = async (req, res) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    // Create notification
+    const withdrawalMessage = `You have successfully withdrawn $${totalWithdrawableInterest.toFixed(2)} interest from all your savings accounts. Your new balance is $${user.AccountBalance.toFixed(2)}.`;
+    await Notification.create({
+      userId,
+      type: "success",
+      message: withdrawalMessage,
+    });
+
+    // Send email
+    const subject = "Savings Interest Withdrawal Successful";
+    const text = withdrawalMessage;
+    const htmlContent = `
+      <p style="font-size: 16px; color: #374151;">Dear <strong>${user.Name}</strong>,</p>
+      <p style="font-size: 15px; color: #374151;">
+        Your interest withdrawal from all savings accounts has been processed successfully.
+      </p>
+      <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2563eb;">
+        <p style="margin: 0; font-size: 14px; color: #1e40af;"><strong>Withdrawal Details:</strong></p>
+        <p style="margin: 5px 0; font-size: 14px; color: #374151;">Total Interest Withdrawn: <strong>$${totalWithdrawableInterest.toFixed(2)}</strong></p>
+        <p style="margin: 5px 0; font-size: 14px; color: #374151;">New Account Balance: <strong>$${user.AccountBalance.toFixed(2)}</strong></p>
+      </div>
+      <p style="font-size: 15px; color: #374151;">
+        The funds have been successfully credited to your account and are now available for use.
+      </p>
+      <p style="margin-top: 20px; font-size: 14px; color: #111827;">
+        Thank you for banking with us.<br><strong>CTBank Team</strong>
+      </p>
+    `;
+    sendEmail(user.Email, subject, text, htmlContent).catch(e => console.error("Email failed:", e.message));
 
     return res.status(200).json({
       message: `Successfully withdrew $${totalWithdrawableInterest.toFixed(

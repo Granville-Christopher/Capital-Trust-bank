@@ -1,0 +1,126 @@
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+        <div class="p-6">
+            <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100">
+                <i class="fa-solid fa-triangle-exclamation text-amber-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 text-center mb-2" id="confirmationTitle">Confirm Action</h3>
+            <p class="text-sm text-gray-600 text-center mb-6" id="confirmationMessage">Are you sure you want to proceed with this action?</p>
+            <div class="flex gap-3">
+                <button id="confirmationCancel" class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition">
+                    Cancel
+                </button>
+                <button id="confirmationConfirm" class="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-md">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+        <div class="p-6 text-center">
+            <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-100">
+                <i class="fa-solid fa-circle-check text-emerald-600 text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2" id="successTitle">Success</h3>
+            <p class="text-sm text-gray-600 mb-6" id="successMessage">Operation completed successfully.</p>
+            <button id="successClose" class="w-full px-4 py-2.5 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-md">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="errorModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+        <div class="p-6 text-center">
+            <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-red-100">
+                <i class="fa-solid fa-circle-xmark text-red-600 text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2" id="errorTitle">Error</h3>
+            <p class="text-sm text-gray-600 mb-6" id="errorMessage">An error occurred. Please try again.</p>
+            <button id="errorClose" class="w-full px-4 py-2.5 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition shadow-md">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Confirmation Modal Handler
+    let confirmationCallback = null;
+    
+    function showConfirmation(title, message, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel') {
+        document.getElementById('confirmationTitle').textContent = title;
+        document.getElementById('confirmationMessage').textContent = message;
+        document.getElementById('confirmationConfirm').textContent = confirmText;
+        document.getElementById('confirmationCancel').textContent = cancelText;
+        document.getElementById('confirmationModal').classList.remove('hidden');
+        confirmationCallback = onConfirm;
+    }
+    
+    document.getElementById('confirmationCancel').addEventListener('click', () => {
+        document.getElementById('confirmationModal').classList.add('hidden');
+        confirmationCallback = null;
+    });
+    
+    document.getElementById('confirmationConfirm').addEventListener('click', () => {
+        if (confirmationCallback) {
+            confirmationCallback();
+        }
+        document.getElementById('confirmationModal').classList.add('hidden');
+        confirmationCallback = null;
+    });
+    
+    // Success Modal Handler
+    function showSuccess(title, message, onClose = null) {
+        document.getElementById('successTitle').textContent = title;
+        document.getElementById('successMessage').textContent = message;
+        document.getElementById('successModal').classList.remove('hidden');
+        
+        const closeBtn = document.getElementById('successClose');
+        closeBtn.onclick = () => {
+            document.getElementById('successModal').classList.add('hidden');
+            if (onClose) onClose();
+        };
+    }
+    
+    // Error Modal Handler
+    function showError(title, message, onClose = null) {
+        document.getElementById('errorTitle').textContent = title;
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('errorModal').classList.remove('hidden');
+        
+        const closeBtn = document.getElementById('errorClose');
+        closeBtn.onclick = () => {
+            document.getElementById('errorModal').classList.add('hidden');
+            if (onClose) onClose();
+        };
+    }
+    
+    // Close modals on backdrop click
+    document.getElementById('confirmationModal').addEventListener('click', (e) => {
+        if (e.target.id === 'confirmationModal') {
+            document.getElementById('confirmationModal').classList.add('hidden');
+            confirmationCallback = null;
+        }
+    });
+    
+    document.getElementById('successModal').addEventListener('click', (e) => {
+        if (e.target.id === 'successModal') {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+    });
+    
+    document.getElementById('errorModal').addEventListener('click', (e) => {
+        if (e.target.id === 'errorModal') {
+            document.getElementById('errorModal').classList.add('hidden');
+        }
+    });
+</script>
+

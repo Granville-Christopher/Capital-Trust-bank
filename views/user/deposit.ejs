@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capital Trust Bank - Top Up / Deposit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#4f46e5" />
+</head>
+<%- include('partials/toastalerts') %>
+
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+    <div class="fixed top-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-b border-gray-100 flex items-center px-4 py-3 z-30 shadow-sm">
+        <button onclick="history.back()" class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100 mr-2">
+            <i class="fa-solid fa-arrow-left text-gray-700 text-sm"></i>
+        </button>
+        <h2 class="text-sm font-bold text-gray-800">Top Up / Deposit</h2>
+    </div>
+
+    <div class="pt-16 px-4 space-y-4">
+        <!-- Important Warning Banner -->
+        <div class="bg-amber-50 border-l-4 border-amber-500 rounded-lg p-4 mb-4">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h3 class="text-sm font-bold text-amber-800 mb-1">⚠️ Important: Cryptocurrency Deposit</h3>
+                    <p class="text-xs text-amber-700 mb-2">
+                        This is a <strong>cryptocurrency deposit</strong>. Please follow these instructions carefully to avoid loss of funds:
+                    </p>
+                    <ul class="text-xs text-amber-700 space-y-1 list-disc list-inside">
+                        <li><strong>Send EXACTLY</strong> to the wallet address shown below</li>
+                        <li><strong>OR scan the QR code</strong> to ensure accuracy</li>
+                        <li><strong>Double-check</strong> the wallet address before sending</li>
+                        <li><strong>Use the correct network</strong> - sending to the wrong network will result in permanent loss of funds</li>
+                        <li><strong>Verify the cryptocurrency type</strong> matches (BTC, ETH, USDT, etc.)</li>
+                    </ul>
+                    <p class="text-xs font-semibold text-amber-800 mt-2">
+                        ⚠️ Funds sent to the wrong address or network cannot be recovered!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <% if (cryptoWallets && cryptoWallets.length > 0) { %>
+            <% cryptoWallets.forEach(function(wallet) { %>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2.5 mb-2.5">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-md">
+                                <i class="fa-solid fa-coins text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-gray-800"><%= wallet.cryptocurrency %></h3>
+                                <p class="text-xs text-gray-500"><%= wallet.walletName %></p>
+                            </div>
+                        </div>
+                        <div class="inline-block px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold">
+                            Network: <%= wallet.network %>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 p-3 bg-red-50 rounded-lg border-2 border-red-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fa-solid fa-circle-exclamation text-red-600 text-sm"></i>
+                            <label class="block text-xs font-bold text-red-800">⚠️ Send EXACTLY to this address:</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <code class="text-xs text-gray-800 break-all flex-1 font-mono bg-white p-2 rounded border border-red-200" id="address-<%= wallet._id %>">
+                                <%= wallet.walletAddress %>
+                            </code>
+                            <button onclick="copyAddress('<%= wallet._id %>', this)" 
+                                class="px-3 py-1.5 bg-red-600 text-white text-xs font-semibold rounded-lg hover:bg-red-700 transition shadow-md flex-shrink-0">
+                                <i class="fa-solid fa-copy mr-1 text-xs"></i> Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-red-700 mt-2 font-medium">
+                            ⚠️ Verify this address matches before sending. Wrong address = lost funds. To avoid mistakes, view and scan the deposit QR code below before sending.
+                        </p>
+                        <% if (wallet.qrCode) { %>
+                            <a href="#qr-section-<%= wallet._id %>" class="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-red-700 underline hover:text-red-800">
+                                <i class="fa-solid fa-qrcode text-xs"></i>
+                                View Deposit QR Code
+                            </a>
+                        <% } else { %>
+                            <p class="text-xs text-red-700 mt-2 font-semibold">
+                                QR code image has not been uploaded for this wallet yet. Please copy the address carefully.
+                            </p>
+                        <% } %>
+                    </div>
+
+                    <% if (wallet.qrCode) { %>
+                        <div id="qr-section-<%= wallet._id %>" class="mb-4 text-center p-3 bg-green-50 rounded-lg border-2 border-green-200">
+                            <div class="flex items-center justify-center gap-2 mb-2">
+                                <i class="fa-solid fa-qrcode text-green-600 text-sm"></i>
+                                <p class="text-xs font-bold text-green-800">✅ Scan QR Code (Recommended)</p>
+                            </div>
+                            <p class="text-xs text-green-700 mb-2">Scanning the QR code ensures accuracy and prevents errors</p>
+                            <img src="<%= wallet.qrCode %>" alt="QR Code for <%= wallet.cryptocurrency %>" class="mx-auto w-40 h-40 border-2 border-green-300 rounded-lg shadow-sm bg-white p-2">
+                        </div>
+                    <% } %>
+
+                    <div class="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <p class="text-xs font-semibold text-blue-800 mb-1">
+                            <i class="fa-solid fa-info-circle mr-1"></i>After sending cryptocurrency:
+                        </p>
+                        <p class="text-xs text-blue-700">
+                            Enter the amount you sent and click "I have made this deposit" to notify us. Our team will verify and credit your account.
+                        </p>
+                    </div>
+
+                    <form class="deposit-form" data-wallet-id="<%= wallet._id %>" data-crypto="<%= wallet.cryptocurrency %>" data-network="<%= wallet.network %>" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Amount Sent (<%= wallet.cryptocurrency %>)</label>
+                            <input type="number" step="0.00000001" min="0.00000001" name="amount" required
+                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm"
+                                placeholder="0.00" />
+                            <p class="text-xs text-gray-500 mt-1">Enter the exact amount you sent in <%= wallet.cryptocurrency %></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="text-xs font-semibold text-gray-700 mb-1.5">Payment proof (screenshot) <span class="text-red-500">*</span></div>
+                            <label class="flex flex-col gap-2 cursor-pointer">
+                                <span class="inline-flex items-center justify-center w-full px-3 py-2.5 border-2 border-dashed border-indigo-200 rounded-lg bg-indigo-50/50 text-xs font-medium text-indigo-800 hover:bg-indigo-50 transition">
+                                    <i class="fa-solid fa-image mr-2"></i>
+                                    <span class="deposit-proof-label">Tap to attach screenshot (JPG, PNG, WEBP — max 5MB)</span>
+                                </span>
+                                <input type="file" name="paymentProof" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                                    class="sr-only deposit-proof-input" required />
+                            </label>
+                            <p class="text-xs text-gray-500 mt-1">Upload a screenshot from your wallet or exchange showing the sent transaction. This helps us verify your deposit faster.</p>
+                            <div class="deposit-proof-preview mt-2 hidden">
+                                <img src="" alt="Payment proof preview" class="max-h-40 rounded-lg border border-gray-200 object-contain bg-white" />
+                                <button type="button" class="deposit-proof-clear mt-1 text-xs text-red-600 font-semibold">Remove image</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-gray-700 mb-1.5">Transaction Hash (Optional)</label>
+                            <input type="text" name="transactionHash"
+                                class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm"
+                                placeholder="Enter transaction hash if available" />
+                        </div>
+
+                        <button type="submit"
+                            class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition duration-200 flex items-center justify-center font-semibold shadow-md text-sm">
+                            <span class="deposit-text">I have made this deposit</span>
+                            <svg class="deposit-spinner animate-spin h-4 w-4 ml-2 hidden text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                                </circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+                <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-wallet text-gray-400 text-lg"></i>
+                </div>
+                <p class="text-gray-600 font-medium">No deposit wallets available at the moment.</p>
+                <p class="text-sm text-gray-500 mt-2">Please contact support for assistance.</p>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-t border-gray-100 z-50">
+        <div class="flex justify-around items-center px-6 py-3">
+            <a href="/udp/dashboard" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-house text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
+            </a>
+            <a href="/udp/finance" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
+            </a>
+            <a href="/udp/cards" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
+            </a>
+            <a href="/udp/profile" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-user text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function copyAddress(walletId, buttonElement) {
+            const addressElement = document.getElementById('address-' + walletId);
+            if (!addressElement) {
+                console.error('Address element not found for wallet:', walletId);
+                return;
+            }
+            
+            const address = addressElement.textContent.trim();
+            const btn = buttonElement || document.querySelector(`button[onclick*="${walletId}"]`);
+            
+            if (!btn) {
+                console.error('Button not found for wallet:', walletId);
+                return;
+            }
+            
+            navigator.clipboard.writeText(address).then(() => {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check mr-1 text-xs"></i> Copied!';
+                btn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                btn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+                    btn.classList.add('bg-red-600', 'hover:bg-red-700');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy address:', err);
+                alert('Failed to copy address. Please copy manually.');
+            });
+        }
+
+        document.querySelectorAll('.deposit-form').forEach(form => {
+            const proofInput = form.querySelector('.deposit-proof-input');
+            const proofPreview = form.querySelector('.deposit-proof-preview');
+            const proofPreviewImg = proofPreview && proofPreview.querySelector('img');
+            const proofLabel = form.querySelector('.deposit-proof-label');
+            const proofClear = form.querySelector('.deposit-proof-clear');
+
+            if (proofInput && proofPreview && proofPreviewImg) {
+                proofInput.addEventListener('change', function () {
+                    const file = this.files && this.files[0];
+                    if (file) {
+                        proofPreviewImg.src = URL.createObjectURL(file);
+                        proofPreview.classList.remove('hidden');
+                        if (proofLabel) proofLabel.textContent = file.name;
+                    } else {
+                        proofPreview.classList.add('hidden');
+                        proofPreviewImg.src = '';
+                        if (proofLabel) proofLabel.textContent = 'Tap to attach screenshot (JPG, PNG, WEBP — max 5MB)';
+                    }
+                });
+                if (proofClear) {
+                    proofClear.addEventListener('click', () => {
+                        proofInput.value = '';
+                        proofPreview.classList.add('hidden');
+                        proofPreviewImg.src = '';
+                        if (proofLabel) proofLabel.textContent = 'Tap to attach screenshot (JPG, PNG, WEBP — max 5MB)';
+                    });
+                }
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const walletId = form.dataset.walletId;
+                const amount = formData.get('amount');
+                const transactionHash = formData.get('transactionHash');
+
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const spinner = form.querySelector('.deposit-spinner');
+                const text = form.querySelector('.deposit-text');
+
+                submitBtn.disabled = true;
+                spinner.classList.remove('hidden');
+                text.textContent = 'Submitting...';
+
+                try {
+                    // Validate amount before sending
+                    const amountNum = parseFloat(amount);
+                    if (isNaN(amountNum) || amountNum <= 0) {
+                        if (typeof showToast === 'function') {
+                            showToast('error', 'Please enter a valid amount greater than 0');
+                        } else {
+                            alert('Please enter a valid amount greater than 0');
+                        }
+                        submitBtn.disabled = false;
+                        spinner.classList.add('hidden');
+                        text.textContent = 'I have made this deposit';
+                        return;
+                    }
+
+                    // Validate payment proof is attached
+                    const proofFile = form.querySelector('.deposit-proof-input');
+                    if (!proofFile || !proofFile.files || proofFile.files.length === 0) {
+                        if (typeof showToast === 'function') {
+                            showToast('error', 'Please attach a payment proof screenshot');
+                        } else {
+                            alert('Please attach a payment proof screenshot');
+                        }
+                        submitBtn.disabled = false;
+                        spinner.classList.add('hidden');
+                        text.textContent = 'I have made this deposit';
+                        return;
+                    }
+
+                    formData.set('cryptoWalletId', walletId);
+                    if (transactionHash && String(transactionHash).trim()) {
+                        formData.set('transactionHash', String(transactionHash).trim());
+                    } else {
+                        formData.delete('transactionHash');
+                    }
+
+                    const response = await fetch('/udp/submit-deposit', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        if (typeof showToast === 'function') {
+                            showToast('success', result.message || 'Deposit request submitted successfully!');
+                        } else {
+                            alert(result.message || 'Deposit request submitted successfully!');
+                        }
+                        form.reset();
+                        setTimeout(() => {
+                            window.location.href = '/udp/dashboard';
+                        }, 2000);
+                    } else {
+                        let errorMessage = 'Failed to submit deposit request';
+                        if (result.errors && result.errors.length > 0) {
+                            errorMessage = result.errors.map(e => e.msg || e.message).join(', ');
+                        } else if (result.error) {
+                            errorMessage = result.error;
+                        }
+                        if (!errorMessage && response.status === 400) {
+                            errorMessage = 'Upload or validation failed. Check image type and size.';
+                        }
+                        if (typeof showToast === 'function') {
+                            showToast('error', errorMessage);
+                        } else {
+                            alert(errorMessage);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('error', 'Network error. Please try again.');
+                    } else {
+                        alert('Network error. Please try again.');
+                    }
+                } finally {
+                    submitBtn.disabled = false;
+                    spinner.classList.add('hidden');
+                    text.textContent = 'I have made this deposit';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+
+

@@ -14,7 +14,7 @@ const kycSchema = new mongoose.Schema(
     occupation: { type: String, required: true },
     accountCategory: {
       type: String,
-      enum: ["personal", "retirement", "business"],
+      enum: ["personal", "joint", "escrow", "retirement", "business"],
       required: true,
     },
     accountType: { type: String, required: true },

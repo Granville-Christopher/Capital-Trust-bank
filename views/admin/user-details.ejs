@@ -4,7 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Capital Trust Bank - User Details</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+      const currencyForm = document.getElementById("currency-form");
+      if (currencyForm) {
+        currencyForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const selectedCurrency = e.target.currency.value;
+          try {
+            const response = await fetch("/admin/users/<%= user._id %>/currency", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ currency: selectedCurrency }),
+            });
+            const result = await response.json();
+            if (response.ok) {
+              showSuccess("Success", result.message || "Account currency updated successfully.", () => {
+                setTimeout(() => location.reload(), 500);
+              });
+            } else {
+              showError("Error", result.error || "Failed to update account currency.");
+            }
+          } catch (err) {
+            showError("Error", "Server error updating account currency.");
+          }
+        });
+      }
+
+    </script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
@@ -16,13 +42,29 @@
       href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank"
     />
   </head>
-  <body class="bg-gray-100 min-h-screen">
+  <body class="bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50 min-h-screen">
     <%- include('partials/header') %> <%- include('partials/sidebar') %>
 
     <main class="ml-0 lg:ml-64 mt-20 p-6">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">User Details</h1>
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">User Details</h1>
+          <p class="text-sm text-gray-600">View and manage user account information.</p>
+        </div>
+        <div>
+          <a
+            href="/admin/users/<%= user._id %>/login-as-user"
+            target="_blank"
+            class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5"
+            title="Log in directly to this user's dashboard without password"
+          >
+            <i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
+            <span>Log In to User Account</span>
+          </a>
+        </div>
+      </div>
 
-      <div class="bg-white rounded-xl shadow p-6">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- User Info -->
           <div>
@@ -31,9 +73,46 @@
             </h2>
             <p><strong>Name:</strong> <%= user.Name %></p>
             <p><strong>Email:</strong> <%= user.Email %></p>
+            <p><strong>Phone:</strong> <%= displayPhone || 'N/A' %></p>
+            <p>
+              <strong>Date of Birth:</strong>
+              <%= displayDateOfBirth ? new Date(displayDateOfBirth + 'T00:00:00').toLocaleDateString() : 'N/A' %>
+            </p>
             <p><strong>Account Number:</strong> <%= user.AccountNumber %></p>
-            <p><strong>Balance:</strong> $<%= user.AccountBalance %></p>
+            <p><strong>Balance:</strong> <span class="font-bold text-gray-900"><%= currencySymbol %><%= Number(user.AccountBalance || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %> (<%= activeCurrency %>)</span></p>
             <p><strong>Role:</strong> <%= user.role %></p>
+            <p><strong>Account Currency:</strong> <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-semibold rounded text-xs border border-indigo-200"><%= currencySymbol %> <%= activeCurrency %></span> <span class="text-xs text-gray-500"><%= (!user.currency || user.currency === 'COUNTRY_DEFAULT') ? '(Country Default)' : '(Admin Override)' %></span></p>
+            <p><strong>Account Tier:</strong> <%= (currentTierConfig && currentTierConfig.label) || 'Tier 1' %></p>
+            <p><strong>Credit Score:</strong> <%= user.CreditScore !== undefined ? user.CreditScore : 500 %></p>
+            <p>
+              <strong>Account Status:</strong>
+              <% const computedAdminStatus = user.status || (user.loginBlocked ? 'blocked' : (user.transactionLock && user.transactionLock.isBlocked ? 'on hold' : 'active')); %>
+              <% if (computedAdminStatus === 'active') { %>
+                <span class="text-emerald-600 font-semibold">Active</span>
+              <% } else if (computedAdminStatus === 'inactive') { %>
+                <span class="text-slate-600 font-semibold">Inactive</span>
+              <% } else if (computedAdminStatus === 'on hold') { %>
+                <span class="text-amber-600 font-semibold">On Hold</span>
+              <% } else { %>
+                <span class="text-red-600 font-semibold">Blocked</span>
+              <% } %>
+            </p>
+            <p>
+              <strong>Login Access:</strong>
+              <% if (user.loginBlocked) { %>
+              <span class="text-red-600 font-semibold">Blocked</span>
+              <% } else { %>
+              <span class="text-emerald-600 font-semibold">Allowed</span>
+              <% } %>
+            </p>
+            <p>
+              <strong>Transaction Access:</strong>
+              <% if (user.transactionLock && user.transactionLock.isBlocked) { %>
+              <span class="text-red-600 font-semibold">Blocked</span>
+              <% } else { %>
+              <span class="text-emerald-600 font-semibold">Active</span>
+              <% } %>
+            </p>
             <p>
               <strong>Created:</strong> <%= new
               Date(user.createdAt).toLocaleDateString() %>
@@ -48,6 +127,10 @@
             </h2>
             <p><strong>Country:</strong> <%= kyc.country %></p>
             <p><strong>Nationality:</strong> <%= kyc.nationality %></p>
+            <p>
+              <strong>Date of Birth:</strong>
+              <%= kyc.dateOfBirth ? new Date(kyc.dateOfBirth).toLocaleDateString() : 'N/A' %>
+            </p>
             <p><strong>Address:</strong> <%= kyc.residentialAddress %></p>
             <p><strong>Occupation:</strong> <%= kyc.occupation %></p>
             <p><strong>Account Category:</strong> <%= kyc.accountCategory %></p>
@@ -67,6 +150,156 @@
         <div class="mt-6 pt-6 border-t">
           <h3 class="text-lg font-semibold text-gray-800 mb-4">Actions</h3>
 
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-700 mb-2">Edit User Details</h4>
+            <form id="edit-user-details-form" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Name</label>
+                <input
+                  type="text"
+                  name="Name"
+                  value="<%= user.Name %>"
+                  required
+                  class="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Phone Number</label>
+                <input
+                  type="text"
+                  name="Phone"
+                  value="<%= displayPhone %>"
+                  required
+                  class="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Date of Birth</label>
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  value="<%= displayDateOfBirth %>"
+                  <%= kyc ? 'required' : '' %>
+                  class="w-full px-3 py-2 border rounded-lg"
+                />
+                <% if (!kyc) { %>
+                <p class="text-xs text-amber-600 mt-1">No KYC yet — date of birth can be edited after the user submits KYC.</p>
+                <% } %>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Credit Score</label>
+                <input
+                  type="number"
+                  name="CreditScore"
+                  value="<%= user.CreditScore !== undefined ? user.CreditScore : 500 %>"
+                  min="300"
+                  max="900"
+                  required
+                  class="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="Email"
+                  value="<%= user.Email %>"
+                  required
+                  class="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Account Status</label>
+                <select name="status" class="w-full px-3 py-2 border rounded-lg bg-white text-sm">
+                  <option value="active" <%= (user.status === 'active' || (!user.status && !user.loginBlocked && !(user.transactionLock && user.transactionLock.isBlocked))) ? 'selected' : '' %>>Active</option>
+                  <option value="inactive" <%= (user.status === 'inactive') ? 'selected' : '' %>>Inactive</option>
+                  <option value="on hold" <%= (user.status === 'on hold' || (!user.status && user.transactionLock && user.transactionLock.isBlocked)) ? 'selected' : '' %>>On Hold</option>
+                  <option value="blocked" <%= (user.status === 'blocked' || (!user.status && user.loginBlocked)) ? 'selected' : '' %>>Blocked</option>
+                </select>
+              </div>              <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Account Currency</label>
+                <select name="currency" class="w-full px-3 py-2 border rounded-lg bg-white text-sm">
+                  <option value="COUNTRY_DEFAULT" <%= (!user.currency || user.currency === 'COUNTRY_DEFAULT') ? 'selected' : '' %>>
+                    Country Default (<%= countryDefaultCurrency || 'USD' %>)
+                  </option>
+                  <% (supportedCurrencies || []).forEach(curr => { %>
+                    <option value="<%= curr.code %>" <%= (user.currency === curr.code) ? 'selected' : '' %>>
+                      <%= curr.code %> - <%= curr.name %> (<%= curr.symbol %>)
+                    </option>
+                  <% }) %>
+                </select>
+              </div>
+              <button
+                type="submit"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 md:col-span-2 w-fit"
+              >
+                Save Details
+              </button>
+            </form>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-700 mb-2">Login Access</h4>
+            <div class="mb-3 p-3 rounded-lg border <%= user.loginBlocked ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200' %>">
+              <p class="text-sm font-semibold <%= user.loginBlocked ? 'text-red-700' : 'text-emerald-700' %>">
+                <%= user.loginBlocked
+                  ? 'This user cannot sign in. They will see: “Login access blocked. Please contact support.”'
+                  : 'This user can sign in normally.' %>
+              </p>
+            </div>
+            <% if (user.loginBlocked) { %>
+            <button
+              type="button"
+              id="unblock-login-btn"
+              class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+            >
+              Unblock Login
+            </button>
+            <% } else { %>
+            <button
+              type="button"
+              id="block-login-btn"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Block Login
+            </button>
+            <% } %>
+          </div>
+
+                                        <!-- Account Display Currency Form Card -->
+          <div class="mb-6 bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm">
+            <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+              <h4 class="font-bold text-gray-900 flex items-center gap-2 text-sm sm:text-base">
+                <i class="fa-solid fa-coins text-indigo-600"></i> Account Display Currency
+              </h4>
+              <span id="active-currency-badge" class="text-xs px-3 py-1 bg-indigo-50 text-indigo-700 font-bold rounded-full border border-indigo-200 shadow-sm">
+                Active: <%= currencySymbol %> <%= activeCurrency %> (<%= (!user.currency || user.currency === 'COUNTRY_DEFAULT') ? 'Country Default' : 'Admin Custom Override' %>)
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 mb-4">
+              Choose the currency for this account. Select <strong>Country Default (<%= countryDefaultCurrency || 'USD' %>)</strong> to automatically format balances based on the user's KYC country, or select a custom world currency.
+            </p>
+            <form id="currency-form" action="/admin/users/<%= user._id %>/currency" method="POST" class="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
+              <select name="currency" id="account-currency-select" class="px-3.5 py-2.5 border border-gray-300 rounded-xl bg-white text-xs sm:text-sm min-w-[280px] focus:ring-2 focus:ring-indigo-500 focus:outline-none" required>
+                <option value="COUNTRY_DEFAULT" <%= (!user.currency || user.currency === 'COUNTRY_DEFAULT') ? 'selected' : '' %>>
+                  Country Default (<%= countryDefaultCurrency || 'USD' %>)
+                </option>
+                <% (supportedCurrencies || []).forEach(curr => { %>
+                  <option value="<%= curr.code %>" <%= (user.currency === curr.code) ? 'selected' : '' %>>
+                    <%= curr.code %> - <%= curr.name %> (<%= curr.symbol %>)
+                  </option>
+                <% }) %>
+              </select>
+              <button
+                type="submit"
+                id="update-currency-submit-btn"
+                class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs sm:text-sm transition shadow-sm whitespace-nowrap flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <i class="fa-solid fa-check text-xs"></i>
+                <span id="update-currency-btn-text">Save Currency</span>
+              </button>
+            </form>
+          </div>
           <!-- Update Balance Form -->
           <div class="mb-4">
             <h4 class="font-medium text-gray-700 mb-2">Update Balance</h4>
@@ -93,27 +326,393 @@
             </form>
           </div>
 
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-700 mb-2">Account Limit Tier</h4>
+            <div class="mb-3 p-3 rounded-lg border bg-indigo-50 border-indigo-200">
+              <p class="text-sm font-semibold text-indigo-700">
+                Current Tier:
+                <%= currentTierConfig.label %>
+                <% if (currentTierConfig.isUnlimited) { %>
+                  (Unlimited)
+                <% } else { %>
+                  - $<%= Number(currentTierConfig.perTransactionLimit || 0).toLocaleString() %> per transaction, $<%= Number(currentTierConfig.dailyLimit || 0).toLocaleString() %> daily
+                <% } %>
+              </p>
+            </div>
+
+            <form id="account-tier-form" class="flex flex-col md:flex-row gap-2 items-start md:items-center">
+              <select name="accountTier" class="px-3 py-2 border rounded-lg min-w-[220px]" required>
+                <% accountTierOptions.forEach((tier) => { %>
+                <option value="<%= tier.key %>" <%= user.accountTier === tier.key ? 'selected' : '' %>>
+                  <%= tier.label %>
+                  <% if (tier.isUnlimited) { %> - Unlimited <% } else { %> - $<%= Number(tier.perTransactionLimit || 0).toLocaleString() %> / tx, $<%= Number(tier.dailyLimit || 0).toLocaleString() %> / day <% } %>
+                </option>
+                <% }) %>
+              </select>
+              <button
+                type="submit"
+                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                Update Tier
+              </button>
+            </form>
+          </div>
+
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-700 mb-2">Transaction Lock Controls</h4>
+
+            <% const isBlocked = user.transactionLock && user.transactionLock.isBlocked; %>
+            <div class="mb-3 p-3 rounded-lg border <%= isBlocked ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200' %>">
+              <p class="text-sm font-semibold <%= isBlocked ? 'text-red-700' : 'text-emerald-700' %>">
+                <%= isBlocked ? 'Withdrawals are currently blocked for this user.' : 'No withdrawal restriction is currently active.' %>
+              </p>
+              <% if (isBlocked) { %>
+              <p class="text-xs text-red-700 mt-1">
+                Reason: <strong><%= user.transactionLock.reasonTitle %></strong>
+              </p>
+              <p class="text-xs text-red-700 mt-1">
+                Required unlock deposit: <strong>$<%= Number(user.transactionLock.unlockDepositAmount || 0).toFixed(2) %></strong>
+              </p>
+              <% } %>
+            </div>
+
+            <form id="transaction-lock-form" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <select name="reasonCode" class="px-3 py-2 border rounded-lg" required>
+                <option value="">Select block reason</option>
+                <% transactionBlockReasons.forEach((reason) => { %>
+                <option value="<%= reason.code %>" <%= user.transactionLock && user.transactionLock.reasonCode === reason.code ? 'selected' : '' %>><%= reason.title %></option>
+                <% }) %>
+              </select>
+              <input
+                type="number"
+                name="unlockDepositAmount"
+                placeholder="Unlock deposit amount"
+                step="0.01"
+                min="0.01"
+                value="<%= user.transactionLock && user.transactionLock.unlockDepositAmount ? user.transactionLock.unlockDepositAmount : '' %>"
+                class="px-3 py-2 border rounded-lg"
+                required
+              />
+              <textarea
+                name="adminNote"
+                placeholder="Optional note (shown to user)"
+                rows="2"
+                class="md:col-span-2 px-3 py-2 border rounded-lg"
+              ></textarea>
+              <button
+                type="submit"
+                class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+              >
+                Block / Update
+              </button>
+              <button
+                type="button"
+                id="unlock-account-btn"
+                class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              >
+                Remove Block
+              </button>
+            </form>
+          </div>
+
+          <!-- Bulk Random Transaction Generator -->
+          <div class="mt-6 mb-6 p-4 rounded-xl border border-indigo-200 bg-indigo-50/50 shadow-sm">
+            <h4 class="font-medium text-gray-800 mb-1 flex items-center gap-2">
+              <i class="fa-solid fa-wand-magic-sparkles text-indigo-600"></i> Generate Bulk Random Transactions
+            </h4>
+            <p class="text-xs text-gray-600 mb-4">
+              Automatically split a total target amount into a specified count of random positive transactions distributed across the date range.
+            </p>
+
+            <form id="bulk-transactions-form" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Total Amount ($)</label>
+                <input
+                  type="number"
+                  name="totalAmount"
+                  placeholder="e.g. 200000"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  class="w-full px-3 py-2 border rounded-lg bg-white text-sm"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Number of Transactions</label>
+                <input
+                  type="number"
+                  name="count"
+                  placeholder="e.g. 39"
+                  min="1"
+                  max="500"
+                  required
+                  class="w-full px-3 py-2 border rounded-lg bg-white text-sm"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Transaction Distribution</label>
+                <select name="distribution" class="w-full px-3 py-2 border rounded-lg bg-white text-sm">
+                  <option value="random_mix">Random Mix (Credit &amp; Debit)</option>
+                  <option value="all_credit">All Credit (+)</option>
+                  <option value="all_debit">All Debit (-)</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">Start Date</label>
+                  <input
+                    type="date"
+                    name="startDate"
+                    class="w-full px-2 py-2 border rounded-lg bg-white text-xs"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-1">End Date</label>
+                  <input
+                    type="date"
+                    name="endDate"
+                    class="w-full px-2 py-2 border rounded-lg bg-white text-xs"
+                  />
+                </div>
+              </div>
+
+              <div class="md:col-span-2 flex items-center gap-2 mt-1">
+                <input
+                  type="checkbox"
+                  id="updateBalanceCheckbox"
+                  name="updateBalance"
+                  value="true"
+                  class="w-4 h-4 text-indigo-600 rounded"
+                />
+                <label for="updateBalanceCheckbox" class="text-xs font-semibold text-gray-700">
+                  Adjust user's actual account balance based on net total
+                </label>
+              </div>
+
+              <div class="md:col-span-2 mt-2">
+                <button
+                  type="submit"
+                  id="generate-bulk-btn"
+                  class="px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition text-sm flex items-center justify-center gap-2"
+                >
+                  <span id="generate-bulk-text">Generate Transactions</span>
+                  <svg id="generate-bulk-spinner" class="animate-spin h-4 w-4 hidden text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Backdate User Transactions Section -->
+          <div class="mb-6">
+            <h4 class="font-medium text-gray-700 mb-2">Manage & Backdate User Transactions</h4>
+            <p class="text-xs text-gray-500 mb-3">
+              Edit the <strong>bank name</strong>, <strong>person name</strong> (sender/recipient), and <strong>transaction date</strong> for any transaction.
+            </p>
+            <div class="overflow-x-auto border rounded-xl">
+              <table class="min-w-full table-auto">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Description</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Type</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Amount</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Status</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Person / Sender Name</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Bank Name</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Transaction Date</th>
+                    <th class="px-3 py-2 text-left text-xs font-semibold text-gray-700">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (transactions && transactions.length > 0) { %>
+                    <% transactions.forEach((transaction) => { %>
+                      <% const sourceDate = new Date(transaction.transactionDate || transaction.createdAt); %>
+                      <% const yyyy = sourceDate.getFullYear(); %>
+                      <% const mm = String(sourceDate.getMonth() + 1).padStart(2, '0'); %>
+                      <% const dd = String(sourceDate.getDate()).padStart(2, '0'); %>
+                      <% const hh = String(sourceDate.getHours()).padStart(2, '0'); %>
+                      <% const mi = String(sourceDate.getMinutes()).padStart(2, '0'); %>
+                      <% const localValue = `${yyyy}-${mm}-${dd}T${hh}:${mi}`; %>
+                      <tr class="border-t">
+                        <td class="px-3 py-2 text-xs text-gray-800 max-w-xs truncate"><%= transaction.description %></td>
+                        <td class="px-3 py-2 text-xs <%= transaction.type === 'debit' ? 'text-red-600' : 'text-emerald-600' %> font-semibold"><%= transaction.type %></td>
+                        <td class="px-3 py-2 text-xs text-gray-800">$<%= Number(transaction.amount || 0).toFixed(2) %></td>
+                        <td class="px-3 py-2">
+                          <select
+                            class="tx-status-select px-2 py-1 border rounded-lg text-xs font-semibold <%= (transaction.status === 'successful' || transaction.status === 'completed') ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : (transaction.status === 'on hold' || transaction.status === 'pending') ? 'bg-amber-50 text-amber-700 border-amber-300' : (transaction.status === 'reversed') ? 'bg-indigo-50 text-indigo-700 border-indigo-300' : 'bg-gray-50 text-gray-700 border-gray-300' %>"
+                            data-transaction-id="<%= transaction._id %>"
+                          >
+                            <option value="pending" <%= transaction.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="successful" <%= (transaction.status === 'successful' || transaction.status === 'completed') ? 'selected' : '' %>>Completed</option>
+                            <option value="on hold" <%= transaction.status === 'on hold' ? 'selected' : '' %>>On Hold</option>
+                            <option value="reversed" <%= transaction.status === 'reversed' ? 'selected' : '' %>>Reversed</option>
+                            <option value="failed" <%= transaction.status === 'failed' ? 'selected' : '' %>>Failed</option>
+                          </select>
+                        </td>
+                        <td class="px-3 py-2">
+                          <input
+                            type="text"
+                            class="tx-name-input px-2 py-1 border rounded-lg text-xs w-36"
+                            placeholder="Person / Sender Name"
+                            value="<%= transaction.relatedFullName || '' %>"
+                            data-transaction-id="<%= transaction._id %>"
+                          />
+                        </td>
+                        <td class="px-3 py-2">
+                          <input
+                            type="text"
+                            class="tx-bank-input px-2 py-1 border rounded-lg text-xs w-36"
+                            placeholder="Bank Name"
+                            value="<%= transaction.bankName || '' %>"
+                            data-transaction-id="<%= transaction._id %>"
+                          />
+                        </td>
+                        <td class="px-3 py-2">
+                          <input
+                            type="datetime-local"
+                            class="tx-backdate-input px-2 py-1 border rounded-lg text-xs"
+                            value="<%= localValue %>"
+                            data-transaction-id="<%= transaction._id %>"
+                          />
+                        </td>
+                        <td class="px-3 py-2">
+                          <div class="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              class="tx-backdate-btn px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-xs font-medium whitespace-nowrap shadow-sm"
+                              data-transaction-id="<%= transaction._id %>"
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              class="tx-delete-btn px-2.5 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs font-medium whitespace-nowrap"
+                              data-transaction-id="<%= transaction._id %>"
+                              title="Delete Transaction"
+                            >
+                              <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="8" class="px-3 py-4 text-sm text-gray-500 text-center">
+                        No transaction history found for this user.
+                      </td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- Delete User -->
-          <form
-            action="/admin/users/<%= user._id %>/delete"
-            method="POST"
-            class="inline"
+          <button
+            type="button"
+            onclick="deleteUser('<%= user._id %>')"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
-            <button
-              type="submit"
-              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              onclick="return confirm('Are you sure you want to delete this user?')"
-            >
-              Delete User
-            </button>
-          </form>
+            Delete User
+          </button>
         </div>
       </div>
     </main>
 
-    <%- include('partials/footer') %> <%- include('partials/toastalerts') %>
+    <%- include('partials/footer') %> <%- include('partials/toastalerts') %> <%- include('partials/confirmation-modal') %>
 
     <script>
+      document
+        .getElementById("edit-user-details-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const payload = {
+            Name: e.target.Name.value,
+            Email: e.target.Email.value,
+            Phone: e.target.Phone.value,
+            dateOfBirth: e.target.dateOfBirth.value,
+            CreditScore: e.target.CreditScore.value,
+            status: e.target.status ? e.target.status.value : undefined,
+            currency: e.target.currency ? e.target.currency.value : undefined,
+          };
+
+          try {
+            const response = await fetch(
+              "/admin/users/<%= user._id %>/update-details",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              }
+            );
+            const result = await response.json();
+            if (response.ok) {
+              showSuccess("Success", result.message, () => {
+                setTimeout(() => location.reload(), 600);
+              });
+            } else {
+              showError("Error", result.error || "Unable to update user details.");
+            }
+          } catch (err) {
+            showError("Error", "Server error. Please try again.");
+          }
+        });
+
+      async function setLoginBlock(loginBlocked) {
+        try {
+          const response = await fetch(
+            "/admin/users/<%= user._id %>/login-block",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ loginBlocked }),
+            }
+          );
+          const result = await response.json();
+          if (response.ok) {
+            showSuccess("Success", result.message, () => {
+              setTimeout(() => location.reload(), 600);
+            });
+          } else {
+            showError("Error", result.error || "Unable to update login access.");
+          }
+        } catch (err) {
+          showError("Error", "Server error. Please try again.");
+        }
+      }
+
+      const blockLoginBtn = document.getElementById("block-login-btn");
+      if (blockLoginBtn) {
+        blockLoginBtn.addEventListener("click", () => {
+          showConfirmation(
+            "Block Login",
+            "This user will no longer be able to sign in until you unblock them. Continue?",
+            () => setLoginBlock(true),
+            "Block Login",
+            "Cancel"
+          );
+        });
+      }
+
+      const unblockLoginBtn = document.getElementById("unblock-login-btn");
+      if (unblockLoginBtn) {
+        unblockLoginBtn.addEventListener("click", () => {
+          showConfirmation(
+            "Unblock Login",
+            "This will restore the user's ability to sign in. Continue?",
+            () => setLoginBlock(false),
+            "Unblock Login",
+            "Cancel"
+          );
+        });
+      }
+
       document
         .getElementById("balance-form")
         .addEventListener("submit", async (e) => {
@@ -134,15 +733,307 @@
             });
             const result = await response.json();
             if (response.ok) {
-              showToast("success", result.message);
-              setTimeout(() => location.reload(), 1500);
+              showSuccess('Success', result.message, () => {
+                setTimeout(() => location.reload(), 1000);
+              });
             } else {
-              showToast("error", result.error || "Update failed");
+              showError('Error', result.error || "Update failed");
             }
           } catch (err) {
-            showToast("error", "Server error");
+            showError('Error', "Server error. Please try again.");
           }
         });
+
+      function deleteUser(userId) {
+        showConfirmation(
+          'Delete User',
+          'Are you sure you want to delete this user? This action cannot be undone and all associated data will be permanently removed.',
+          () => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/users/${userId}/delete`;
+            document.body.appendChild(form);
+            form.submit();
+          },
+          'Delete',
+          'Cancel'
+        );
+      }
+
+      document
+        .getElementById("account-tier-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const payload = {
+            accountTier: e.target.accountTier.value,
+          };
+
+          try {
+            const response = await fetch(
+              "/admin/users/<%= user._id %>/account-tier",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              }
+            );
+
+            const result = await response.json();
+            if (response.ok) {
+              showSuccess("Success", result.message, () => {
+                setTimeout(() => location.reload(), 500);
+              });
+            } else {
+              showError("Error", result.error || "Unable to update account tier.");
+            }
+          } catch (err) {
+            showError("Error", "Server error. Please try again.");
+          }
+        });
+
+      document
+        .getElementById("transaction-lock-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const payload = {
+            isBlocked: true,
+            reasonCode: e.target.reasonCode.value,
+            unlockDepositAmount: e.target.unlockDepositAmount.value,
+            adminNote: e.target.adminNote.value,
+          };
+
+          try {
+            const response = await fetch(
+              "/admin/users/<%= user._id %>/transaction-lock",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              }
+            );
+
+            const result = await response.json();
+            if (response.ok) {
+              showSuccess("Success", result.message, () => {
+                setTimeout(() => location.reload(), 600);
+              });
+            } else {
+              showError("Error", result.error || "Unable to update transaction lock.");
+            }
+          } catch (err) {
+            showError("Error", "Server error. Please try again.");
+          }
+        });
+
+      document.getElementById("unlock-account-btn").addEventListener("click", () => {
+        showConfirmation(
+          "Remove Transaction Block",
+          "This will allow the user to withdraw immediately. Continue?",
+          async () => {
+            try {
+              const response = await fetch(
+                "/admin/users/<%= user._id %>/transaction-lock",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ isBlocked: false }),
+                }
+              );
+              const result = await response.json();
+
+              if (response.ok) {
+                showSuccess("Success", result.message, () => {
+                  setTimeout(() => location.reload(), 600);
+                });
+              } else {
+                showError("Error", result.error || "Unable to remove transaction lock.");
+              }
+            } catch (err) {
+              showError("Error", "Server error. Please try again.");
+            }
+          },
+          "Remove Block",
+          "Cancel"
+        );
+      });
+
+      document.querySelectorAll(".tx-backdate-btn").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const txId = button.dataset.transactionId;
+          const dateInput = document.querySelector(
+            `.tx-backdate-input[data-transaction-id="${txId}"]`
+          );
+          const nameInput = document.querySelector(
+            `.tx-name-input[data-transaction-id="${txId}"]`
+          );
+          const bankInput = document.querySelector(
+            `.tx-bank-input[data-transaction-id="${txId}"]`
+          );
+          const statusInput = document.querySelector(
+            `.tx-status-select[data-transaction-id="${txId}"]`
+          );
+
+          if (!dateInput || !dateInput.value) {
+            showError("Error", "Please select a valid date/time.");
+            return;
+          }
+
+          const originalText = button.textContent;
+          button.disabled = true;
+          button.textContent = "Saving...";
+
+          try {
+            const response = await fetch(
+              `/admin/users/<%= user._id %>/transactions/${txId}/backdate`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  backdatedAt: dateInput.value,
+                  personName: nameInput ? nameInput.value.trim() : "",
+                  bankName: bankInput ? bankInput.value.trim() : "",
+                  status: statusInput ? statusInput.value : undefined
+                }),
+              }
+            );
+
+            const result = await response.json();
+            if (response.ok) {
+              showSuccess("Success", result.message || "Transaction updated successfully.", () => {
+                setTimeout(() => location.reload(), 500);
+              });
+            } else {
+              showError("Error", result.error || "Failed to update transaction.");
+            }
+          } catch (err) {
+            showError("Error", "Server error. Please try again.");
+          } finally {
+            button.disabled = false;
+            button.textContent = originalText;
+          }
+        });
+      });
+
+      document.querySelectorAll(".tx-delete-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          const txId = button.dataset.transactionId;
+          showConfirmation(
+            "Delete Transaction",
+            "Are you sure you want to delete this transaction record? This action cannot be undone.",
+            async () => {
+              try {
+                const response = await fetch(
+                  `/admin/users/<%= user._id %>/transactions/${txId}/delete`,
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                  }
+                );
+                const result = await response.json();
+                if (response.ok) {
+                  showSuccess("Success", result.message || "Transaction deleted successfully.", () => {
+                    setTimeout(() => location.reload(), 500);
+                  });
+                } else {
+                  showError("Error", result.error || "Failed to delete transaction.");
+                }
+              } catch (err) {
+                showError("Error", "Server error. Please try again.");
+              }
+            },
+            "Delete",
+            "Cancel"
+          );
+        });
+      });
+
+      document
+        .getElementById("bulk-transactions-form")
+        ?.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const btn = document.getElementById("generate-bulk-btn");
+          const btnText = document.getElementById("generate-bulk-text");
+          const spinner = document.getElementById("generate-bulk-spinner");
+
+          const payload = {
+            totalAmount: e.target.totalAmount.value,
+            count: e.target.count.value,
+            distribution: e.target.distribution.value,
+            startDate: e.target.startDate.value,
+            endDate: e.target.endDate.value,
+            updateBalance: e.target.updateBalance.checked,
+          };
+
+          btn.disabled = true;
+          btnText.textContent = "Generating...";
+          spinner.classList.remove("hidden");
+
+          try {
+            const response = await fetch(
+              "/admin/users/<%= user._id %>/generate-transactions",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              }
+            );
+
+            const result = await response.json();
+            if (response.ok) {
+              showSuccess("Success", result.message, () => {
+                setTimeout(() => location.reload(), 600);
+              });
+            } else {
+              showError("Error", result.error || "Failed to generate bulk transactions.");
+            }
+          } catch (err) {
+            showError("Error", "Server error. Please try again.");
+          } finally {
+            btn.disabled = false;
+            btnText.textContent = "Generate Transactions";
+            spinner.classList.add("hidden");
+          }
+        });
+    </script>
+  
+    <script>
+      // Dedicated Currency Form Handler
+      const currencyForm = document.getElementById("currency-form");
+      if (currencyForm) {
+        currencyForm.addEventListener("submit", async function(e) {
+          e.preventDefault();
+          const selectedCurrency = document.getElementById("account-currency-select").value;
+          const submitBtn = document.getElementById("update-currency-submit-btn");
+          const btnText = document.getElementById("update-currency-btn-text");
+
+          if (submitBtn) submitBtn.disabled = true;
+          if (btnText) btnText.textContent = "Saving...";
+
+          try {
+            const response = await fetch("/admin/users/<%= user._id %>/currency", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ currency: selectedCurrency }),
+            });
+            const result = await response.json();
+            if (response.ok) {
+              showSuccess("Success", result.message || "Account currency updated successfully.", () => {
+                setTimeout(() => location.reload(), 400);
+              });
+            } else {
+              showError("Error", result.error || "Failed to update account currency.");
+            }
+          } catch (err) {
+            console.error("Currency update error:", err);
+            showError("Error", "Server error updating account currency.");
+          } finally {
+            if (submitBtn) submitBtn.disabled = false;
+            if (btnText) btnText.textContent = "Save Currency";
+          }
+        });
+      }
     </script>
   </body>
 </html>

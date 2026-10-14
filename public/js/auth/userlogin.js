@@ -1,92 +1,270 @@
-const loginForm = document.getElementById("login");
-const loginBtn = document.getElementById("login-btn");
-const loginText = document.getElementById("login-text");
-const spinner = document.getElementById("spinner");
+document.addEventListener("DOMContentLoaded", function () {
+  // Elements
+  const loginSection = document.getElementById("login-section");
+  const otpSection = document.getElementById("otp-section");
+  const loginForm = document.getElementById("login");
+  const loginBtn = document.getElementById("login-btn");
+  const loginText = document.getElementById("login-text");
+  const spinner = document.getElementById("spinner");
+  const loginErrorMsg = document.getElementById("login-error-msg");
+  const loginErrorText = document.getElementById("login-error-text");
 
-// Create modal in DOM
-const modalHTML = `
-<div id="kycModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
-  <div class="bg-white p-6 max-w-lg w-full shadow-lg">
-    <h2 class="text-lg font-bold mb-4" id="kycModalTitle">KYC Notice</h2>
-    <p class="text-gray-700 mb-6" id="kycModalMessage"></p>
-    <div class="flex justify-end space-x-2">
-      <button id="kycModalClose" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Close</button>
-      <button id="kycModalAction" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 hidden">Go to KYC</button>
-    </div>
-  </div>
-</div>
-`;
-document.body.insertAdjacentHTML("beforeend", modalHTML);
+  const loginOtpForm = document.getElementById("loginOtpForm");
+  const otpInput = document.getElementById("otpInput");
+  const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+  const verifyOtpText = document.getElementById("verifyOtpText");
+  const otpSpinner = document.getElementById("otpSpinner");
+  const otpErrorMsg = document.getElementById("otpErrorMsg");
+  const otpErrorText = document.getElementById("otpErrorText");
+  const otpSuccessMsg = document.getElementById("otpSuccessMsg");
+  const otpSuccessText = document.getElementById("otpSuccessText");
+  const userEmailSpan = document.getElementById("userEmailSpan");
+  const resendOtpBtn = document.getElementById("resendOtpBtn");
+  const backToLoginBtn = document.getElementById("backToLoginBtn");
 
-// Modal controls
-const kycModal = document.getElementById("kycModal");
-const kycModalMessage = document.getElementById("kycModalMessage");
-const kycModalAction = document.getElementById("kycModalAction");
-document.getElementById("kycModalClose").addEventListener("click", () => {
-  kycModal.classList.add("hidden");
-});
-kycModalAction.addEventListener("click", () => {
-  window.location.href = "/secure/ctb/kyc";
-});
+  const loginBlockedModal = document.getElementById("loginBlockedModal");
+  const loginBlockedModalMessage = document.getElementById("loginBlockedModalMessage");
+  const loginBlockedModalClose = document.getElementById("loginBlockedModalClose");
 
-loginForm.addEventListener("submit", async function (e) {
-  e.preventDefault();
+  // Determine dynamic base path (/user/secure/fubank or /user/secure/ctb)
+  const isFubank = window.location.pathname.includes("fubank");
+  const postBasePath = isFubank ? "/user/secure/fubank" : "/user/secure/ctb";
 
-  const formData = new FormData(loginForm);
-  const data = Object.fromEntries(formData.entries());
+  function showToastMessage(msg, isSuccess = false) {
+    if (typeof showToast === "function") {
+      showToast(msg);
+    }
+  }
 
-  loginBtn.disabled = true;
-  loginText.textContent = "Processing";
-  spinner.classList.remove("hidden");
+  // 1. Handle Login Form Submission
+  if (loginForm) {
+    loginForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      if (loginErrorMsg) loginErrorMsg.classList.add("hidden");
 
-  try {
-    const res = await fetch("/user/secure/ctb/login", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+      const emailVal = document.getElementById("email")?.value.trim();
+      const passwordVal = document.getElementById("password")?.value;
 
-    const result = await res.json();
-
-    if (res.ok) {
-      loginText.textContent = "Logged In!";
-      spinner.classList.add("hidden");
-      setTimeout(() => {
-        window.location.href = "/udp/dashboard";
-      }, 1000);
-    } else {
-      if (result.kycStatus === "not_submitted") {
-        kycModalMessage.textContent = result.error;
-        kycModalAction.classList.remove("hidden");
-        kycModal.classList.remove("hidden");
-        setTimeout(() => {
-          window.location.href = "/secure/ctb/kyc";
-        }, 1000);
-      } else if (result.kycStatus === "under_review") {
-        kycModalMessage.textContent = result.error;
-        kycModalAction.classList.add("hidden");
-        kycModal.classList.remove("hidden");
-      } else {
-        let errorMessage = "Login failed";
-        if (Array.isArray(result.errors)) {
-          errorMessage = result.errors.map((err) => err.msg).join(" | ");
-        } else if (result.error) {
-          errorMessage = result.error;
+      if (!emailVal || !passwordVal) {
+        if (loginErrorMsg && loginErrorText) {
+          loginErrorText.textContent = "Please provide both your email address and password.";
+          loginErrorMsg.classList.remove("hidden");
         }
-        showToast(errorMessage);
+        return;
       }
 
-      loginBtn.disabled = false;
-      loginText.textContent = "Log in";
-      spinner.classList.add("hidden");
-    }
-  } catch (error) {
-    showToast("Network error. Please try again.");
-    loginBtn.disabled = false;
-    loginText.textContent = "Log in";
-    spinner.classList.add("hidden");
+      loginBtn.disabled = true;
+      loginText.textContent = "Signing In...";
+      if (spinner) spinner.classList.remove("hidden");
+
+      try {
+        const res = await fetch(`${postBasePath}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ Email: emailVal, Password: passwordVal }),
+          credentials: "include",
+        });
+
+        const result = await res.json();
+
+        if (res.ok && result.requiresOtp) {
+          // Smoothly switch to Step 2: OTP Card
+          if (loginSection) loginSection.classList.add("hidden");
+          if (otpSection) otpSection.classList.remove("hidden");
+          if (userEmailSpan) userEmailSpan.textContent = result.email || emailVal;
+
+          if (otpInput) {
+            otpInput.value = "";
+            otpInput.focus();
+          }
+        } else if (res.ok && (result.message === "Login successful" || result.success)) {
+          loginText.textContent = "Redirecting...";
+          window.location.href = result.redirect || "/udp/dashboard";
+        } else {
+          if (result.loginBlocked) {
+            if (loginBlockedModalMessage) {
+              loginBlockedModalMessage.textContent =
+                result.error || "Login access blocked. Please contact support.";
+            }
+            if (loginBlockedModal) {
+              loginBlockedModal.classList.remove("hidden");
+              loginBlockedModal.classList.add("flex");
+            }
+          } else {
+            let errorText = result.error || "Invalid email or password.";
+            if (Array.isArray(result.errors) && result.errors.length > 0) {
+              errorText = result.errors.map((err) => err.msg).join(" | ");
+            }
+            if (loginErrorMsg && loginErrorText) {
+              loginErrorText.textContent = errorText;
+              loginErrorMsg.classList.remove("hidden");
+            }
+            showToastMessage(errorText);
+          }
+        }
+      } catch (err) {
+        console.error("Login fetch error:", err);
+        const netErr = "Network error connecting to server. Please try again.";
+        if (loginErrorMsg && loginErrorText) {
+          loginErrorText.textContent = netErr;
+          loginErrorMsg.classList.remove("hidden");
+        }
+        showToastMessage(netErr);
+      } finally {
+        loginBtn.disabled = false;
+        loginText.textContent = "Sign In";
+        if (spinner) spinner.classList.add("hidden");
+      }
+    });
+  }
+
+  // 2. Handle OTP Verification Submission
+  if (loginOtpForm) {
+    loginOtpForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      if (otpErrorMsg) otpErrorMsg.classList.add("hidden");
+      if (otpSuccessMsg) otpSuccessMsg.classList.add("hidden");
+
+      const codeVal = otpInput?.value.trim();
+      if (!codeVal || codeVal.length !== 6) {
+        if (otpErrorMsg && otpErrorText) {
+          otpErrorText.textContent = "Please enter the complete 6-digit verification code.";
+          otpErrorMsg.classList.remove("hidden");
+        }
+        return;
+      }
+
+      verifyOtpBtn.disabled = true;
+      verifyOtpText.textContent = "Verifying...";
+      if (otpSpinner) otpSpinner.classList.remove("hidden");
+
+      try {
+        const res = await fetch(`${postBasePath}/verify-login-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ otp: codeVal }),
+          credentials: "include",
+        });
+
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          verifyOtpText.textContent = "Verified!";
+          if (otpSuccessMsg && otpSuccessText) {
+            otpSuccessText.textContent = "Code verified! Redirecting to your dashboard...";
+            otpSuccessMsg.classList.remove("hidden");
+          }
+          setTimeout(() => {
+            window.location.href = result.redirect || "/udp/dashboard";
+          }, 400);
+        } else {
+          const errText = result.error || "Invalid or expired verification code.";
+          if (otpErrorMsg && otpErrorText) {
+            otpErrorText.textContent = errText;
+            otpErrorMsg.classList.remove("hidden");
+          }
+          showToastMessage(errText);
+          verifyOtpBtn.disabled = false;
+          verifyOtpText.textContent = "Verify & Enter Dashboard";
+          if (otpSpinner) otpSpinner.classList.add("hidden");
+        }
+      } catch (err) {
+        console.error("OTP verification error:", err);
+        const errText = "Network error verifying code. Please try again.";
+        if (otpErrorMsg && otpErrorText) {
+          otpErrorText.textContent = errText;
+          otpErrorMsg.classList.remove("hidden");
+        }
+        showToastMessage(errText);
+        verifyOtpBtn.disabled = false;
+        verifyOtpText.textContent = "Verify & Enter Dashboard";
+        if (otpSpinner) otpSpinner.classList.add("hidden");
+      }
+    });
+  }
+
+  // 3. Handle Resend OTP Code
+  if (resendOtpBtn) {
+    resendOtpBtn.addEventListener("click", async function (e) {
+      e.preventDefault();
+      if (otpErrorMsg) otpErrorMsg.classList.add("hidden");
+      if (otpSuccessMsg) otpSuccessMsg.classList.add("hidden");
+
+      resendOtpBtn.disabled = true;
+      const originalText = resendOtpBtn.textContent;
+      resendOtpBtn.textContent = "Sending...";
+
+      try {
+        const res = await fetch(`${postBasePath}/resend-login-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          const successMsg = result.message || "A new 6-digit code has been sent to your email.";
+          if (otpSuccessMsg && otpSuccessText) {
+            otpSuccessText.textContent = successMsg;
+            otpSuccessMsg.classList.remove("hidden");
+          }
+          showToastMessage(successMsg, true);
+
+          // 60-second cooldown
+          let secondsLeft = 60;
+          const interval = setInterval(() => {
+            secondsLeft--;
+            if (secondsLeft > 0) {
+              resendOtpBtn.textContent = `Resend (${secondsLeft}s)`;
+            } else {
+              clearInterval(interval);
+              resendOtpBtn.disabled = false;
+              resendOtpBtn.textContent = originalText;
+            }
+          }, 1000);
+        } else {
+          const failMsg = result.error || "Failed to resend code. Please try again.";
+          if (otpErrorMsg && otpErrorText) {
+            otpErrorText.textContent = failMsg;
+            otpErrorMsg.classList.remove("hidden");
+          }
+          showToastMessage(failMsg);
+          resendOtpBtn.disabled = false;
+          resendOtpBtn.textContent = originalText;
+        }
+      } catch (err) {
+        console.error("Resend OTP error:", err);
+        const failMsg = "Network error resending code.";
+        if (otpErrorMsg && otpErrorText) {
+          otpErrorText.textContent = failMsg;
+          otpErrorMsg.classList.remove("hidden");
+        }
+        resendOtpBtn.disabled = false;
+        resendOtpBtn.textContent = originalText;
+      }
+    });
+  }
+
+  // 4. Handle Back to Login
+  if (backToLoginBtn) {
+    backToLoginBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (otpSection) otpSection.classList.add("hidden");
+      if (loginSection) loginSection.classList.remove("hidden");
+      if (loginErrorMsg) loginErrorMsg.classList.add("hidden");
+      if (otpErrorMsg) otpErrorMsg.classList.add("hidden");
+      if (otpSuccessMsg) otpSuccessMsg.classList.add("hidden");
+    });
+  }
+
+  // 5. Handle Blocked Modal Close
+  if (loginBlockedModalClose) {
+    loginBlockedModalClose.addEventListener("click", function () {
+      if (loginBlockedModal) {
+        loginBlockedModal.classList.add("hidden");
+        loginBlockedModal.classList.remove("flex");
+      }
+    });
   }
 });

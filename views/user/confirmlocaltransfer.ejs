@@ -97,10 +97,12 @@
     <div id="transferModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
 
-            <div id="successIcon" class="mb-4 hidden"> <i
-                    class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
-                <h3 class="mt-2 text-xl font-semibold text-gray-800">Transfer Successful</h3>
-                <p class="text-sm text-gray-500" id="successMessage">Your transaction was completed.</p>
+            <div id="successIcon" class="mb-4 hidden">
+                <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto">
+                    <i class="fa-solid fa-clock-rotate-left text-amber-600 text-3xl animate-pulse"></i>
+                </div>
+                <h3 class="mt-2 text-xl font-semibold text-gray-800">Transfer Pending</h3>
+                <p class="text-sm text-gray-500" id="successMessage">Your payment is being processed and will be completed within 2 hours.</p>
             </div>
 
             <div id="failureIcon" class="mb-4 hidden"> <i

@@ -47,7 +47,7 @@ const internationalTransferSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending_otp", "completed", "failed", "cancelled"],
+      enum: ["pending_otp", "pending", "completed", "on hold", "reversed", "failed", "cancelled"],
       default: "pending_otp",
     },
   },

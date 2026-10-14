@@ -9,7 +9,29 @@ const { body, validationResult } = require("express-validator");
 const escape = require("escape-html");
 const bcrypt = require("bcrypt");
 const { generateOtp, sendOtpEmail } = require("../../config/transferotpmailer");
+const { sendTransferInitiatedEmail, sendTransferCreditEmail } = require("../../config/transactionmailer");
 const Notification = require("../../models/usermodels/notifications");
+
+const ACCOUNT_TIER_LIMITS = {
+  tier1: {
+    label: "Tier 1",
+    perTransactionLimit: 5000,
+    dailyLimit: 20000,
+    isUnlimited: false,
+  },
+  tier2: {
+    label: "Tier 2",
+    perTransactionLimit: 25000,
+    dailyLimit: 100000,
+    isUnlimited: false,
+  },
+  tier3: {
+    label: "Tier 3",
+    perTransactionLimit: null,
+    dailyLimit: null,
+    isUnlimited: true,
+  },
+};
 
 function generateNumericReferenceId() {
   const timestamp = Date.now().toString();
@@ -23,6 +45,106 @@ function generateNumericReferenceId() {
   return timestamp + randomPart;
 }
 
+function getTransactionBlockResponse(user) {
+  const lock = user?.transactionLock || {};
+  const unlockAmount = Number(lock.unlockDepositAmount || 0);
+
+  return {
+    error: "Withdrawals are temporarily blocked on this account.",
+    block: {
+      reasonTitle: lock.reasonTitle || "Withdrawal Restriction Active",
+      reasonMessage:
+        lock.reasonMessage ||
+        "Withdrawals are temporarily restricted on this account. Please contact support for assistance.",
+      unlockDepositAmount: unlockAmount,
+      unlockInstruction:
+        unlockAmount > 0
+          ? `To reactivate withdrawals, deposit at least $${unlockAmount.toFixed(
+              2
+            )}. The deposited funds remain fully yours and stay available in your account.`
+          : "Please contact support to reactivate withdrawals.",
+    },
+  };
+}
+
+function getAccountTierConfig(tier) {
+  return ACCOUNT_TIER_LIMITS[tier] || ACCOUNT_TIER_LIMITS.tier1;
+}
+
+function getTodayRange() {
+  const now = new Date();
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(now);
+  end.setHours(23, 59, 59, 999);
+  return { start, end };
+}
+
+async function getTodaysDebitTotals(userId) {
+  const { start, end } = getTodayRange();
+
+  const [historyDebits, pendingIntl, pendingLocal] = await Promise.all([
+    TransactionHistory.find({
+      userId,
+      type: "debit",
+      status: "successful",
+      transactionDate: { $gte: start, $lte: end },
+    })
+      .select("amount")
+      .lean(),
+    internationalTransferModel
+      .find({
+        userId,
+        status: "pending_otp",
+        createdAt: { $gte: start, $lte: end },
+      })
+      .select("Amount")
+      .lean(),
+    localTransferModel
+      .find({
+        userId,
+        status: "pending_otp",
+        createdAt: { $gte: start, $lte: end },
+      })
+      .select("Amount")
+      .lean(),
+  ]);
+
+  const successfulTotal = historyDebits.reduce(
+    (sum, tx) => sum + Number(tx.amount || 0),
+    0
+  );
+  const pendingTotal =
+    pendingIntl.reduce((sum, tx) => sum + Number(tx.Amount || 0), 0) +
+    pendingLocal.reduce((sum, tx) => sum + Number(tx.Amount || 0), 0);
+
+  return {
+    successfulTotal,
+    pendingTotal,
+    usedToday: successfulTotal + pendingTotal,
+  };
+}
+
+async function validateTierLimit(user, amount) {
+  const tier = getAccountTierConfig(user.accountTier);
+  if (tier.isUnlimited) {
+    return null;
+  }
+
+  if (amount > tier.perTransactionLimit) {
+    return `Your ${tier.label} per-transaction limit is $${tier.perTransactionLimit.toLocaleString()}. Please reduce the amount or contact support for a tier upgrade.`;
+  }
+
+  const { usedToday } = await getTodaysDebitTotals(user._id);
+  if (usedToday + amount > tier.dailyLimit) {
+    const remaining = Math.max(0, tier.dailyLimit - usedToday);
+    return `Your ${tier.label} daily transaction limit is $${tier.dailyLimit.toLocaleString()}. Remaining today: $${remaining.toLocaleString()}.`;
+  }
+
+  return null;
+}
+
+
 const internationalTransfer = [
   body("FullName")
     .isLength({ min: 2 })
@@ -30,8 +152,8 @@ const internationalTransfer = [
     .trim()
     .escape(),
   body("Amount")
-    .isFloat({ min: 100 })
-    .withMessage("Amount must be a number not less than 100")
+    .isFloat({ min: 1 })
+    .withMessage("Amount must be at least $1.00")
     .trim()
     .escape(),
   body("AccountNumber")
@@ -103,11 +225,15 @@ const internationalTransfer = [
       const userEmail = req.session.user.email;
 
       const safeFullName = escape(FullName);
-      const safeAmount = escape(Amount);
       const safeAccountNumber = escape(AccountNumber);
       const safeBankName = escape(BankName);
       const safeAddress = escape(Address);
       const safeIban = escape(Iban);
+
+      const transferAmount = parseFloat(Amount);
+      if (isNaN(transferAmount) || transferAmount < 1) {
+        return res.status(400).json({ error: "Invalid transfer amount." });
+      }
 
       const user = await User.findById(userId);
 
@@ -115,21 +241,17 @@ const internationalTransfer = [
         return res.status(404).json({ error: "User not found." });
       }
 
-      if (user.Balance < safeAmount) {
-        return res.status(400).json({ error: "Insufficient funds." });
+      if (user.transactionLock?.isBlocked) {
+        return res.status(423).json(getTransactionBlockResponse(user));
       }
 
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { $inc: { Balance: -safeAmount } },
-        { new: true }
-      );
+      const tierValidationError = await validateTierLimit(user, transferAmount);
+      if (tierValidationError) {
+        return res.status(400).json({ error: tierValidationError });
+      }
 
-      if (!updatedUser) {
-        console.error("Failed to update user balance for userId:", userId);
-        return res
-          .status(500)
-          .json({ error: "Failed to update balance. Please try again." });
+      if (user.AccountBalance < transferAmount) {
+        return res.status(400).json({ error: "Insufficient funds." });
       }
 
       const referenceId = generateNumericReferenceId();
@@ -141,7 +263,7 @@ const internationalTransfer = [
         userId: userId,
         ReferenceId: referenceId,
         FullName: safeFullName,
-        Amount: safeAmount,
+        Amount: transferAmount,
         AccountNumber: safeAccountNumber,
         BankName: safeBankName,
         Address: safeAddress,
@@ -153,13 +275,13 @@ const internationalTransfer = [
 
       await newTransfer.save();
 
-      const emailResult = await sendOtpEmail(userEmail, otp);
+      const emailResult = await sendOtpEmail(userEmail, otp, user?.Name);
       if (!emailResult.success) {
         console.error("Failed to send OTP email:", emailResult.error);
         await internationalTransferModel.deleteOne({ _id: newTransfer._id });
         return res.status(500).json({
           error:
-            "Failed to send OTP email. Please try Initiate the transaction again.",
+            "Failed to send OTP email. Please try initiating the transaction again.",
         });
       }
 
@@ -182,12 +304,12 @@ const localTransfer = [
     .trim()
     .escape(),
   body("Amount")
-    .isFloat({ min: 100 })
-    .withMessage("Amount must be a number not less than 100")
+    .isFloat({ min: 1 })
+    .withMessage("Amount must be at least $1.00")
     .trim(),
   body("AccountNumber")
-    .isLength({ min: 9, max: 9 })
-    .withMessage("Account Number must be 9 digits")
+    .isLength({ min: 5, max: 20 })
+    .withMessage("Account Number must be at least 5 digits")
     .isNumeric()
     .withMessage("Account Number must be numeric")
     .trim()
@@ -237,6 +359,18 @@ const localTransfer = [
         return res.status(404).json({ error: "Sender user not found." });
       }
 
+      if (senderUser.transactionLock?.isBlocked) {
+        return res.status(423).json(getTransactionBlockResponse(senderUser));
+      }
+
+      const tierValidationError = await validateTierLimit(
+        senderUser,
+        transferAmount
+      );
+      if (tierValidationError) {
+        return res.status(400).json({ error: tierValidationError });
+      }
+
       const recipientUser = await User.findOne({
         AccountNumber: AccountNumber,
       });
@@ -276,7 +410,7 @@ const localTransfer = [
 
       await newTransfer.save();
 
-      const emailResult = await sendOtpEmail(senderEmail, otp);
+      const emailResult = await sendOtpEmail(senderEmail, otp, senderUser?.Name);
       if (!emailResult.success) {
         console.error("Failed to send OTP email:", emailResult.error);
         await localTransferModel.deleteOne({ _id: newTransfer._id });
@@ -641,7 +775,7 @@ const verifyTransfer = [
         relatedUserId: null,
         relatedAccount: transfer.AccountNumber,
         relatedFullName: transfer.FullName,
-        status: "successful",
+        status: "pending",
       });
 
       await transactionHistory.save({ session });
@@ -649,9 +783,11 @@ const verifyTransfer = [
       const notification = new Notification({
         userId: userId,
         type: "transfer_debit",
-        message: `You sent $${transfer.Amount.toLocaleString()} to ${
+        title: "Transfer Pending",
+        statusType: "pending",
+        message: `You sent ${transfer.Amount.toLocaleString()} to ${
           transfer.FullName
-        } (${transfer.AccountNumber}). Reference: ${transfer.ReferenceId}.`,
+        } (${transfer.AccountNumber}). Reference: ${transfer.ReferenceId}. Payment is pending processing.`,
         relatedEntity: transfer._id,
         relatedReferenceId: transfer.ReferenceId,
         read: false,
@@ -659,7 +795,7 @@ const verifyTransfer = [
 
       await notification.save({ session });
 
-      transfer.status = "completed";
+      transfer.status = "pending";
       transfer.otp = null;
       transfer.otpExpires = null;
       await transfer.save({ session });
@@ -667,8 +803,15 @@ const verifyTransfer = [
       await session.commitTransaction();
       session.endSession();
 
+      // Send email alert to user (asynchronous & non-blocking)
+      sendTransferInitiatedEmail({
+        user,
+        transaction: transactionHistory,
+        transfer,
+      }).catch((err) => console.error("❌ Failed to send transfer initiated email:", err));
+
       res.status(200).json({
-        message: "International Transfer Successful!",
+        message: "Your payment is being processed and will be completed within 2 hours.",
         transferId: transfer._id,
         status: transfer.status,
       });
@@ -859,7 +1002,7 @@ const verifyLocalTransfer = [
         relatedUserId: transfer.recipientId,
         relatedAccount: transfer.AccountNumber,
         relatedFullName: transfer.FullName,
-        status: "successful",
+        status: "pending",
       });
       await senderDebitHistory.save({ session });
 
@@ -878,7 +1021,7 @@ const verifyLocalTransfer = [
       });
       await recipientCreditHistory.save({ session });
 
-      transfer.status = "completed";
+      transfer.status = "pending";
       transfer.otp = null;
       transfer.otpExpires = null;
       await transfer.save({ session });
@@ -886,9 +1029,11 @@ const verifyLocalTransfer = [
       const senderNotification = new Notification({
         userId: senderId,
         type: "transfer_debit",
-        message: `You sent ₦${transfer.Amount.toLocaleString()} to ${
+        title: "Transfer Pending",
+        statusType: "pending",
+        message: `You sent ${transfer.Amount.toLocaleString()} to ${
           transfer.FullName
-        } (${transfer.AccountNumber}). Reference: ${transfer.ReferenceId}.`,
+        } (${transfer.AccountNumber}). Reference: ${transfer.ReferenceId}. Payment is pending processing.`,
         relatedEntity: transfer._id,
         relatedReferenceId: transfer.ReferenceId,
         read: false,
@@ -898,7 +1043,9 @@ const verifyLocalTransfer = [
       const recipientNotification = new Notification({
         userId: transfer.recipientId,
         type: "transfer_credit",
-        message: `You received ₦${transfer.Amount.toLocaleString()} from ${
+        title: "Credit Alert",
+        statusType: "successful",
+        message: `You received ${transfer.Amount.toLocaleString()} from ${
           senderUser.Name
         } (${senderUser.AccountNumber}). Reference: ${transfer.ReferenceId}.`,
         relatedEntity: transfer._id,
@@ -910,12 +1057,28 @@ const verifyLocalTransfer = [
       await session.commitTransaction();
       session.endSession();
 
+      // Send email alert to sender (asynchronous & non-blocking)
+      sendTransferInitiatedEmail({
+        user: senderUser,
+        transaction: senderDebitHistory,
+        transfer,
+      }).catch((err) => console.error("❌ Failed to send sender transfer email:", err));
+
+      // Send credit alert email to recipient if internal user
+      if (recipientUser && recipientUser.Email) {
+        sendTransferCreditEmail({
+          user: recipientUser,
+          transaction: recipientCreditHistory,
+          senderName: senderUser.Name,
+        }).catch((err) => console.error("❌ Failed to send recipient credit email:", err));
+      }
+
       res.status(200).json({
-        message: `You successfully transferred ₦${transfer.Amount.toLocaleString()} to ${
-          transfer.FullName
-        }!`,
+        message: "Your payment is being processed and will be completed within 2 hours.",
+
+
         transferId: transfer._id,
-        status: transfer.status,
+        status: "pending",
       });
     } catch (err) {
       if (session && session.inTransaction()) {

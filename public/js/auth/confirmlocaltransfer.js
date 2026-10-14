@@ -1,5 +1,4 @@
-// Existing functions:
-function showSuccessModal(message = "Your transaction was completed.") {
+function showSuccessModal(message = "Your payment is being processed and will be completed within 2 hours.") {
   document.getElementById("transferModal").classList.remove("hidden");
   document.getElementById("successIcon").classList.remove("hidden");
   document.getElementById("failureIcon").classList.add("hidden");
@@ -91,7 +90,7 @@ form.addEventListener("submit", async function (event) {
     const data = await response.json();
 
     if (response.ok) {
-      showSuccessModal(data.message || "Transfer successfully completed!");
+      showSuccessModal(data.message || "Your payment is being processed and will be completed within 2 hours.");
     } else {
       showFailureModal(
         data.error || "Transfer failed. Please check your details."

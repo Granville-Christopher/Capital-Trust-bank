@@ -15,7 +15,7 @@ async function generateUniqueAccountNumber() {
     const max = 999999999;
     accountNumber = String(Math.floor(Math.random() * (max - min + 1)) + min);
 
-    const existingUser = await User.findOne({ accountNumber: accountNumber });
+    const existingUser = await User.findOne({ AccountNumber: accountNumber });
 
     if (!existingUser) {
       isUnique = true;

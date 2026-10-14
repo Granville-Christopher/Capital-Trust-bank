@@ -2,8 +2,11 @@ const express = require("express");
 const router = express.Router();
 const {
   transferPage,
-  localTransferPage,
 } = require("../../controllers/usercontrollers/transfercontroller");
+const {
+  getDepositPage,
+  submitDepositRequest,
+} = require("../../controllers/usercontrollers/depositcontroller");
 const User = require("../../models/usermodels/userSignup");
 const internationalTransferModel = require("../../models/usermodels/internationaltf");
 const TransactionHistory = require("../../models/usermodels/transactionhistory");
@@ -13,6 +16,11 @@ const LoanHistory = require("../../models/usermodels/loanhistory");
 const DebitCard = require("../../models/usermodels/debitcard");
 const CreditCard = require("../../models/usermodels/creditcard");
 const KYC = require("../../models/usermodels/kyc");
+const {
+  getUserCurrency,
+  getCurrencySymbol,
+  formatUserBalance,
+} = require("../../utils/currencyHelper");
 
 router.get("/savings", async (req, res) => {
   try {
@@ -27,20 +35,22 @@ router.get("/savings", async (req, res) => {
     }
 
     const kyc = await KYC.findOne({ userId }).lean();
-    if (!kyc) {
-      return res.status(404).render("user/login", { error: "KYC not found" });
-    }
-    const { getCurrencyAbbreviation } = require("country-currency-map");
-    const userCountry = kyc?.country;
-    const currencyCode = getCurrencyAbbreviation(userCountry) || "USD";
+    const currencyCode = getUserCurrency(user, kyc);
+    const currencySymbol = getCurrencySymbol(currencyCode);
 
-    return res.status(200).render("user/savings", { user, kyc, currencyCode });
+    return res.status(200).render("user/savings", {
+      user,
+      kyc: kyc || null,
+      currencyCode,
+      currencySymbol,
+    });
   } catch (error) {
     res.status(500).render("user/login", {
       error: "Server error",
       user: null,
       kyc: null,
-      currencyCode: null,
+      currencyCode: "USD",
+      currencySymbol: "$",
     });
   }
 });
@@ -108,12 +118,8 @@ router.get("/financehistory", async (req, res) => {
     );
 
     const kyc = await KYC.findOne({ userId }).lean();
-    if (!kyc) {
-      return res.status(404).render("user/login", { error: "KYC not found" });
-    }
-    const { getCurrencyAbbreviation } = require("country-currency-map");
-    const userCountry = kyc?.country;
-    const currencyCode = getCurrencyAbbreviation(userCountry) || "USD";
+    const currencyCode = getUserCurrency(user, kyc);
+    const currencySymbol = getCurrencySymbol(currencyCode);
 
     return res.status(200).render("user/financehistory", {
       user,
@@ -122,18 +128,18 @@ router.get("/financehistory", async (req, res) => {
       totalSavings,
       totalLoans,
       currencyCode,
-      kyc,
+      currencySymbol,
+      kyc: kyc || null,
     });
   } catch (error) {
     console.error("❌ Finance History Error:", error.stack || error);
-    res
-      .status(500)
-      .render("user/login", {
-        error: "Server error",
-        user: null,
-        kyc: null,
-        currencyCode: null,
-      });
+    res.status(500).render("user/login", {
+      error: "Server error",
+      user: null,
+      kyc: null,
+      currencyCode: "USD",
+      currencySymbol: "$",
+    });
   }
 });
 
@@ -175,11 +181,16 @@ router.get("/cards", async (req, res) => {
     const creditCard = await CreditCard.findOne({ userId }).lean();
     const debitCard = await DebitCard.findOne({ userId }).lean();
     const user = await User.findById(userId).lean();
+    const kyc = await KYC.findOne({ userId }).lean();
+    const currencyCode = getUserCurrency(user, kyc);
+    const currencySymbol = getCurrencySymbol(currencyCode);
 
     res.render("user/cards", {
       creditCard,
       debitCard,
       userName: user?.Name || "",
+      currencyCode,
+      currencySymbol,
     });
   } catch (err) {
     res.status(500).send("Server error");
@@ -209,7 +220,6 @@ router.get("/notifications", async (req, res) => {
 });
 
 router.get("/confirmtransfer/:transferId", transferPage);
-router.get("/confirmlocaltransfer/:transferId", localTransferPage);
 
 router.get("/creditcard", async (req, res) => {
   try {
@@ -262,35 +272,62 @@ router.get("/dashboard", async (req, res) => {
       return res.status(404).render("user/login", { error: "User not found" });
     }
 
-    const kyc = await KYC.findOne({ userId }).lean();
-    if (!kyc) {
-      console.log("KYC not found for user");
-      return res.status(404).render("user/login", { error: "KYC not found" });
-    }
+    const kyc = (await KYC.findOne({ userId }).lean()) || null;
 
-    const recentTransactions = await TransactionHistory.find({ userId })
+    const recentTransactions = (await TransactionHistory.find({ userId })
       .sort({ transactionDate: -1, createdAt: -1 })
       .limit(3)
+      .lean()) || [];
+
+    const statusPopup = await Notification.findOne({
+      userId,
+      popupDismissed: false,
+      statusType: { $in: ["successful", "completed", "on_hold", "reversed"] },
+    })
+      .sort({ createdAt: -1 })
       .lean();
 
-    const { getCurrencyAbbreviation } = require("country-currency-map");
-    const userCountry = kyc?.country;
-    const currencyCode = getCurrencyAbbreviation(userCountry) || "USD";
+    const currencyCode = getUserCurrency(user, kyc);
+    const currencySymbol = getCurrencySymbol(currencyCode);
+    const formattedBalance = formatUserBalance(user.AccountBalance, currencyCode);
+
     res.status(200).render("user/dashboard", {
       user,
       recentTransactions,
       kyc,
       currencyCode,
+      currencySymbol,
+      formattedBalance,
+      statusPopup: statusPopup || null,
     });
   } catch (error) {
     console.error("Dashboard error:", error);
 
-    res.status(500).render("user/dashboard", {
-      error: "Server error",
-      user: null,
-      recentTransactions: [],
-      kyc: null,
-      currencyCode: "USD",
+    try {
+      const userId = req.session.user?.id;
+      if (userId) {
+        const user = await User.findById(userId).lean();
+        if (user) {
+          const kyc = (await KYC.findOne({ userId }).lean()) || null;
+          const currencyCode = getUserCurrency(user, kyc);
+          const currencySymbol = getCurrencySymbol(currencyCode);
+          return res.status(200).render("user/dashboard", {
+            user,
+            recentTransactions: [],
+            kyc: null,
+            currencyCode,
+            currencySymbol,
+            formattedBalance: formatUserBalance(user.AccountBalance, currencyCode),
+            statusPopup: null,
+          });
+        }
+      }
+    } catch (fallbackErr) {
+      console.error("Dashboard fallback error:", fallbackErr);
+    }
+
+    return res.status(500).render("user/login", {
+      error: "An unexpected error occurred loading your dashboard. Please log in again.",
     });
   }
 });
@@ -308,48 +345,50 @@ router.get("/finance", async (req, res) => {
     }
 
     const kyc = await KYC.findOne({ userId }).lean();
-    if (!kyc) {
-      return res.status(404).render("user/login", { error: "KYC not found" });
-    }
+    const currencyCode = getUserCurrency(user, kyc);
+    const currencySymbol = getCurrencySymbol(currencyCode);
 
-    const { getCurrencyAbbreviation } = require("country-currency-map");
-    const userCountry = kyc?.country;
-    const currencyCode = getCurrencyAbbreviation(userCountry) || "USD";
-
-    return res.status(200).render("user/finance", { user, kyc, currencyCode });
+    return res.status(200).render("user/finance", {
+      user,
+      kyc: kyc || null,
+      currencyCode,
+      currencySymbol,
+    });
   } catch (error) {
     res.status(500).render("user/login", {
       error: "Server error",
       user: null,
       kyc: null,
-      currencyCode: null,
+      currencyCode: "USD",
+      currencySymbol: "$",
     });
   }
 });
 
-router.get("/internationaltransfer", async (req, res) => {
+router.get("/transfer", async (req, res) => {
   try {
     const userId = req.session.user?.id;
     if (!userId) {
       return res.redirect("/secure/ctb/login");
     }
+
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.redirect("/secure/ctb/login");
+    }
+
+    if (user.transactionLock?.isBlocked) {
+      return res.redirect("/udp/dashboard");
+    }
+
     return res.status(200).render("user/internationaltransfer");
   } catch (error) {
     return res.status(200).render("user/login");
   }
 });
 
-router.get("/localtransfer", async (req, res) => {
-  try {
-    const userId = req.session.user?.id;
-    if (!userId) {
-      return res.redirect("/secure/ctb/login");
-    }
-    return res.status(200).render("user/localtransfer");
-  } catch (error) {
-    return res.status(200).render("user/login");
-  }
-});
+router.get("/deposit", getDepositPage);
+router.post("/submit-deposit", submitDepositRequest);
 
 router.get("/settings", async (req, res) => {
   try {
@@ -363,11 +402,8 @@ router.get("/settings", async (req, res) => {
     }
 
     const kyc = await KYC.findOne({ userId }).lean();
-    if (!kyc) {
-      return res.status(404).render("user/login", { error: "KYC not found" });
-    }
 
-    return res.status(200).render("user/settings", { user, kyc });
+    return res.status(200).render("user/settings", { user, kyc: kyc || null });
   } catch (error) {
     console.error("Settings error:", error);
     return res
@@ -383,6 +419,11 @@ router.get("/transactionhistory", async (req, res) => {
       return res.redirect("/secure/ctb/login");
     }
 
+    const user = await User.findById(userId).lean();
+    if (!user) {
+      return res.status(404).render("user/login", { error: "User not found" });
+    }
+
     const internationalTransfers = await internationalTransferModel
       .find({ userId })
       .sort({ createdAt: -1 })
@@ -396,38 +437,39 @@ router.get("/transactionhistory", async (req, res) => {
     let totalExpenses = 0;
 
     transactionHistory.forEach((transaction) => {
+      const amt = Number(transaction.amount || 0);
       if (transaction.type === "credit") {
-        totalIncome += transaction.amount;
+        totalIncome += amt;
       } else if (transaction.type === "debit") {
-        totalExpenses += transaction.amount;
+        totalExpenses += amt;
       }
     });
 
     const kyc = await KYC.findOne({ userId }).lean();
-    if (!kyc) {
-      return res.status(404).render("user/login", { error: "KYC not found" });
-    }
-    const { getCurrencyAbbreviation } = require("country-currency-map");
-    const userCountry = kyc?.country;
-    const currencyCode = getCurrencyAbbreviation(userCountry) || "USD";
+    const currencyCode = getUserCurrency(user, kyc);
+    const currencySymbol = getCurrencySymbol(currencyCode);
 
     return res.status(200).render("user/transactionhistory", {
+      user,
       internationalTransfers,
       transactionHistory,
       totalIncome,
       totalExpenses,
       currencyCode,
-      kyc
+      currencySymbol,
+      kyc: kyc || null,
     });
   } catch (error) {
     console.error("❌ Error fetching transaction history:", error);
     return res.status(500).render("user/transactionhistory", {
+      user: null,
       internationalTransfers: [],
       transactionHistory: [],
       totalIncome: 0,
       totalExpenses: 0,
-      currencyCode: null,
-      kyc: null
+      currencyCode: "USD",
+      currencySymbol: "$",
+      kyc: null,
     });
   }
 });
@@ -445,21 +487,23 @@ router.get("/profile", async (req, res) => {
     }
 
     const kyc = await KYC.findOne({ userId }).lean();
-    if (!kyc) {
-      return res.status(404).render("user/login", { error: "KYC not found" });
-    }
-    const { getCurrencyAbbreviation } = require("country-currency-map");
-    const userCountry = kyc?.country;
-    const currencyCode = getCurrencyAbbreviation(userCountry) || "USD";
+    const currencyCode = getUserCurrency(user, kyc);
+    const currencySymbol = getCurrencySymbol(currencyCode);
 
-    return res.status(200).render("user/profile", { user, kyc, currencyCode });
+    return res.status(200).render("user/profile", {
+      user,
+      kyc: kyc || null,
+      currencyCode,
+      currencySymbol,
+    });
   } catch (error) {
     console.error("Profile error:", error);
     return res.status(500).render("user/login", {
       error: "Server error",
       user: null,
       kyc: null,
-      currencyCode: null,
+      currencyCode: "USD",
+      currencySymbol: "$",
     });
   }
 });

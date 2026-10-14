@@ -1,148 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Capital Trust Bank - Debit card</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
     <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
     <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
-
-    <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta property="og:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-    <meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:site_name" content="Capital Trust Bank" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@CTBankOfficial" />
-    <meta name="twitter:creator" content="@CTBankOfficial" />
-    <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta name="twitter:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-
-
+    <meta name="theme-color" content="#4f46e5" />
 </head>
 <style>
     .card-face {
         width: 100%;
-        height: 200px;
-        border-radius: 1rem;
+        height: 220px;
+        border-radius: 1.5rem;
         padding: 1.5rem;
-        background-color: #2563eb;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
         color: white;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 12px 24px rgba(99, 102, 241, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-face::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     }
 
     .card-back {
-        background-color: #1e3a8a;
+        background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
     }
 </style>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 space-y-6 text-gray-800 relative">
-
-    <div id="noCardSection" class="hidden text-center">
-        <p class="text-sm mb-4">No debit card available</p>
-        <button onclick="showCardTypeSelector()"
-            class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition">
-            Create New Debit Card?
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-24">
+    <div class="fixed top-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-b border-gray-100 flex items-center px-5 py-4 z-30 shadow-sm">
+        <button onclick="history.back()" class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100 mr-3">
+            <i class="fa-solid fa-arrow-left text-gray-700"></i>
         </button>
+        <h2 class="text-lg font-bold text-gray-800">Debit Card</h2>
     </div>
 
-    <div id="cardTypeSelector" class="hidden bg-white rounded-xl shadow p-6 max-w-md mx-auto">
-        <p class="text-sm font-semibold mb-4 text-center text-gray-700">Select Debit Card Type</p>
-        <div class="grid grid-cols-2 gap-4">
-            <div id="mastercardOption" onclick="selectCard('mastercard')"
-                class="cursor-pointer border-2 rounded-xl p-4 flex flex-col items-center transition hover:border-blue-400">
-                <i class="fa-brands fa-cc-mastercard text-4xl text-orange-500 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700">Mastercard</span>
+    <div class="pt-20 px-5 space-y-5">
+        <div id="noCardSection" class="hidden text-center bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-credit-card-alt text-gray-400 text-2xl"></i>
             </div>
-            <div id="visaOption" onclick="selectCard('visa')"
-                class="cursor-pointer border-2 rounded-xl p-4 flex flex-col items-center transition hover:border-blue-400">
-                <i class="fa-brands fa-cc-visa text-4xl text-blue-600 mb-2"></i>
-                <span class="text-sm font-medium text-gray-700">Visa</span>
-            </div>
-        </div>
-        <button onclick="confirmCardType()"
-            class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-            Continue
-        </button>
-    </div>
-
-    <div id="cardSection">
-        <div class="relative w-full max-w-md mx-auto">
-            <div id="carouselSlides" class="w-full">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 mt-6 text-center">
-            <button
-                class="flex flex-col items-center justify-center bg-white rounded-xl shadow px-4 py-5 hover:bg-blue-50 transition">
-                <i class="fa-solid fa-snowflake text-blue-600 text-2xl mb-1"></i>
-                <span class="text-sm font-medium text-gray-700">Freeze Card</span>
-            </button>
-            <button
-                class="flex flex-col items-center justify-center bg-white rounded-xl shadow px-4 py-5 hover:bg-red-50 transition">
-                <i class="fa-solid fa-ban text-red-600 text-2xl mb-1"></i>
-                <span class="text-sm font-medium text-red-700">Terminate Card</span>
+            <p class="text-gray-600 mb-4 font-medium">No debit card available</p>
+            <button onclick="showCardTypeSelector()"
+                class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-lg">
+                Create New Debit Card
             </button>
         </div>
 
-        <a href="/secure/ctb/managedebitcardpin" class="w-full">
-            <button
-                class="items-center justify-center bg-white rounded-xl mt-4 w-full shadow px-4 py-5 hover:bg-blue-50 transition">
-                <i class="fa-solid fa-edit text-blue-600 text-2xl mb-1"></i>
-                <span class="text-sm font-medium text-blue-700">Manage Card</span>
+        <div id="cardTypeSelector" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-md mx-auto">
+            <p class="text-base font-bold mb-5 text-center text-gray-800">Select Debit Card Type</p>
+            <div class="grid grid-cols-2 gap-4">
+                <div id="mastercardOption" onclick="selectCard('mastercard')"
+                    class="cursor-pointer border-2 border-gray-200 rounded-xl p-5 flex flex-col items-center transition hover:border-indigo-500 hover:bg-indigo-50">
+                    <i class="fa-brands fa-cc-mastercard text-4xl text-orange-500 mb-2"></i>
+                    <span class="text-sm font-semibold text-gray-700">Mastercard</span>
+                </div>
+                <div id="visaOption" onclick="selectCard('visa')"
+                    class="cursor-pointer border-2 border-gray-200 rounded-xl p-5 flex flex-col items-center transition hover:border-indigo-500 hover:bg-indigo-50">
+                    <i class="fa-brands fa-cc-visa text-4xl text-blue-600 mb-2"></i>
+                    <span class="text-sm font-semibold text-gray-700">Visa</span>
+                </div>
+            </div>
+            <button onclick="confirmCardType()"
+                class="mt-6 w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-lg">
+                Continue
             </button>
-        </a>
-    </div>
+        </div>
 
-    <div id="generatingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
-            <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
-            <h3 class="text-lg font-semibold">Generating Card...</h3>
-            <p class="text-sm text-gray-500">Please wait while we prepare your debit card.</p>
+        <div id="cardSection" class="space-y-5">
+            <div class="relative w-full max-w-md mx-auto">
+                <div id="carouselSlides" class="w-full"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-center max-w-md mx-auto">
+                <button
+                    class="flex flex-col items-center justify-center bg-white rounded-xl shadow-sm border border-gray-100 px-4 py-5 hover:bg-gray-50 transition hover:border-indigo-500">
+                    <i class="fa-solid fa-snowflake text-indigo-600 text-2xl mb-1"></i>
+                    <span class="text-sm font-semibold text-gray-700">Freeze Card</span>
+                </button>
+                <button
+                    class="flex flex-col items-center justify-center bg-white rounded-xl shadow-sm border border-gray-100 px-4 py-5 hover:bg-red-50 transition hover:border-red-500">
+                    <i class="fa-solid fa-ban text-red-600 text-2xl mb-1"></i>
+                    <span class="text-sm font-semibold text-red-700">Terminate Card</span>
+                </button>
+            </div>
+
+            <a href="/secure/ctb/managedebitcardpin" class="block max-w-md mx-auto">
+                <button
+                    class="w-full items-center justify-center bg-white rounded-xl shadow-sm border border-gray-100 px-4 py-5 hover:bg-indigo-50 transition hover:border-indigo-500">
+                    <i class="fa-solid fa-edit text-indigo-600 text-2xl mb-1"></i>
+                    <span class="text-sm font-semibold text-indigo-700">Manage Card</span>
+                </button>
+            </a>
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
-
-            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="mt-1">Home</span>
-            </a>
-
-            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-chart-line text-lg"></i>
-                <span class="mt-1">Finance</span>
-            </a>
-
-            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-credit-card text-lg"></i>
-                <span class="mt-1">Cards</span>
-            </a>
-
-            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="mt-1">Me</span>
-            </a>
-
+    <div id="generatingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
+            <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-5xl mb-4"></i>
+            <h3 class="text-lg font-bold text-gray-800">Generating Card...</h3>
+            <p class="text-sm text-gray-500 mt-2">Please wait while we prepare your debit card.</p>
         </div>
     </div>
-    <script src="/js/frontendfiles/debitcard.js"> </script>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-t border-gray-100 z-50">
+        <div class="flex justify-around items-center px-6 py-3">
+            <a href="dashboard" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-house text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
+            </a>
+            <a href="finance" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
+            </a>
+            <a href="cards" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
+            </a>
+            <a href="profile" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-user text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
+            </a>
+        </div>
+    </div>
+    <script src="/js/frontendfiles/debitcard.js"></script>
 </body>
 
 </html>

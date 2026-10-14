@@ -7,28 +7,59 @@
     <title>Capital Trust Bank - Loans</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
-    <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
-    <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
-    <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
-    <meta name="theme-color" content="#2563EB" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen pt-4 pb-24 px-6">
-
-    <div class="max-w-lg mx-4 pt-4 flex justify-between items-center z-10 bg-blue-100 fixed top-0 left-0 right-0">
-        <a href="finance"
-            class="inline-block mb-6 px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-            &larr; Back to Finance
-        </a>
-
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">My Loans</h1>
-    </div>
-    <div id="loanContainer" class="space-y-4 pt-16">
-        <p class="text-gray-500">Loading your loans...</p>
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+    <div class="fixed top-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-b border-gray-100 flex items-center px-4 py-3 z-30 shadow-sm">
+        <button onclick="history.back()" class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100 mr-2">
+            <i class="fa-solid fa-arrow-left text-gray-700 text-sm"></i>
+        </button>
+        <h2 class="text-sm font-bold text-gray-800">My Loans</h2>
     </div>
 
+    <div class="pt-16 px-4">
+        <div id="loanContainer" class="space-y-3 max-w-md mx-auto">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-2">
+                    <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-base"></i>
+                </div>
+                <p class="text-gray-600 font-medium text-sm">Loading your loans...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-t border-gray-100 z-50">
+        <div class="flex justify-around items-center px-4 py-2.5">
+            <a href="dashboard" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-house text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
+            </a>
+            <a href="finance" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
+            </a>
+            <a href="cards" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
+            </a>
+            <a href="profile" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
+            </a>
+        </div>
+    </div>
+    <script src="/js/frontendfiles/loans.js" defer></script>
 </body>
-<script src="/js/frontendfiles/loans.js" defer> </script>
 
 </html>

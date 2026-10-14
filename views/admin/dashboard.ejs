@@ -9,74 +9,129 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
       href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank"
     />
+    <style>
+      body { font-family: 'Inter', sans-serif; }
+    </style>
   </head>
-  <body class="bg-gray-100 min-h-screen">
+  <body class="bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50 min-h-screen">
     <%- include('partials/header') %> <%- include('partials/sidebar') %>
 
     <main class="ml-0 lg:ml-64 mt-20 p-6">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard Overview</h1>
+        <p class="text-sm text-gray-600">Welcome back, <%= admin?.name || 'Admin' %>. Here's what's happening today.</p>
+      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Users -->
-        <div class="bg-white rounded-xl p-6 shadow hover:shadow-md transition">
-          <div class="flex items-center">
-            <div class="p-3 bg-blue-100 rounded-full">
-              <i class="fa-solid fa-users text-blue-600 text-2xl"></i>
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-users text-white text-xl"></i>
             </div>
-            <div class="ml-4">
-              <p class="text-sm text-gray-600">Total Users</p>
-              <p class="text-2xl font-bold text-gray-800"><%= totalUsers %></p>
+            <div class="text-right">
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Active</span>
             </div>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">Total Users</p>
+            <p class="text-3xl font-bold text-gray-900"><%= totalUsers %></p>
+            <p class="text-xs text-gray-500 mt-2">Registered accounts</p>
           </div>
         </div>
 
         <!-- Pending KYC -->
-        <div class="bg-white rounded-xl p-6 shadow hover:shadow-md transition">
-          <div class="flex items-center">
-            <div class="p-3 bg-yellow-100 rounded-full">
-              <i class="fa-solid fa-id-card text-yellow-600 text-2xl"></i>
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-id-card text-white text-xl"></i>
             </div>
-            <div class="ml-4">
-              <p class="text-sm text-gray-600">Pending KYC</p>
-              <p class="text-2xl font-bold text-gray-800"><%= pendingKYC %></p>
+            <div class="text-right">
+              <span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Pending</span>
             </div>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">Pending KYC</p>
+            <p class="text-3xl font-bold text-gray-900"><%= pendingKYC %></p>
+            <p class="text-xs text-gray-500 mt-2">Awaiting verification</p>
           </div>
         </div>
 
         <!-- Active Loans -->
-        <div class="bg-white rounded-xl p-6 shadow hover:shadow-md transition">
-          <div class="flex items-center">
-            <div class="p-3 bg-green-100 rounded-full">
-              <i
-                class="fa-solid fa-hand-holding-dollar text-green-600 text-2xl"
-              ></i>
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-hand-holding-dollar text-white text-xl"></i>
             </div>
-            <div class="ml-4">
-              <p class="text-sm text-gray-600">Active Loans</p>
-              <p class="text-2xl font-bold text-gray-800"><%= activeLoans %></p>
+            <div class="text-right">
+              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Active</span>
             </div>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">Active Loans</p>
+            <p class="text-3xl font-bold text-gray-900"><%= activeLoans %></p>
+            <p class="text-xs text-gray-500 mt-2">Currently active</p>
           </div>
         </div>
 
         <!-- Verified Users -->
-        <div class="bg-white rounded-xl p-6 shadow hover:shadow-md transition">
-          <div class="flex items-center">
-            <div class="p-3 bg-purple-100 rounded-full">
-              <i class="fa-solid fa-check-circle text-purple-600 text-2xl"></i>
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-check-circle text-white text-xl"></i>
             </div>
-            <div class="ml-4">
-              <p class="text-sm text-gray-600">Verified Users</p>
-              <p class="text-2xl font-bold text-gray-800">
-                <%= verifiedUsers %>
-              </p>
+            <div class="text-right">
+              <span class="text-xs font-semibold text-violet-600 bg-violet-50 px-2 py-1 rounded-full">Verified</span>
             </div>
           </div>
+          <div>
+            <p class="text-sm font-medium text-gray-500 mb-1">Verified Users</p>
+            <p class="text-3xl font-bold text-gray-900"><%= verifiedUsers %></p>
+            <p class="text-xs text-gray-500 mt-2">KYC approved</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <a href="/admin/kyc" class="flex items-center p-4 bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl hover:from-amber-100 hover:to-amber-200 transition border border-amber-200">
+            <div class="w-12 h-12 rounded-lg bg-amber-500 flex items-center justify-center mr-4">
+              <i class="fa-solid fa-id-card text-white text-lg"></i>
+            </div>
+            <div>
+              <p class="font-semibold text-gray-900">Review KYC</p>
+              <p class="text-xs text-gray-600">Verify user documents</p>
+            </div>
+          </a>
+          <a href="/admin/deposit-requests" class="flex items-center p-4 bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-xl hover:from-indigo-100 hover:to-indigo-200 transition border border-indigo-200">
+            <div class="w-12 h-12 rounded-lg bg-indigo-500 flex items-center justify-center mr-4">
+              <i class="fa-solid fa-coins text-white text-lg"></i>
+            </div>
+            <div>
+              <p class="font-semibold text-gray-900">Deposit Requests</p>
+              <p class="text-xs text-gray-600">Approve deposits</p>
+            </div>
+          </a>
+          <a href="/admin/loans" class="flex items-center p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl hover:from-emerald-100 hover:to-emerald-200 transition border border-emerald-200">
+            <div class="w-12 h-12 rounded-lg bg-emerald-500 flex items-center justify-center mr-4">
+              <i class="fa-solid fa-hand-holding-dollar text-white text-lg"></i>
+            </div>
+            <div>
+              <p class="font-semibold text-gray-900">Manage Loans</p>
+              <p class="text-xs text-gray-600">View loan applications</p>
+            </div>
+          </a>
         </div>
       </div>
     </main>

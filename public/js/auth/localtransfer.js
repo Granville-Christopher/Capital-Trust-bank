@@ -11,7 +11,7 @@ accountNumberInput.addEventListener("input", () => {
   recipientFullNameInput.value = "";
   recipientFullNameInput.readOnly = true;
 
-  if (accountNumber.length === 9 && /^\d+$/.test(accountNumber)) {
+  if (accountNumber.length >= 5 && /^\d+$/.test(accountNumber)) {
     lookupTimeout = setTimeout(async () => {
       try {
         const response = await fetch(
@@ -57,6 +57,7 @@ form.addEventListener("submit", async function (event) {
 
   try {
     const amountInput = document.getElementById("Amount").value;
+    let transferAmount;
     try {
       const parsedAmount = parseFloat(amountInput);
       if (isNaN(parsedAmount) || parsedAmount < 1) {
@@ -82,8 +83,8 @@ form.addEventListener("submit", async function (event) {
       BankName: document.getElementById("Bank").value,
     };
 
-    if (!data.AccountNumber.match(/^\d{9}$/)) {
-      showToast("Account Number must be a 9-digit number.");
+    if (!data.AccountNumber.match(/^\d{5,20}$/)) {
+      showToast("Account Number must be at least 5 digits.");
       internationaltransferText.textContent = "Initiate transfer";
       spinner.classList.add("hidden");
       internationaltransferBtn.disabled = false;
@@ -108,7 +109,7 @@ form.addEventListener("submit", async function (event) {
       recipientFullNameInput.value === ""
     ) {
       showToast(
-        "Please enter a valid 9-digit account number to find the recipient, or ensure the recipient's name is filled."
+        "Please enter a valid account number to find the recipient, or ensure the recipient's name is filled."
       );
       internationaltransferText.textContent = "Initiate transfer";
       spinner.classList.add("hidden");
@@ -128,7 +129,14 @@ form.addEventListener("submit", async function (event) {
     if (contentType && contentType.includes("application/json")) {
       const responseData = await response.json();
       if (!response.ok) {
+        const blockMessage = responseData.block
+          ? `${responseData.block.reasonTitle || "Withdrawal Restriction Active"}: ${
+              responseData.block.reasonMessage || responseData.error
+            } ${responseData.block.unlockInstruction || ""}`
+          : null;
+
         const errorMsg =
+          blockMessage ||
           responseData.errors?.map((err) => err.msg).join("\n") ||
           responseData.error ||
           responseData.message ||

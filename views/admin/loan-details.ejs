@@ -16,13 +16,16 @@
       href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank"
     />
   </head>
-  <body class="bg-gray-100 min-h-screen">
+  <body class="bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50 min-h-screen">
     <%- include('partials/header') %> <%- include('partials/sidebar') %>
 
     <main class="ml-0 lg:ml-64 mt-20 p-6">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">Loan Details</h1>
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Loan Details</h1>
+        <p class="text-sm text-gray-600">View detailed information about the loan application.</p>
+      </div>
 
-      <div class="bg-white rounded-xl shadow p-6">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- User Info -->
           <div>
@@ -50,9 +53,9 @@
             <p>
               <strong>Status:</strong>
               <span
-                class="px-2 py-1 rounded-full text-xs font-medium <%= loan.status === 'Active' ? 'bg-green-100 text-green-800' : loan.status === 'Paid' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' %>"
+                class="px-2 py-1 rounded-full text-xs font-medium <%= loan.status === 'approved' ? 'bg-green-100 text-green-800' : loan.status === 'repaid' ? 'bg-blue-100 text-blue-800' : loan.status === 'defaulted' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' %>"
               >
-                <%= loan.status %>
+                <%= loan.status.charAt(0).toUpperCase() + loan.status.slice(1) %>
               </span>
             </p>
             <p>
@@ -66,7 +69,7 @@
         <div class="mt-6 pt-6 border-t">
           <h3 class="text-lg font-semibold text-gray-800 mb-4">Actions</h3>
           <div class="flex gap-4">
-            <% if (loan.status !== 'Paid') { %>
+            <% if (loan.status !== 'repaid') { %>
             <button
               onclick="markAsPaid('<%= loan._id %>')"
               class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
@@ -84,26 +87,33 @@
       </div>
     </main>
 
-    <%- include('partials/footer') %> <%- include('partials/toastalerts') %>
+    <%- include('partials/footer') %> <%- include('partials/toastalerts') %> <%- include('partials/confirmation-modal') %>
 
     <script>
       async function markAsPaid(loanId) {
-        if (!confirm("Are you sure you want to mark this loan as paid?"))
-          return;
-        try {
-          const response = await fetch(`/admin/loans/${loanId}/mark-paid`, {
-            method: "POST",
-          });
-          const result = await response.json();
-          if (response.ok) {
-            showToast("success", result.message);
-            setTimeout(() => (window.location.href = "/admin/loans"), 1500);
-          } else {
-            showToast("error", result.error || "Update failed");
-          }
-        } catch (err) {
-          showToast("error", "Server error");
-        }
+        showConfirmation(
+          'Mark Loan as Paid',
+          'Are you sure you want to mark this loan as paid? This action cannot be undone.',
+          async () => {
+            try {
+              const response = await fetch(`/admin/loans/${loanId}/mark-paid`, {
+                method: "POST",
+              });
+              const result = await response.json();
+              if (response.ok) {
+                showSuccess('Success', result.message, () => {
+                  setTimeout(() => (window.location.href = "/admin/loans"), 1000);
+                });
+              } else {
+                showError('Error', result.error || "Update failed");
+              }
+            } catch (err) {
+              showError('Error', "Server error. Please try again.");
+            }
+          },
+          'Mark as Paid',
+          'Cancel'
+        );
       }
     </script>
   </body>

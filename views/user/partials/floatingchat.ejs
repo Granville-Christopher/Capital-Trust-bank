@@ -1,0 +1,285 @@
+<!-- Live Support Floating Chat Widget -->
+<div id="support-chat-root" class="fixed bottom-24 right-5 md:bottom-8 md:right-8 z-50 font-sans">
+  
+  <!-- Floating Launcher Button -->
+  <button
+    id="chat-toggle-btn"
+    type="button"
+    class="relative flex items-center justify-center w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 focus:outline-none ring-4 ring-blue-500/20"
+    aria-label="Open Customer Support Chat"
+  >
+    <i id="chat-icon-open" class="fa-solid fa-headset text-2xl transition-transform duration-300"></i>
+    <i id="chat-icon-close" class="fa-solid fa-xmark text-2xl hidden transition-transform duration-300"></i>
+    
+    <!-- Unread Badge -->
+    <span
+      id="chat-unread-badge"
+      class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center ring-2 ring-white animate-pulse"
+    >
+      0
+    </span>
+  </button>
+
+  <!-- Chat Drawer / Modal Box -->
+  <div
+    id="chat-window"
+    class="hidden fixed bottom-24 right-5 md:bottom-24 md:right-8 w-[92vw] sm:w-[380px] max-w-[420px] h-[520px] max-h-[80vh] bg-white rounded-2xl shadow-2xl border border-slate-200/80 flex flex-col overflow-hidden z-50 transition-all duration-300 transform origin-bottom-right"
+  >
+    
+    <!-- Chat Header -->
+    <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white px-4 py-3.5 flex items-center justify-between shadow-md">
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <div class="w-10 h-10 rounded-full bg-blue-600/30 border border-blue-400/40 flex items-center justify-center text-white font-bold text-sm shadow-inner">
+            <i class="fa-solid fa-headset text-blue-300"></i>
+          </div>
+          <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold tracking-tight text-white leading-tight">Live Support Team</h3>
+          <p class="text-[11px] text-blue-200/90 flex items-center gap-1 font-medium">
+            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping inline-block"></span>
+            Online &bull; Instant Support
+          </p>
+        </div>
+      </div>
+      <button
+        id="chat-close-btn"
+        type="button"
+        class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white flex items-center justify-center transition"
+        title="Close Chat"
+      >
+        <i class="fa-solid fa-chevron-down text-xs"></i>
+      </button>
+    </div>
+
+    <!-- Notice Banner -->
+    <div class="bg-blue-50/80 border-b border-blue-100 px-3.5 py-1.5 text-[11px] text-blue-800 flex items-center gap-1.5 font-medium">
+      <i class="fa-solid fa-shield-halved text-blue-600 text-xs"></i>
+      <span>End-to-end encrypted banking support channel</span>
+    </div>
+
+    <!-- Messages Container -->
+    <div
+      id="chat-messages-container"
+      class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/60 scroll-smooth"
+    >
+      <!-- Default welcome bubble -->
+      <div class="flex items-start gap-2 max-w-[85%]">
+        <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5 shadow-sm">
+          <i class="fa-solid fa-headset text-[11px]"></i>
+        </div>
+        <div class="bg-white text-slate-800 border border-slate-200 rounded-2xl rounded-tl-sm px-3.5 py-2.5 shadow-sm text-xs leading-relaxed">
+          <p class="font-semibold text-[11px] text-blue-900 mb-0.5">Support Specialist</p>
+          <p>Hello! How can we assist you with your account, transfers, or services today?</p>
+          <span class="block text-[10px] text-slate-400 text-right mt-1">Just now</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Footer -->
+    <div class="p-3 bg-white border-t border-slate-100 flex items-center gap-2">
+      <div class="flex-1 relative">
+        <textarea
+          id="chat-input-text"
+          rows="1"
+          placeholder="Type your message here..."
+          class="w-full text-xs bg-slate-100/90 text-slate-900 placeholder-slate-400 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition resize-none max-h-24 leading-relaxed"
+        ></textarea>
+      </div>
+      <button
+        id="chat-send-btn"
+        type="button"
+        class="w-9 h-9 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white flex items-center justify-center transition shadow-md flex-shrink-0"
+        title="Send Message"
+      >
+        <i class="fa-solid fa-paper-plane text-xs"></i>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  const toggleBtn = document.getElementById("chat-toggle-btn");
+  const closeBtn = document.getElementById("chat-close-btn");
+  const chatWindow = document.getElementById("chat-window");
+  const iconOpen = document.getElementById("chat-icon-open");
+  const iconClose = document.getElementById("chat-icon-close");
+  const unreadBadge = document.getElementById("chat-unread-badge");
+  const messagesContainer = document.getElementById("chat-messages-container");
+  const inputText = document.getElementById("chat-input-text");
+  const sendBtn = document.getElementById("chat-send-btn");
+
+  let isOpen = false;
+  let pollInterval = null;
+  let badgeInterval = null;
+  let loadedMessageIds = new Set();
+
+  function formatTime(isoDate) {
+    if (!isoDate) return "";
+    const d = new Date(isoDate);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function scrollToBottom() {
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  }
+
+  function renderMessage(msg) {
+    if (loadedMessageIds.has(msg.id)) return;
+    loadedMessageIds.add(msg.id);
+
+    const isUser = msg.sender === "user";
+    const wrapper = document.createElement("div");
+
+    if (isUser) {
+      wrapper.className = "flex justify-end";
+      wrapper.innerHTML = `
+        <div class="max-w-[85%] bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl rounded-tr-sm px-3.5 py-2.5 shadow-sm text-xs leading-relaxed">
+          <p class="whitespace-pre-wrap">${msg.message}</p>
+          <span class="block text-[10px] text-blue-200 text-right mt-1">${formatTime(msg.createdAt)}</span>
+        </div>
+      `;
+    } else {
+      wrapper.className = "flex items-start gap-2 max-w-[85%]";
+      wrapper.innerHTML = `
+        <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5 shadow-sm">
+          <i class="fa-solid fa-headset text-[11px]"></i>
+        </div>
+        <div class="bg-white text-slate-800 border border-slate-200 rounded-2xl rounded-tl-sm px-3.5 py-2.5 shadow-sm text-xs leading-relaxed">
+          <p class="font-semibold text-[11px] text-blue-900 mb-0.5">${msg.adminName || 'Support Specialist'}</p>
+          <p class="whitespace-pre-wrap">${msg.message}</p>
+          <span class="block text-[10px] text-slate-400 text-right mt-1">${formatTime(msg.createdAt)}</span>
+        </div>
+      `;
+    }
+
+    messagesContainer.appendChild(wrapper);
+    scrollToBottom();
+  }
+
+  async function fetchMessages() {
+    try {
+      const res = await fetch("/user/api/support-chat/messages");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.success && Array.isArray(data.messages)) {
+        data.messages.forEach(renderMessage);
+        updateUnreadBadge(0);
+      }
+    } catch (err) {
+      console.warn("Could not fetch support chat messages:", err);
+    }
+  }
+
+  async function fetchUnreadCount() {
+    if (isOpen) return;
+    try {
+      const res = await fetch("/user/api/support-chat/unread-count");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.success) {
+        updateUnreadBadge(data.unreadCount || 0);
+      }
+    } catch (err) {
+      // quiet fail
+    }
+  }
+
+  function updateUnreadBadge(count) {
+    if (!unreadBadge) return;
+    if (count > 0) {
+      unreadBadge.textContent = count > 9 ? "9+" : count;
+      unreadBadge.classList.remove("hidden");
+      unreadBadge.classList.add("flex");
+    } else {
+      unreadBadge.classList.add("hidden");
+      unreadBadge.classList.remove("flex");
+    }
+  }
+
+  function toggleChat(forceOpen) {
+    isOpen = typeof forceOpen === "boolean" ? forceOpen : !isOpen;
+    if (isOpen) {
+      chatWindow.classList.remove("hidden");
+      iconOpen.classList.add("hidden");
+      iconClose.classList.remove("hidden");
+      fetchMessages();
+      scrollToBottom();
+      if (inputText) inputText.focus();
+      if (!pollInterval) {
+        pollInterval = setInterval(fetchMessages, 3500);
+      }
+    } else {
+      chatWindow.classList.add("hidden");
+      iconOpen.classList.remove("hidden");
+      iconClose.classList.add("hidden");
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+      }
+      fetchUnreadCount();
+    }
+  }
+
+  async function handleSend() {
+    const text = (inputText.value || "").trim();
+    if (!text) return;
+
+    inputText.value = "";
+    sendBtn.disabled = true;
+
+    // Optimistically render
+    const tempId = "temp-" + Date.now();
+    renderMessage({
+      id: tempId,
+      sender: "user",
+      message: text,
+      createdAt: new Date().toISOString(),
+    });
+
+    try {
+      const res = await fetch("/user/api/support-chat/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+      if (data.success && data.message) {
+        loadedMessageIds.add(data.message.id);
+      }
+    } catch (err) {
+      console.error("Failed to send message:", err);
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  if (toggleBtn) toggleBtn.addEventListener("click", () => toggleChat());
+  if (closeBtn) closeBtn.addEventListener("click", () => toggleChat(false));
+  if (sendBtn) sendBtn.addEventListener("click", handleSend);
+
+  if (inputText) {
+    inputText.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+  }
+
+  // Global trigger helper
+  window.openSupportChat = function() {
+    toggleChat(true);
+  };
+
+  // Initial check
+  fetchUnreadCount();
+  badgeInterval = setInterval(fetchUnreadCount, 15000);
+})();
+</script>

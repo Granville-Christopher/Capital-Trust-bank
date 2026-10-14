@@ -1,130 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Capital Trust Bank - Set credit card pin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
     <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
     <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
-
-    <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta property="og:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-    <meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:site_name" content="Capital Trust Bank" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@CTBankOfficial" />
-    <meta name="twitter:creator" content="@CTBankOfficial" />
-    <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta name="twitter:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-
-
+    <meta name="theme-color" content="#4f46e5" />
 </head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 flex flex-col justify-center items-center">
-    <div class="bg-white rounded-xl shadow p-6 max-w-sm w-full text-center">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">
-            <i class="fa-solid fa-key text-blue-600 mr-2"></i>
-            Set Credit Card PIN
-        </h2>
-
-        <p class="text-sm text-gray-600 mb-3">Enter your 4-digit PIN</p>
-        <div class="flex justify-center gap-2 mb-6">
-            <input type="password" maxlength="1" class="pin-box" />
-            <input type="password" maxlength="1" class="pin-box" />
-            <input type="password" maxlength="1" class="pin-box" />
-            <input type="password" maxlength="1" class="pin-box" />
-        </div>
-
-        <button id="setPinBtn"
-            class="w-full py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition">
-            <i class="fa-solid fa-lock mr-2"></i> Set Pin
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-24">
+    <div class="fixed top-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-b border-gray-100 flex items-center px-5 py-4 z-30 shadow-sm">
+        <button onclick="history.back()" class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100 mr-3">
+            <i class="fa-solid fa-arrow-left text-gray-700"></i>
         </button>
+        <h2 class="text-lg font-bold text-gray-800">Set Credit Card PIN</h2>
+    </div>
+
+    <div class="pt-20 px-5 flex flex-col justify-center items-center min-h-[calc(100vh-80px)]">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-sm w-full text-center">
+            <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-key text-indigo-600 text-2xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Set Credit Card PIN</h2>
+
+            <p class="text-sm font-semibold text-gray-700 mb-4">Enter your 4-digit PIN</p>
+            <div class="flex justify-center gap-3 mb-6">
+                <input type="password" maxlength="1" class="pin-box" />
+                <input type="password" maxlength="1" class="pin-box" />
+                <input type="password" maxlength="1" class="pin-box" />
+                <input type="password" maxlength="1" class="pin-box" />
+            </div>
+
+            <button id="setPinBtn"
+                class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl font-semibold hover:from-indigo-700 hover:to-indigo-800 transition shadow-lg">
+                <i class="fa-solid fa-lock mr-2"></i> Set Pin
+            </button>
+        </div>
     </div>
 
     <style>
         .pin-box {
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 3rem;
+            height: 3rem;
             text-align: center;
             font-size: 1.25rem;
-            border: 2px solid #3b82f6;
-            border-radius: 9999px;
+            font-weight: 600;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
             outline: none;
+            transition: all 0.3s;
         }
 
         .pin-box:focus {
-            box-shadow: 0 0 0 2px #3b82f6;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
     </style>
 
-    <div id="generatingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
-            <i class="fa-solid fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
-            <h3 class="text-lg font-semibold">Setting PIN...</h3>
-            <p class="text-sm text-gray-500">Please wait while we set your credit card PIN.</p>
+    <div id="generatingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
+            <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-5xl mb-4"></i>
+            <h3 class="text-lg font-bold text-gray-800">Setting PIN...</h3>
+            <p class="text-sm text-gray-500 mt-2">Please wait while we set your credit card PIN.</p>
         </div>
     </div>
 
-    <div id="pinModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
-
+    <div id="pinModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center relative">
             <div id="successIcon" class="mb-4">
-                <i class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
-                <h3 class="mt-2 text-xl font-semibold text-gray-800">PIN Set Successfully</h3>
-                <p class="text-sm text-gray-500">Your credit card PIN has been set.</p>
+                <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-circle-check text-emerald-600 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">PIN Set Successfully</h3>
+                <p class="text-sm text-gray-500 mt-2">Your credit card PIN has been set.</p>
             </div>
 
             <div id="failureIcon" class="mb-4 hidden">
-                <i class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
-                <h3 class="mt-2 text-xl font-semibold text-gray-800">Failed to Set PIN</h3>
-                <p class="text-sm text-gray-500">Something went wrong. Please try again.</p>
+                <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-circle-xmark text-red-600 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">Failed to Set PIN</h3>
+                <p class="text-sm text-gray-500 mt-2">Something went wrong. Please try again.</p>
             </div>
 
             <button onclick="closePinModal()"
-                class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+                class="mt-6 w-full py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition font-semibold shadow-lg">
                 Close
             </button>
         </div>
     </div>
-    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
 
-            <a href="/udp/dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="mt-1">Home</span>
+    <div class="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-t border-gray-100 z-50">
+        <div class="flex justify-around items-center px-6 py-3">
+            <a href="/udp/dashboard" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-house text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
             </a>
-
-            <a href="/udp/finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-chart-line text-lg"></i>
-                <span class="mt-1">Finance</span>
+            <a href="/udp/finance" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
             </a>
-
-            <a href="/udp/cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-credit-card text-lg"></i>
-                <span class="mt-1">Cards</span>
+            <a href="/udp/cards" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
             </a>
-
-            <a href="/udp/profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="mt-1">Me</span>
+            <a href="/udp/profile" class="flex flex-col items-center gap-1 text-gray-600">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-user text-lg"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
             </a>
-
         </div>
     </div>
 

@@ -130,4 +130,11 @@ router.get("/setdebitcardpin", async (req, res) => {
   }
 });
 
+router.all("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) console.error("Logout error:", err);
+    res.redirect("/secure/ctb/login");
+  });
+});
+
 module.exports = router;

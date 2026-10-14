@@ -1,13 +1,19 @@
-require('dotenv').config();
+require("dotenv").config();
 const mongoose = require("mongoose");
 
 const db = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+    const mongoUri =
+      process.env.MONGO_URL ||
+      process.env.MONGODB_URI ||
+      process.env.MONGO_URI ||
+      process.env.DATABASE_URL ||
+      "mongodb+srv://christophergranville2_db_user:0gIEP0xwNMwpP8RA@cluster0.jx7kqcg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+    await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 15000,
     });
-    console.log("✅ MongoDB Connected");
+    console.log("✅ MongoDB Connected successfully");
   } catch (error) {
     console.error("❌ MongoDB Connection Failed:", error.message);
   }

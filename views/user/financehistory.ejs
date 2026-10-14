@@ -7,227 +7,218 @@
     <title>Capital Trust Bank - Finance History</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
     <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
     <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
-    <meta name="theme-color" content="#2563EB" />
+    <meta name="theme-color" content="#4f46e5" />
 </head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 space-y-6 relative">
-
-    <div class="flex justify-between px-3 fixed right-0 left-0 top-0 bg-blue-100 items-center mb-4 shadow-md">
-        <h2 class="text-xl py-4 font-semibold text-gray-800">
-            <i class="fa-solid fa-file-invoice-dollar text-blue-600 mr-2"></i>
-            Finance History
-        </h2>
-        <p class="text-blue-600">
-            <a href="finance">Back to finance</a>
-        </p>
-    </div>
-
-    <div class="flex justify-between mb-4 pt-8 px-4 max-w-7xl mx-auto">
-        <button id="btnSavings" class="text-blue-600 font-semibold border-b-2 border-b-blue-600 pb-1">
-            Savings History
-        </button>
-        <button id="btnLoans"
-            class="text-gray-600 font-semibold border-b-2 border-transparent pb-1 hover:text-blue-600">
-            Loan History
-        </button>
-    </div>
-
-    <div id="savingsHistorySection" class="max-w-7xl mx-auto block space-y-4">
-
-        <div class="flex justify-between items-center px-4">
-            <p class="font-semibold text-gray-700">Total Amount Saved:</p>
-            <p class="font-semibold text-blue-600">
-                <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
-                    .format(totalSavings || 0) %>
-            </p>
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+    <div class="fixed top-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-b border-gray-100 flex items-center justify-between px-4 py-3 z-30 shadow-sm">
+        <div class="flex items-center gap-2">
+            <button onclick="history.back()" class="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition border border-gray-100">
+                <i class="fa-solid fa-arrow-left text-gray-700 text-sm"></i>
+            </button>
+            <h2 class="text-sm font-bold text-gray-800">Finance History</h2>
         </div>
+        <a href="finance" class="text-indigo-600 hover:text-indigo-700 text-xs font-semibold">Back to Finance</a>
+    </div>
 
-        <div class="flex justify-end mb-2 px-4">
-            <button id="downloadSavingsHistory" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Download Savings History
+    <div class="pt-16 px-4 space-y-4">
+        <div class="flex justify-between max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 p-3">
+            <button id="btnSavings" class="text-indigo-600 font-semibold border-b-2 border-indigo-600 pb-1.5 px-3 text-xs">
+                Savings History
+            </button>
+            <button id="btnLoans" class="text-gray-500 font-semibold border-b-2 border-transparent pb-1.5 px-3 hover:text-indigo-600 text-xs">
+                Loan History
             </button>
         </div>
 
-        <div class="overflow-x-auto rounded-xl pb-6 max-h-[550px] bg-white shadow">
+        <div id="savingsHistorySection" class="max-w-7xl mx-auto block space-y-4">
+            <div class="flex justify-between items-center px-4 bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                <p class="font-semibold text-gray-700">Total Amount Saved:</p>
+                <p class="font-bold text-indigo-600 text-lg">
+                    <%= new Intl.NumberFormat(undefined, { style: "currency", currency: currencyCode }).format(totalSavings || 0) %>
+                </p>
+            </div>
 
-            <table class="w-full text-sm" id="savingsTable">
-                <thead class="bg-blue-100 text-gray-700 sticky w-full top-0 z-10">
-                    <div class="flex justify-between items-center px-4 py-3 border-b">
-                        <div class="text-gray-700 font-semibold whitespace-nowrap p-4">
-                            <p>Total Deposits:</p>
-                            <span class="text-green-600">
-                                <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
-                                    .format( savingsHistory.filter(s=> s.type === 'deposit')
-                                    .reduce((sum, s) => sum + (s.amount || 0), 0)
-                                    ) %>
-                            </span>
-                        </div>
+            <div class="flex justify-end mb-2 px-4">
+                <button id="downloadSavingsHistory" class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition shadow-md">
+                    <i class="fa-solid fa-download mr-2"></i>Download Savings History
+                </button>
+            </div>
 
-                        <div class="text-gray-700 font-semibold whitespace-nowrap p-4">
-                            <p>Total Withdrawals:</p>
-                            <span class="text-red-600">
-                                <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
-                                    .format( savingsHistory.filter(s=> s.type === 'withdraw_interest')
-                                    .reduce((sum, s) => sum + (s.amount || 0), 0)
-                                    ) %>
-                            </span>
+            <div class="overflow-x-auto rounded-2xl pb-6 max-h-[550px] bg-white shadow-sm border border-gray-100">
+                <table class="w-full text-sm" id="savingsTable">
+                    <thead class="bg-indigo-50 text-gray-700 sticky w-full top-0 z-10">
+                        <div class="flex justify-between items-center px-4 py-3 border-b border-gray-200">
+                            <div class="text-gray-700 font-semibold whitespace-nowrap p-4">
+                                <p class="text-xs text-gray-500 mb-1">Total Deposits:</p>
+                                <span class="text-emerald-600 text-lg">
+                                    <%= new Intl.NumberFormat(undefined, { style: "currency", currency: currencyCode }).format(savingsHistory.filter(s=> s.type === 'deposit').reduce((sum, s) => sum + (s.amount || 0), 0)) %>
+                                </span>
+                            </div>
+                            <div class="text-gray-700 font-semibold whitespace-nowrap p-4">
+                                <p class="text-xs text-gray-500 mb-1">Total Withdrawals:</p>
+                                <span class="text-red-600 text-lg">
+                                    <%= new Intl.NumberFormat(undefined, { style: "currency", currency: currencyCode }).format(savingsHistory.filter(s=> s.type === 'withdraw_interest').reduce((sum, s) => sum + (s.amount || 0), 0)) %>
+                                </span>
+                            </div>
+                            <div class="text-gray-700 font-semibold whitespace-nowrap p-4">
+                                <p class="text-xs text-gray-500 mb-1">Total Compound Interest:</p>
+                                <span class="text-indigo-600 text-lg">
+                                    <%= new Intl.NumberFormat(undefined, { style: "currency", currency: currencyCode }).format(savingsHistory.filter(s=> s.type === 'compound_interest').reduce((sum, s) => sum + (s.amount || 0), 0)) %>
+                                </span>
+                            </div>
                         </div>
-
-                        <div class="text-gray-700 font-semibold whitespace-nowrap p-4">
-                            <p>Total Compound Interest:</p>
-                            <span class="text-blue-600">
-                                <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
-                                    .format( savingsHistory.filter(s=> s.type === 'compound_interest')
-                                    .reduce((sum, s) => sum + (s.amount || 0), 0)
-                                    ) %>
-                            </span>
-                        </div>
-                    </div>
-                    <tr>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Date</th>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Type</th>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Amount</th>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Balance After</th>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Reference ID</th>
-                    </tr>
-                </thead>
-                <tbody class="text-gray-800 bg-white">
-                    <% if (savingsHistory && savingsHistory.length> 0) { %>
-                        <% savingsHistory.forEach(function(saving) { %>
-                            <tr class="border-b">
-                                <td class="py-2 px-4">
-                                    <%= new Date(saving.createdAt).toLocaleDateString() %>
-                                </td>
-                                <td class="py-2 px-4 capitalize
-                                <% if (saving.type === 'deposit') { %> text-green-600 
-                                <% } else if (saving.type === 'withdraw_interest') { %> text-red-600 
-                                <% } else if (saving.type === 'compound_interest') { %> text-blue-600 
-                                <% } else { %> text-gray-600 <% } %>">
-                                    <%= saving.type.replace('_', ' ' ) %>
-                                </td>
-                                <td class="py-2 px-4 font-semibold 
-                                <% if (saving.type === 'deposit') { %> text-green-600 
-                                <% } else if (saving.type === 'withdraw_interest') { %> text-red-600 <% } %>">
-                                    <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
-                                        .format(saving.amount || 0) %>
-                                </td>
-                                <td class="py-2 px-4 text-blue-600 font-semibold">
-                                    <%= new Intl.NumberFormat(undefined, { style: "currency" , currency: currencyCode })
-                                        .format(saving.balanceAfter || 0) %>
-                                </td>
-                                <td class="py-2 px-4 text-gray-600">
-                                    <%= saving.referenceId ? saving.referenceId : 'N/A' %>
+                        <tr>
+                            <th class="py-3 px-4 text-left whitespace-nowrap font-semibold">Date</th>
+                            <th class="py-3 px-4 text-left whitespace-nowrap font-semibold">Type</th>
+                            <th class="py-3 px-4 text-left whitespace-nowrap font-semibold">Amount</th>
+                            <th class="py-3 px-4 text-left whitespace-nowrap font-semibold">Balance After</th>
+                            <th class="py-3 px-4 text-left whitespace-nowrap font-semibold">Reference ID</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-800 bg-white">
+                        <% if (savingsHistory && savingsHistory.length > 0) { %>
+                            <% savingsHistory.forEach(function(saving) { %>
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                                    <td class="py-2 px-3 text-xs">
+                                        <%= new Date(saving.createdAt).toLocaleDateString() %>
+                                    </td>
+                                    <td class="py-2 px-3 capitalize font-medium text-xs
+                                    <% if (saving.type === 'deposit') { %> text-emerald-600 
+                                    <% } else if (saving.type === 'withdraw_interest') { %> text-red-600 
+                                    <% } else if (saving.type === 'compound_interest') { %> text-indigo-600 
+                                    <% } else { %> text-gray-600 <% } %>">
+                                        <%= saving.type.replace('_', ' ') %>
+                                    </td>
+                                    <td class="py-2 px-3 font-semibold text-xs
+                                    <% if (saving.type === 'deposit') { %> text-emerald-600 
+                                    <% } else if (saving.type === 'withdraw_interest') { %> text-red-600 <% } %>">
+                                        <%= new Intl.NumberFormat(undefined, { style: "currency", currency: currencyCode }).format(saving.amount || 0) %>
+                                    </td>
+                                    <td class="py-2 px-3 text-indigo-600 font-semibold text-xs">
+                                        <%= new Intl.NumberFormat(undefined, { style: "currency", currency: currencyCode }).format(saving.balanceAfter || 0) %>
+                                    </td>
+                                    <td class="py-2 px-3 text-gray-600 text-xs">
+                                        <%= saving.referenceId ? saving.referenceId : 'N/A' %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" class="py-6 px-3 text-center text-gray-500">
+                                    <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fa-solid fa-piggy-bank text-gray-400 text-base"></i>
+                                    </div>
+                                    <p class="text-xs">No savings history found.</p>
                                 </td>
                             </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="loanHistorySection" class="max-w-7xl mx-auto hidden space-y-3">
+            <div class="flex justify-between items-center px-3 bg-white rounded-xl shadow-sm border border-gray-100 p-3">
+                <p class="font-semibold text-gray-700 text-xs">Total Loans:</p>
+                <p class="font-bold text-red-600 text-sm">
+                    <%= currencyCode %> <%= totalLoans ? totalLoans.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00' %>
+                </p>
+            </div>
+
+            <div class="flex justify-end mb-2 px-3">
+                <button id="downloadLoanHistory" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 transition shadow-md">
+                    <i class="fa-solid fa-download mr-1.5 text-xs"></i>Download Loan History
+                </button>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl pb-4 max-h-[650px] bg-white shadow-sm border border-gray-100">
+                <table class="min-w-full text-xs" id="loanTable">
+                    <thead class="bg-indigo-50 text-gray-700 sticky top-0 z-10">
+                        <tr>
+                            <th class="py-2 px-3 text-left whitespace-nowrap font-semibold text-xs">Date</th>
+                            <th class="py-2 px-3 text-left whitespace-nowrap font-semibold text-xs">Reason</th>
+                            <th class="py-2 px-3 text-left whitespace-nowrap font-semibold text-xs">Amount</th>
+                            <th class="py-2 px-3 text-left whitespace-nowrap font-semibold text-xs">Action</th>
+                            <th class="py-2 px-3 text-left whitespace-nowrap font-semibold text-xs">Note</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-800">
+                        <% if (loanHistory && loanHistory.length > 0) { %>
+                            <% loanHistory.forEach(function(loan) { %>
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                                    <td class="py-2 px-3 text-xs">
+                                        <%= new Date(loan.createdAt).toLocaleDateString() %>
+                                    </td>
+                                    <td class="py-2 px-3 capitalize text-xs">
+                                        <%= loan.reason %>
+                                    </td>
+                                    <td class="py-2 px-3 text-red-600 font-semibold text-xs">
+                                        <%= currencyCode %> <%= (loan.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+                                    </td>
+                                    <td class="py-2 px-3 capitalize font-medium text-xs
+                            <% if (loan.action === 'approved' || loan.action === 'repaid') { %> text-emerald-600 
+                            <% } else if (loan.action === 'rejected') { %> text-red-600 
+                            <% } else { %> text-yellow-600 <% } %>">
+                                        <%= loan.action %>
+                                    </td>
+                                    <td class="py-2 px-3 text-gray-600 whitespace-nowrap text-xs">
+                                        <%= loan.statusNote ? loan.statusNote : 'No additional note' %>
+                                    </td>
+                                </tr>
                             <% }); %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="5" class="py-4 px-4 text-center text-gray-500">
-                                            No savings history found.
-                                        </td>
-                                    </tr>
-                                    <% } %>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-
-    <div id="loanHistorySection" class="max-w-7xl mx-auto hidden space-y-4">
-
-        <div class="flex justify-between items-center px-4">
-            <p class="font-semibold text-gray-700">Total Loans:</p>
-            <p class="font-semibold text-red-600">
-                <%= currencyCode %>
-                    <%= totalLoans ? totalLoans.toLocaleString(undefined, { minimumFractionDigits: 2,
-                        maximumFractionDigits: 2 }) : '0.00' %>
-            </p>
-        </div>
-
-        <div class="flex justify-end mb-2 px-4">
-            <button id="downloadLoanHistory" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Download Loan History
-            </button>
-        </div>
-
-        <div class="overflow-x-auto rounded-xl pb-6 max-h-[650px] bg-white shadow">
-            <table class="min-w-full text-sm" id="loanTable">
-                <thead class="bg-blue-100 text-gray-700 sticky top-0 z-10">
-                    <tr>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Date</th>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Reason</th>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Amount</th>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Action</th>
-                        <th class="py-2 px-4 text-left whitespace-nowrap">Note</th>
-                    </tr>
-                </thead>
-                <tbody class="text-gray-800">
-                    <% if (loanHistory && loanHistory.length> 0) { %>
-                        <% loanHistory.forEach(function(loan) { %>
-                            <tr class="border-b">
-                                <td class="py-2 px-4">
-                                    <%= new Date(loan.createdAt).toLocaleDateString() %>
-                                </td>
-                                <td class="py-2 px-4 capitalize">
-                                    <%= loan.reason %>
-                                </td>
-                                <td class="py-2 px-4 text-red-600 font-semibold">
-                                    <%= currencyCode %>
-                                        <%= (loan.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2 }) %>
-                                </td>
-                                <td class="py-2 px-4 capitalize
-                        <% if (loan.action === 'approved' || loan.action === 'repaid') { %> text-green-600 
-                        <% } else if (loan.action === 'rejected') { %> text-red-600 
-                        <% } else { %> text-yellow-600 <% } %>">
-                                    <%= loan.action %>
-                                </td>
-                                <td class="py-2 px-4 text-gray-600 whitespace-nowrap">
-                                    <%= loan.statusNote ? loan.statusNote : 'No additional note' %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" class="py-6 px-3 text-center text-gray-500">
+                                    <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fa-solid fa-hand-holding-dollar text-gray-400 text-base"></i>
+                                    </div>
+                                    <p class="text-xs">No loan history found.</p>
                                 </td>
                             </tr>
-                            <% }); %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="5" class="py-4 px-4 text-center text-gray-500">
-                                            No loan history found.
-                                        </td>
-                                    </tr>
-                                    <% } %>
-                </tbody>
-            </table>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-
-    <div class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t-2 shadow-md z-50">
-        <div class="flex justify-between items-center px-8 py-3 text-xs text-gray-700">
-            <a href="dashboard" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-house text-lg"></i>
-                <span class="mt-1">Home</span>
+    <div class="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-t border-gray-100 z-50">
+        <div class="flex justify-around items-center px-4 py-2.5">
+            <a href="dashboard" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-house text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
             </a>
-            <a href="finance" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-chart-line text-lg"></i>
-                <span class="mt-1">Finance</span>
+            <a href="finance" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
             </a>
-            <a href="cards" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-credit-card text-lg"></i>
-                <span class="mt-1">Cards</span>
+            <a href="cards" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
             </a>
-            <a href="profile" class="flex flex-col items-center text-blue-600 hover:text-blue-800">
-                <i class="fa-solid fa-user text-lg"></i>
-                <span class="mt-1">Me</span>
+            <a href="profile" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
             </a>
         </div>
     </div>
 
-    <script src="/js/frontendfiles/financehistory.js">
-
-    </script>
-
+    <script src="/js/frontendfiles/financehistory.js"></script>
 </body>
 
 </html>

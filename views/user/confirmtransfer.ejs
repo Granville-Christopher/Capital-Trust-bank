@@ -1,141 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Capital Trust Bank - Verify international transfer</title>
+    <title>Capital Trust Bank - Verify Transfer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="icon" type="image/png" sizes="32x32" href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank" />
     <link rel="icon" type="image/png" sizes="16x16" href="https://placehold.co/16x16/2563EB/DBEAFE?text=CTBank" />
     <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/2563EB/DBEAFE?text=CTBank" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563EB" />
-
-    <meta property="og:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta property="og:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://capital-trust-bank-production.up.railway.app/" />
-    <meta property="og:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:site_name" content="Capital Trust Bank" />
-    <meta property="og:locale" content="en_US" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@CTBankOfficial" />
-    <meta name="twitter:creator" content="@CTBankOfficial" />
-    <meta name="twitter:title" content="Capital Trust Bank - Secure & Modern Banking" />
-    <meta name="twitter:description"
-        content="Manage your finances with ease. Secure, fast, and reliable banking services for all your needs." />
-    <meta name="twitter:image" content="https://capital-trust-bank-production.up.railway.app/images/hpg.jpg" />
-
-
+    <meta name="theme-color" content="#4f46e5" />
 </head>
 
-<body class="bg-gradient-to-b from-blue-100 to-gray-100 min-h-screen p-6 relative">
-    <div class="">
-        <a href="/udp/dashboard" class="text-red-600 hover:text-red-800 text-sm no-underline">
-            <i class="fa-solid fa-xmark"></i> Cancel Payment
+<body class="bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50 min-h-screen pb-20">
+    <div class="fixed top-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-b border-gray-100 flex items-center px-4 py-3 z-30 shadow-sm">
+        <a href="/udp/dashboard" class="text-red-600 hover:text-red-700 text-xs font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-xmark text-sm"></i> Cancel Payment
         </a>
     </div>
-    <div class="mb-6 mt-8 flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800">
-            <i class="fa-solid fa-key text-blue-600 mr-2"></i>
-            Transfer Verification
-        </h2>
+
+    <div class="pt-16 px-4 space-y-4">
+        <div class="text-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-2">
+                <i class="fa-solid fa-key text-indigo-600 text-lg"></i>
+            </div>
+            <h2 class="text-base font-bold text-gray-800">Transfer Verification</h2>
+            <p class="text-xs text-gray-500 mt-1">Enter the OTP sent to your email</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 max-w-sm mx-auto mb-4">
+            <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-1.5">
+                <i class="fa-solid fa-money-bill-transfer text-indigo-600 text-sm"></i> Transfer Summary
+            </h3>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center pb-1.5 border-b border-gray-100">
+                    <span class="text-xs font-semibold text-gray-600">Recipient:</span>
+                    <span class="text-xs font-semibold text-gray-800"><%= transferDetails.FullName %></span>
+                </div>
+                <div class="flex justify-between items-center pb-1.5 border-b border-gray-100">
+                    <span class="text-xs font-semibold text-gray-600">Account Number:</span>
+                    <span class="text-xs font-semibold text-gray-800"><%= transferDetails.AccountNumber %></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold text-gray-600">Amount:</span>
+                    <span class="text-base font-bold text-indigo-600">$<%= transferDetails.Amount %></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 max-w-sm mx-auto">
+            <form id="confirmtransfer">
+                <input type="hidden" id="transferId" value="<%= transferDetails._id %>">
+
+                <div class="flex justify-center gap-1.5 mb-4">
+                    <input type="text" maxlength="1" class="otp-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                    <input type="text" maxlength="1" class="otp-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                    <input type="text" maxlength="1" class="otp-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                    <input type="text" maxlength="1" class="otp-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                    <input type="text" maxlength="1" class="otp-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                    <input type="text" maxlength="1" class="otp-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                </div>
+
+                <!-- Payment PIN Section -->
+                <div class="mt-4">
+                    <p class="text-xs font-semibold text-gray-700 mb-2 text-center">Enter your 4-digit Payment PIN</p>
+                    <div class="flex justify-center gap-2">
+                        <input type="password" maxlength="1" class="pin-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                        <input type="password" maxlength="1" class="pin-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                        <input type="password" maxlength="1" class="pin-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                        <input type="password" maxlength="1" class="pin-box w-10 h-12 text-center text-base font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                    </div>
+                </div>
+
+                <button type="submit" id="confirmBtn"
+                    class="w-full mt-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition font-semibold shadow-md text-sm">
+                    <span id="confirmText">Verify Transfer</span>
+                    <svg id="confirmSpinner" class="animate-spin h-4 w-4 ml-2 hidden text-white inline"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
     </div>
-    <div class="bg-white rounded-xl shadow p-6 max-w-sm mx-auto text-left mb-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-3">
-            <i class="fa-solid fa-money-bill-transfer text-blue-600 mr-2"></i> Transfer Summary
-        </h3>
-        <p class="text-sm text-gray-700">
-            <span class="font-medium">Recipient:</span>
-            <%= transferDetails.FullName %>
-        </p>
-        <p class="text-sm text-gray-700">
-            <span class="font-medium">Account Number:</span>
-            <%= transferDetails.AccountNumber %>
-        </p>
-        <p class="text-sm text-gray-700">
-            <span class="font-medium">Amount:</span>
-            $<%= transferDetails.Amount %>
-        </p>
-    </div>
-    <div class="bg-white rounded-xl shadow p-6 max-w-sm mx-auto text-center">
-        <form id="confirmtransfer">
-            <input type="hidden" id="transferId" value="<%= transferDetails._id %>">
 
-            <p class="text-sm text-gray-600 mb-3">Enter the 6-digit OTP sent to your email</p>
-            <div class="flex justify-center gap-2 mb-6">
-                <input type="text" maxlength="1" class="otp-box" />
-                <input type="text" maxlength="1" class="otp-box" />
-                <input type="text" maxlength="1" class="otp-box" />
-                <input type="text" maxlength="1" class="otp-box" />
-                <input type="text" maxlength="1" class="otp-box" />
-                <input type="text" maxlength="1" class="otp-box" />
+    <!-- Success/Failure Modal -->
+    <div id="transferModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-xs w-full mx-4 text-center">
+            <!-- Success/Pending Icon -->
+            <div id="successIcon" class="hidden mb-4">
+                <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto">
+                    <i class="fa-solid fa-clock-rotate-left text-amber-600 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mt-3">Transfer Pending</h3>
+                <p id="successMessage" class="text-sm text-gray-500 mt-1">Your payment is being processed and will be completed within 2 hours.</p>
             </div>
-
-            <p class="text-sm text-gray-600 mb-3">Enter your 4-digit Payment PIN</p>
-            <div class="flex justify-center gap-2 mb-6">
-                <input type="password" maxlength="1" class="pin-box" />
-                <input type="password" maxlength="1" class="pin-box" />
-                <input type="password" maxlength="1" class="pin-box" />
-                <input type="password" maxlength="1" class="pin-box" />
+            <!-- Failure Icon -->
+            <div id="failureIcon" class="hidden mb-4">
+                <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto">
+                    <i class="fa-solid fa-xmark text-red-600 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mt-3">Transfer Failed</h3>
+                <p id="errorMessage" class="text-sm text-gray-500 mt-1">Something went wrong. Please try again.</p>
             </div>
-
-            <button type="submit"
-                class="w-full py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition">
-                <i class="fa-solid fa-check-circle mr-2"></i> Confirm Transfer
-            </button>
-        </form>
-    </div>
-
-    <div id="transferModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center relative animate-fadeIn">
-
-            <div id="successIcon" class="mb-4 hidden"> <i
-                    class="fa-solid fa-circle-check text-green-500 text-5xl animate-bounce"></i>
-                <h3 class="mt-2 text-xl font-semibold text-gray-800">Transfer Successful</h3>
-                <p class="text-sm text-gray-500" id="successMessage">Your transaction was completed.</p>
-            </div>
-
-            <div id="failureIcon" class="mb-4 hidden"> <i
-                    class="fa-solid fa-circle-xmark text-red-500 text-5xl animate-shake"></i>
-                <h3 class="mt-2 text-xl font-semibold text-gray-800">Transfer Failed</h3>
-                <p class="text-sm text-gray-500" id="errorMessage">Something went wrong. Please try again.</p>
-            </div>
-
-            <button onclick="closeModal()"
-                class="mt-6 w-full py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+            <button onclick="closeModal()" class="mt-4 w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold text-sm">
                 Close
             </button>
         </div>
     </div>
 
-    <style>
-        .otp-box,
-        .pin-box {
-            width: 2.5rem;
-            height: 2.5rem;
-            text-align: center;
-            font-size: 1.25rem;
-            border: 2px solid #3b82f6;
-            border-radius: 9999px;
-            outline: none;
-        }
-
-        .otp-box:focus,
-        .pin-box:focus {
-            box-shadow: 0 0 0 2px #3b82f6;
-        }
-    </style>
-
+    <div class="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-lg border-t border-gray-100 z-50">
+        <div class="flex justify-around items-center px-4 py-2.5">
+            <a href="/udp/dashboard" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-house text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Home</span>
+            </a>
+            <a href="/udp/finance" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Finance</span>
+            </a>
+            <a href="/udp/cards" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-credit-card text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Cards</span>
+            </a>
+            <a href="/udp/profile" class="flex flex-col items-center gap-0.5 text-gray-600">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+                <span class="text-xs font-medium">Profile</span>
+            </a>
+        </div>
+    </div>
     <script src="/js/auth/confirmtransfer.js"></script>
-
 </body>
 
 </html>

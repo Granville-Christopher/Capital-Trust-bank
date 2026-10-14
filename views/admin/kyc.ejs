@@ -16,13 +16,16 @@
       href="https://placehold.co/32x32/2563EB/DBEAFE?text=CTBank"
     />
   </head>
-  <body class="bg-gray-100 min-h-screen">
+  <body class="bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50 min-h-screen">
     <%- include('partials/header') %> <%- include('partials/sidebar') %>
 
     <main class="ml-0 lg:ml-64 mt-20 p-6">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">KYC Verification</h1>
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">KYC Verification</h1>
+        <p class="text-sm text-gray-600">Review and verify user identity documents and information.</p>
+      </div>
 
-      <div class="bg-white rounded-xl shadow p-6">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
         <div class="overflow-x-auto">
           <table class="min-w-full table-auto">
             <thead>
@@ -88,43 +91,59 @@
       </div>
     </main>
 
-    <%- include('partials/footer') %> <%- include('partials/toastalerts') %>
+    <%- include('partials/footer') %> <%- include('partials/toastalerts') %> <%- include('partials/confirmation-modal') %>
 
     <script>
       async function approveKYC(kycId) {
-        if (!confirm("Are you sure you want to approve this KYC?")) return;
-        try {
-          const response = await fetch(`/admin/kyc/${kycId}/approve`, {
-            method: "POST",
-          });
-          const result = await response.json();
-          if (response.ok) {
-            showToast("success", result.message);
-            setTimeout(() => location.reload(), 1500);
-          } else {
-            showToast("error", result.error || "Approval failed");
-          }
-        } catch (err) {
-          showToast("error", "Server error");
-        }
+        showConfirmation(
+          'Approve KYC',
+          'Are you sure you want to approve this KYC verification? The user will be verified.',
+          async () => {
+            try {
+              const response = await fetch(`/admin/kyc/${kycId}/approve`, {
+                method: "POST",
+              });
+              const result = await response.json();
+              if (response.ok) {
+                showSuccess('Success', result.message, () => {
+                  setTimeout(() => location.reload(), 1000);
+                });
+              } else {
+                showError('Error', result.error || "Approval failed");
+              }
+            } catch (err) {
+              showError('Error', "Server error. Please try again.");
+            }
+          },
+          'Approve',
+          'Cancel'
+        );
       }
 
       async function declineKYC(kycId) {
-        if (!confirm("Are you sure you want to decline this KYC?")) return;
-        try {
-          const response = await fetch(`/admin/kyc/${kycId}/decline`, {
-            method: "POST",
-          });
-          const result = await response.json();
-          if (response.ok) {
-            showToast("success", result.message);
-            setTimeout(() => location.reload(), 1500);
-          } else {
-            showToast("error", result.error || "Decline failed");
-          }
-        } catch (err) {
-          showToast("error", "Server error");
-        }
+        showConfirmation(
+          'Decline KYC',
+          'Are you sure you want to decline this KYC verification? This action cannot be undone.',
+          async () => {
+            try {
+              const response = await fetch(`/admin/kyc/${kycId}/decline`, {
+                method: "POST",
+              });
+              const result = await response.json();
+              if (response.ok) {
+                showSuccess('Success', result.message, () => {
+                  setTimeout(() => location.reload(), 1000);
+                });
+              } else {
+                showError('Error', result.error || "Decline failed");
+              }
+            } catch (err) {
+              showError('Error', "Server error. Please try again.");
+            }
+          },
+          'Decline',
+          'Cancel'
+        );
       }
     </script>
   </body>
